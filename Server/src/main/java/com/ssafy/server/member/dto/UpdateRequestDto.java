@@ -10,10 +10,9 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-@Schema(title = "MemberInfoDto : 회원 정보", description = "회원의 정보를 나타낸다.")
-public class MemberInfoDto {
-
-	@Schema(description = "아이디", example = "snoopy")
+@Schema(title = "UpdateRequestDto : 수정할 회원 정보", description = "수정할 회원의 정보를 나타낸다.")
+public class UpdateRequestDto {
+    @Schema(description = "아이디", example = "snoopy")
     private String userId;
     @Schema(description = "이름", example = "스누피")
     private String userName;
@@ -23,6 +22,4 @@ public class MemberInfoDto {
     private String emailId;
     @Schema(description = "이메일 도메인", example = "gmail.com")
     private String emailDomain;
-    @Schema(description = "프로필 사진 저장 경로")
-    private String profileSavePath;
 }

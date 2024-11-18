@@ -1,28 +1,43 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.server.member.mapper.FileMapper">
 
-	<resultMap id="fileInfo" type="fileInfoDto">
+	<resultMap id="file" type="com.ssafy.server.member.dto.FileInfoDto">
 		<result property="fileId" column="file_id" />
+		<result property="userId" column="user_id" />
 		<result property="originalName" column="original_name" />
 		<result property="savePath" column="save_path" />
 	</resultMap>
 
+	<!-- 파일 업로드 -->
 	<insert id="uploadFile" parameterType="com.ssafy.server.member.dto.FileInfoDto">
-		INSERT INTO fileinfo (original_name, save_path)
-		VALUES (#{originalName}, #{savePath})
-		<selectKey keyProperty="fileId" resultType="int"
-			order="AFTER">
+		INSERT INTO fileinfo (user_id, original_name, save_path)
+		VALUES (#{userId}, #{originalName}, #{savePath})
+		<selectKey keyProperty="fileId" resultType="int" order="AFTER">
 			SELECT LAST_INSERT_ID()
 		</selectKey>
 	</insert>
 
-
-	<select id="getFileInfoByUserId" parameterType="String" resultMap="fileInfo">
-		SELECT f.file_id, f.original_name, f.save_path
-		FROM fileinfo f
-		JOIN members m ON m.profile_id = f.file_id
-		WHERE m.user_id = #{userId}
+	<!-- 사용자 ID로 파일 정보 가져오기 -->
+	<select id="getFileInfoByUserId" parameterType="String" resultMap="file">
+		SELECT file_id, user_id, original_name, save_path
+		FROM fileinfo
+		WHERE user_id = #{userId}
+		ORDER BY upload_date DESC
+			LIMIT 1
 	</select>
+
+	<!-- 파일 ID로 파일 삭제 -->
+	<delete id="deleteFileById" parameterType="int">
+		DELETE FROM fileinfo
+		WHERE file_id = #{fileId}
+	</delete>
+
+	<!-- 사용자 ID로 파일 삭제 -->
+	<delete id="deleteFileByUserId" parameterType="String">
+		DELETE FROM fileinfo
+		WHERE user_id = #{userId}
+	</delete>
+
 </mapper>

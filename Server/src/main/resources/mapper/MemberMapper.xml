@@ -26,10 +26,16 @@
 	</insert>
 
 	<!-- 회원 정보 조회 -->
-	<select id="userInfo" parameterType="string" resultMap="member">
-		select user_name, user_id, email_id, email_domain, join_date
-		from members
-		where user_id = #{userId}
+	<select id="findByUserId" parameterType="string" resultMap="member">
+		SELECT
+			user_id,
+			user_name,
+			email_id,
+			email_domain
+		FROM
+			members
+		WHERE
+			user_id = #{userId};
 	</select>
 	
 	<!-- 회원 정보 수정 -->
@@ -43,21 +49,11 @@
         WHERE
             user_id = #{userId}
 	</update>
- 	
- 	<!-- 프로필 이미지 업데이트 -->
-    <update id="updateProfileImage" parameterType="map">
-	    UPDATE members
-	    SET profile_id = #{fileId}
-	    WHERE user_id = #{userId}
-	</update>
 
-
-    <!-- 프로필 이미지 조회 -->
-    <select id="findProfileImage" resultType="String">
-        SELECT profile_img
-        FROM members
-        WHERE user_id = #{userId}
-    </select>
+	<!-- 회원 삭제 -->
+	<delete id="deleteByUserId" parameterType="String">
+		DELETE FROM members WHERE user_id = #{userId}
+	</delete>
  	
 
 	<update id="saveRefreshToken" parameterType="map">

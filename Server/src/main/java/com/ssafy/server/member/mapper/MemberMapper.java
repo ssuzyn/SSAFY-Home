@@ -1,6 +1,7 @@
 package com.ssafy.server.member.mapper;
 
 
+import com.ssafy.server.member.dto.UpdateRequestDto;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -14,11 +15,9 @@ public interface MemberMapper {
 
 	MemberInfoDto login(LoginRequestDto memberDto) throws SQLException;
     void register(MemberInfoDto memberDto) throws SQLException;
-    MemberInfoDto userInfo(String userId) throws SQLException;
-	void updateUserInfo(MemberInfoDto memberDto) throws Exception;
-	
-	void updateProfileImage(String userId, int fileId);
-	String findProfileImage(String userId);
+    MemberInfoDto findByUserId(String userId) throws SQLException;
+	void updateUserInfo(UpdateRequestDto memberDto) throws SQLException;
+    void deleteByUserId(String userId) throws SQLException;
 	
     void saveRefreshToken(Map<String, String> map) throws SQLException;
     Object getRefreshToken(String userid) throws SQLException;

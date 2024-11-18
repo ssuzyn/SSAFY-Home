@@ -1,8 +1,11 @@
 package com.ssafy.server.member.service;
 
+import com.ssafy.server.member.dto.FileInfoDto;
+import com.ssafy.server.member.dto.UpdateRequestDto;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.server.member.dto.LoginRequestDto;
@@ -10,14 +13,11 @@ import com.ssafy.server.member.dto.MemberInfoDto;
 import com.ssafy.server.member.mapper.MemberMapper;
 
 @Service
+@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 	
 	private final MemberMapper memberMapper;
-
-	public MemberServiceImpl(MemberMapper memberMapper) {
-		super();
-		this.memberMapper = memberMapper;
-	}
+	private final FileService fileService;
 
 	@Override
 	public MemberInfoDto login(LoginRequestDto memberDto) throws Exception {
@@ -31,12 +31,23 @@ public class MemberServiceImpl implements MemberService {
 	
 	@Override
 	public MemberInfoDto userInfo(String userId) throws Exception {
-		return memberMapper.userInfo(userId);
+		MemberInfoDto memberDto = memberMapper.findByUserId(userId);
+		FileInfoDto fileInfoDto = fileService.getProfileImage(userId);
+		memberDto.setProfileSavePath(fileInfoDto.getSavePath());
+		return memberDto;
 	}
 	
 	@Override
-	public void updateUserInfo(MemberInfoDto memberDto) throws Exception {
+	public void updateUserInfo(UpdateRequestDto memberDto) throws Exception {
 		memberMapper.updateUserInfo(memberDto);
+	}
+
+	public void deleteUser(String userId) throws Exception {
+		// 1. 회원의 프로필 파일 삭제
+		fileService.deleteFilesByUserId(userId);
+
+		// 2. 회원 삭제
+		memberMapper.deleteByUserId(userId);
 	}
 
 	@Override
