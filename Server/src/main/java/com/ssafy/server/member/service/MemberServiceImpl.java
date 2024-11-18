@@ -1,10 +1,13 @@
 package com.ssafy.server.member.service;
 
-import com.ssafy.server.member.dto.MemberDto;
-import com.ssafy.server.member.mapper.MemberMapper;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.springframework.stereotype.Service;
+
+import com.ssafy.server.member.dto.LoginRequestDto;
+import com.ssafy.server.member.dto.MemberInfoDto;
+import com.ssafy.server.member.mapper.MemberMapper;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -17,18 +20,23 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public MemberDto login(MemberDto memberDto) throws Exception {
+	public MemberInfoDto login(LoginRequestDto memberDto) throws Exception {
 		return memberMapper.login(memberDto);
 	}
 
 	@Override
-	public void register(MemberDto memberDto) throws Exception {
+	public void register(MemberInfoDto memberDto) throws Exception {
 		memberMapper.register(memberDto);  // 회원가입 처리
 	}
 	
 	@Override
-	public MemberDto userInfo(String userId) throws Exception {
+	public MemberInfoDto userInfo(String userId) throws Exception {
 		return memberMapper.userInfo(userId);
+	}
+	
+	@Override
+	public void updateUserInfo(MemberInfoDto memberDto) throws Exception {
+		memberMapper.updateUserInfo(memberDto);
 	}
 
 	@Override
@@ -51,5 +59,7 @@ public class MemberServiceImpl implements MemberService {
 		map.put("token", null);
 		memberMapper.deleteRefreshToken(map);
 	}
+
+	
 
 }

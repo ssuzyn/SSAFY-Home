@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -40,13 +41,22 @@ public class WebConfiguration implements WebMvcConfigurer {
             .maxAge(1800); // Pre-flight Caching
     }
 
-//	@Override
-//	public void addInterceptors(InterceptorRegistry registry) {
-//		registry.addInterceptor(jwtInterceptor);
-//	}
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(jwtInterceptor)
+                .addPathPatterns("/**") // 모든 경로에 적용
+                .excludePathPatterns(
+                    "/user/login", 
+                    "/user/register", 
+                    "/swagger-ui/**", // Swagger UI 경로
+                    "/v3/api-docs/**", // API Docs 경로
+                    "/v3/api-docs" // 추가적인 API Docs 경로
+                );
+    }
+
 
     //	Swagger UI 실행시 404처리
-//	Swagger2 일경우
+    //	Swagger2 일경우
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/img/**").addResourceLocations("classpath:/static/assets/img/");

@@ -1,21 +1,21 @@
 package com.ssafy.server.util;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.ssafy.server.exception.UnAuthorizedException;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
-import java.io.UnsupportedEncodingException;
-import java.security.SignatureException;
-import java.util.Date;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
@@ -113,7 +113,7 @@ public class JWTUtil {
 			claims = Jwts.parserBuilder().setSigningKey(this.generateKey()).build().parseClaimsJws(authorization);
 		} catch (Exception e) {
 			log.error(e.getMessage());
-			throw new UnAuthorizedException();
+			throw new UnAuthorizedException("JWT 검증 실패");
 		}
 		Map<String, Object> value = claims.getBody();
 		log.info("value : {}", value);

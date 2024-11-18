@@ -135,6 +135,12 @@ JOIN (
     AND hd.`floor` = latest.`floor` 
     AND CONCAT(hd.`deal_year`, LPAD(hd.`deal_month`, 2, '0'), LPAD(hd.`deal_day`, 2, '0')) = latest.latest_date;
 
+ALTER TABLE `latest_housedeals`
+ADD CONSTRAINT `fk_latest_housedeals_apt_seq`
+FOREIGN KEY (`apt_seq`)
+REFERENCES `houseinfos` (`apt_seq`)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 LOCK TABLES `members` WRITE;
 /*!40000 ALTER TABLE `members` DISABLE KEYS */;

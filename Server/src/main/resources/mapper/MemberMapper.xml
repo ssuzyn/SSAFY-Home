@@ -4,14 +4,12 @@
 
 <mapper namespace="com.ssafy.server.member.mapper.MemberMapper">
 
-	<resultMap id="member" type="com.ssafy.server.member.dto.MemberDto">
+	<resultMap id="member" type="com.ssafy.server.member.dto.MemberInfoDto">
 		<result column="user_id" property="userId"/>
 		<result column="user_name" property="userName"/>
 		<result column="user_pwd" property="userPwd"/>
 		<result column="email_id" property="emailId"/>
 		<result column="email_domain" property="emailDomain"/>
-		<result column="join_date" property="joinDate"/>
-		<result column="token" property="token"/>
 	</resultMap>
 
 	<select id="login" parameterType="map" resultMap="member">
@@ -30,6 +28,18 @@
 		from members
 		where user_id = #{userId}
 	</select>
+	
+	<update id="updateUserInfo" parameterType="map">
+		UPDATE members
+        SET
+            user_name = #{userName},
+            user_pwd = #{userPwd},
+            email_id = #{emailId},
+            email_domain = #{emailDomain}
+        WHERE
+            user_id = #{userId}
+	</update>
+ 	
 
 	<update id="saveRefreshToken" parameterType="map">
 		update members

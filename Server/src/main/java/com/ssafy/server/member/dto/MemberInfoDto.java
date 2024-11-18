@@ -1,0 +1,26 @@
+package com.ssafy.server.member.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
+@Schema(title = "MemberInfoDto : 회원 정보", description = "회원의 정보를 나타낸다.")
+public class MemberInfoDto {
+
+	@Schema(description = "아이디", example = "snoopy")
+    private String userId;
+    @Schema(description = "이름", example = "스누피")
+    private String userName;
+    @Schema(description = "비밀번호", example = "1234")
+    private String userPwd;
+    @Schema(description = "이메일 아이디", example = "snoopy")
+    private String emailId;
+    @Schema(description = "이메일 도메인", example = "gmail.com")
+    private String emailDomain;
+}

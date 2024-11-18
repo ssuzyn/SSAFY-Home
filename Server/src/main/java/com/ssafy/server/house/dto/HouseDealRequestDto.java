@@ -13,9 +13,9 @@ import lombok.ToString;
 @Schema(title = "HouseDealRequestDto : 아파트 실거래가 요청 정보", description = "")
 public class HouseDealRequestDto {
 
-	@Schema(description = "동 코드")
+	@Schema(description = "동 코드", example="2726011300")
 	private String dongCode;
 	
-	@Schema(description = "아파트 이름")
+	@Schema(description = "아파트 이름", example="하늘채")
 	private String aptNm;
 }
