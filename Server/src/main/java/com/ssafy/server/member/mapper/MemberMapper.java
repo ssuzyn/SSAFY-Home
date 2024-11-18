@@ -16,6 +16,10 @@ public interface MemberMapper {
     void register(MemberInfoDto memberDto) throws SQLException;
     MemberInfoDto userInfo(String userId) throws SQLException;
 	void updateUserInfo(MemberInfoDto memberDto) throws Exception;
+	
+	void updateProfileImage(String userId, int fileId);
+	String findProfileImage(String userId);
+	
     void saveRefreshToken(Map<String, String> map) throws SQLException;
     Object getRefreshToken(String userid) throws SQLException;
     void deleteRefreshToken(Map<String, String> map) throws SQLException;

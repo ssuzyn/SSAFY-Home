@@ -4,39 +4,41 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.server.member.dto.LoginRequestDto;
 import com.ssafy.server.member.dto.MemberInfoDto;
+import com.ssafy.server.member.service.FileService;
 import com.ssafy.server.member.service.MemberService;
 import com.ssafy.server.util.JWTUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/user")
 @Tag(name = "회원 인증 컨트롤러", description = "로그인 로그아웃, 회원 정보 처리하는 클래스.")
 @Slf4j
 public class MemberController {
 
     private final MemberService memberService;
+    private final FileService fileService;
     private final JWTUtil jwtUtil;
-
-    public MemberController(MemberService memberService, JWTUtil jwtUtil) {
-        super();
-        this.memberService = memberService;
-        this.jwtUtil = jwtUtil;
-    }
 
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 이용하여 로그인 처리.")
     @PostMapping("/login")
@@ -142,6 +144,34 @@ public class MemberController {
         } catch (Exception e) {
             log.error("회원 정보 수정 중 에러 발생: {}", e.getMessage(), e);
             resultMap.put("message", "회원 정보 수정 중 문제가 발생했습니다.");
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(resultMap, status);
+    }
+    
+    @PostMapping(value= "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+    	    summary = "회원 사진 업로드",
+    	    description = "회원 사진 파일을 업로드합니다."
+    	)
+    public ResponseEntity<Map<String, Object>> uploadFile(
+        HttpServletRequest request,
+        @RequestParam("file") @Parameter(description = "업로드할 프로필 사진 파일", required = true, 
+                content = @Content(mediaType = "multipart/form-data")) MultipartFile file) {
+        
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status;
+
+        try {
+            String userId = (String) request.getAttribute("userId");
+            fileService.uploadFile(userId, file);
+
+            resultMap.put("message", "파일 업로드 성공");
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            log.error("파일 업로드 중 오류 발생: {}", e.getMessage(), e);
+            resultMap.put("message", "파일 업로드 중 문제가 발생했습니다.");
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.server.member.mapper.FileMapper">
+
+	<resultMap id="fileInfo" type="fileInfoDto">
+		<result property="fileId" column="file_id" />
+		<result property="originalName" column="original_name" />
+		<result property="savePath" column="save_path" />
+	</resultMap>
+
+	<insert id="uploadFile" parameterType="com.ssafy.server.member.dto.FileInfoDto">
+		INSERT INTO fileinfo (original_name, save_path)
+		VALUES (#{originalName}, #{savePath})
+		<selectKey keyProperty="fileId" resultType="int"
+			order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+
+	<select id="getFileInfoByUserId" parameterType="String" resultMap="fileInfo">
+		SELECT f.file_id, f.original_name, f.save_path
+		FROM fileinfo f
+		JOIN members m ON m.profile_id = f.file_id
+		WHERE m.user_id = #{userId}
+	</select>
+</mapper>

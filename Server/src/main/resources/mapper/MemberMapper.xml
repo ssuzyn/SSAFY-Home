@@ -12,23 +12,27 @@
 		<result column="email_domain" property="emailDomain"/>
 	</resultMap>
 
+	<!-- 로그인 -->
 	<select id="login" parameterType="map" resultMap="member">
 		select user_id, user_name, token
 		from members
 		where user_id = #{userId} and user_pwd = #{userPwd}
 	</select>
 
+	<!-- 회원 가입 -->
 	<insert id="register" parameterType="map">
 		INSERT INTO members (user_id, user_name, user_pwd, email_id, email_domain, join_date)
 		VALUES (#{userId}, #{userName}, #{userPwd}, #{emailId}, #{emailDomain}, NOW());
 	</insert>
 
+	<!-- 회원 정보 조회 -->
 	<select id="userInfo" parameterType="string" resultMap="member">
 		select user_name, user_id, email_id, email_domain, join_date
 		from members
 		where user_id = #{userId}
 	</select>
 	
+	<!-- 회원 정보 수정 -->
 	<update id="updateUserInfo" parameterType="map">
 		UPDATE members
         SET
@@ -39,6 +43,21 @@
         WHERE
             user_id = #{userId}
 	</update>
+ 	
+ 	<!-- 프로필 이미지 업데이트 -->
+    <update id="updateProfileImage" parameterType="map">
+	    UPDATE members
+	    SET profile_id = #{fileId}
+	    WHERE user_id = #{userId}
+	</update>
+
+
+    <!-- 프로필 이미지 조회 -->
+    <select id="findProfileImage" resultType="String">
+        SELECT profile_img
+        FROM members
+        WHERE user_id = #{userId}
+    </select>
  	
 
 	<update id="saveRefreshToken" parameterType="map">

@@ -23,4 +23,6 @@ public class MemberInfoDto {
     private String emailId;
     @Schema(description = "이메일 도메인", example = "gmail.com")
     private String emailDomain;
+    @Schema(description = "프로필 사진", example = "")
+    private String profileId;
 }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 
@@ -21,14 +22,26 @@ public class SwaggerConfiguration {
 
 	@Bean
 	public OpenAPI api() {
-		SecurityScheme apiKey = new SecurityScheme().type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.HEADER)
-				.name("Authorization");
+	    // Security 설정
+	    SecurityScheme apiKey = new SecurityScheme().type(SecurityScheme.Type.APIKEY)
+	            .in(SecurityScheme.In.HEADER)
+	            .name("Authorization");
 
-		SecurityRequirement securityRequirement = new SecurityRequirement().addList("Bearer Token");
+	    SecurityRequirement securityRequirement = new SecurityRequirement().addList("Bearer Token");
 
-		return new OpenAPI().components(new Components().addSecuritySchemes("Bearer Token", apiKey))
-				.addSecurityItem(securityRequirement);
+	    // 파일 업로드용 스키마 추가
+	    Schema<?> multipartSchema = new Schema<String>()
+	            .type("string")
+	            .format("binary")
+	            .description("업로드할 파일");
+
+	    return new OpenAPI()
+	            .components(new Components()
+	                .addSecuritySchemes("Bearer Token", apiKey)
+	                .addSchemas("MultipartFile", multipartSchema)) // 파일 스키마 추가
+	            .addSecurityItem(securityRequirement);
 	}
+
 
 	@Bean
 	public GroupedOpenApi allApi() {
