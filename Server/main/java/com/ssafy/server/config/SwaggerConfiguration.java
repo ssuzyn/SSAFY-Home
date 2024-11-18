@@ -1,15 +1,14 @@
 package com.ssafy.server.config;
 
-import org.springdoc.core.models.GroupedOpenApi;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.models.GroupedOpenApi;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 //Swagger-UI 확인
 //http://localhost/vue/swagger-ui/index.html
@@ -67,11 +66,6 @@ public class SwaggerConfiguration {
 	@Bean
 	public GroupedOpenApi mapApi() {
 		return GroupedOpenApi.builder().group("ssafy-map").pathsToMatch("/map/**").build();
-	}
-	
-	@Bean
-	public GroupedOpenApi houseApi() {
-		return GroupedOpenApi.builder().group("ssafy-house").pathsToMatch("/house/**").build();
 	}
 	
 }

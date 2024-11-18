@@ -62,10 +62,10 @@ CREATE TABLE IF NOT EXISTS `comments` (
 
 
 CREATE TABLE `sidocodes` (
-  `sido_code` varchar(10) NOT NULL,
-  `sido_name` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`sido_code`),
-  UNIQUE KEY `sido_name` (`sido_name`)
+  `sidoCode` varchar(10) NOT NULL,
+  `sidoName` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`sidoCode`),
+  UNIQUE KEY `sidoName` (`sidoName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `guguncodes` (
@@ -89,52 +89,6 @@ SET SQL_SAFE_UPDATES = 0;
 UPDATE houseinfos h
 JOIN dongcodes d ON CONCAT(h.sgg_cd, h.umd_cd) = d.dong_code
 SET h.dong_code = d.dong_code;
-
-CREATE TABLE IF NOT EXISTS `latest_housedeals` (
-  `no` INT NOT NULL AUTO_INCREMENT,
-  `apt_seq` VARCHAR(20) NOT NULL,
-  `apt_dong` VARCHAR(40) NULL DEFAULT NULL,
-  `floor` VARCHAR(3) NULL DEFAULT NULL,
-  `deal_year` INT NOT NULL,
-  `deal_month` INT NOT NULL,
-  `deal_day` INT NOT NULL,
-  `exclu_use_ar` DECIMAL(7,2) NULL DEFAULT NULL,
-  `deal_amount` VARCHAR(10) NULL DEFAULT NULL,
-  PRIMARY KEY (`no`),
-  UNIQUE KEY `unique_apt_floor` (`apt_seq`, `floor`),
-  INDEX `apt_seq_index` (`apt_seq` ASC)
-)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
-INSERT IGNORE INTO `latest_housedeals` (`apt_seq`, `apt_dong`, `floor`, `deal_year`, `deal_month`, `deal_day`, `exclu_use_ar`, `deal_amount`)
-SELECT 
-    hd.`apt_seq`, 
-    hd.`apt_dong`, 
-    hd.`floor`, 
-    hd.`deal_year`, 
-    hd.`deal_month`, 
-    hd.`deal_day`, 
-    hd.`exclu_use_ar`, 
-    hd.`deal_amount`
-FROM 
-    `housedeals` hd
-JOIN (
-    SELECT 
-        `apt_seq`, 
-        `floor`, 
-        MAX(CONCAT(`deal_year`, LPAD(`deal_month`, 2, '0'), LPAD(`deal_day`, 2, '0'))) AS latest_date
-    FROM 
-        `housedeals`
-    GROUP BY 
-        `apt_seq`, `floor`
-) latest ON 
-    hd.`apt_seq` = latest.`apt_seq` 
-    AND hd.`floor` = latest.`floor` 
-    AND CONCAT(hd.`deal_year`, LPAD(hd.`deal_month`, 2, '0'), LPAD(hd.`deal_day`, 2, '0')) = latest.latest_date;
-
 
 LOCK TABLES `members` WRITE;
 /*!40000 ALTER TABLE `members` DISABLE KEYS */;
