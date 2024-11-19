@@ -1,15 +1,16 @@
+<script setup>
+import AppHeader from '@/components/layout/AppHeader.vue';
+</script>
+
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 w-full">
-    <Header />
+    <AppHeader />
     <main class="flex-grow w-full">
-      <router-view></router-view>
+      <RouterView></RouterView>
     </main>
   </div>
 </template>
 
-<script setup>
-import Header from './components/Header.vue';
-</script>
 
 <style>
 body, html {

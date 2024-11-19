@@ -65,12 +65,12 @@
             deal_day DESC;
     </select>
 
-    <!-- 동코드로 아파트 실거래 정보 조회 -->
-    <select id="getDealsByDong" parameterType="string" resultMap="HouseDealResponseMap">
-        SELECT 
-        	hi.apt_seq,
-	        hi.apt_nm, 
-	        lhd.floor, 
+
+	<select id="getDeals" parameterType="map" resultMap="HouseDealResponseMap">
+	    SELECT
+	        hi.apt_seq,
+	        hi.apt_nm,
+	        lhd.floor,
 	        lhd.exclu_use_ar,
 	        lhd.deal_amount,
 	        lhd.deal_year,
@@ -78,58 +78,19 @@
 	        lhd.deal_day,
 	        hi.latitude,
 	        hi.longitude
-	    FROM 
+	    FROM
 	        latest_housedeals lhd
-	    JOIN 
+	    JOIN
 	        houseinfos hi ON lhd.apt_seq = hi.apt_seq
-	    WHERE 
-	        hi.dong_code = #{dongCode};
-    </select>
-
-    <!-- 특정 아파트 이름으로 실거래 정보 조회 -->
-    <select id="getDealsByAptName" parameterType="string" resultMap="HouseDealResponseMap">
-        SELECT 
-        	hi.apt_seq,
-	        hi.apt_nm, 
-	        lhd.floor, 
-	        lhd.exclu_use_ar,
-	        lhd.deal_amount,
-	        lhd.deal_year,
-	        lhd.deal_month,
-	        lhd.deal_day,
-	        hi.latitude,
-	        hi.longitude
-	    FROM 
-	        latest_housedeals lhd
-	    JOIN 
-	        houseinfos hi ON lhd.apt_seq = hi.apt_seq
-	    JOIN 
-	        dongcodes dc ON hi.umd_nm = dc.dong_name
-	    WHERE 
-	        hi.apt_nm LIKE CONCAT('%', #{aptName}, '%')
-    </select>
-
-	<!-- 동 코드 & 아파트 이름으로 실거래 정보 조회 -->
-    <select id="getDealsByDongAndAptName" parameterType="string" resultMap="HouseDealResponseMap">
-        SELECT 
-        	hi.apt_seq,
-		    hi.apt_nm, 
-		    lhd.floor, 
-		    lhd.exclu_use_ar, 
-		    lhd.deal_amount, 
-		    lhd.deal_year, 
-		    lhd.deal_month, 
-		    lhd.deal_day, 
-		    hi.latitude, 
-		    hi.longitude
-		FROM 
-		    latest_housedeals lhd
-		JOIN 
-		    houseinfos hi ON lhd.apt_seq = hi.apt_seq
-		WHERE 
-		    hi.dong_code = #{dongCode}
-		    AND hi.apt_nm LIKE CONCAT('%', #{aptName}, '%')
-    </select>
+	    <where>
+	        <if test="dongCode != null and dongCode != ''">
+	            AND hi.dong_code = #{dongCode}
+	        </if>
+	        <if test="aptName != null and aptName != ''">
+	            AND hi.apt_nm LIKE CONCAT('%', #{aptName}, '%')
+	        </if>
+	    </where>
+	</select>
 	
 
     <!-- 동코드로 시, 군, 동 정보 조회 -->

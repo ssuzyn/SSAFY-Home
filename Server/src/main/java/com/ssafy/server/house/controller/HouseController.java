@@ -55,38 +55,26 @@ public class HouseController {
 
     @PostMapping("/getDeals")
     public ResponseEntity<Map<String, Object>> getDeals(@RequestBody HouseDealRequestDto houseDealRequestDto) {
+    	
     	String dongCode = houseDealRequestDto.getDongCode();
-    	String aptName = houseDealRequestDto.getAptNm();
+    	String aptNm = houseDealRequestDto.getAptNm();
     	
         try {
-            if (dongCode == null && aptName == null) {
+            if (dongCode == null && aptNm == null) {
                 return createErrorResponse("동코드나 아파트 이름 중 하나를 입력해야 합니다.", HttpStatus.BAD_REQUEST);
             }
-
-            List<HouseDealResponseDto> houseDealDto = getHouseDeals(dongCode, aptName);
-            if (houseDealDto == null || houseDealDto.isEmpty()) {
+            
+            List<HouseDealResponseDto> houseDealDto = houseService.getDeals(dongCode, aptNm);
+            
+            if (houseDealDto.isEmpty()) {
                 return createResponse("해당 조건에 대한 거래 정보가 없습니다.", Collections.emptyList());
             }
 
-            log.debug("Number of deals found: {}", houseDealDto.size());
             return createResponse("거래 정보 조회 성공", houseDealDto);
 
         } catch (Exception e) {
             log.error("거래 정보 조회 중 에러 발생: {}", e.getMessage(), e);
             return createErrorResponse("거래 정보를 불러오는 중 문제가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private List<HouseDealResponseDto> getHouseDeals(String dongCode, String aptName) {
-        if (dongCode != null && aptName != null) {
-            log.debug("dongCode: {}, aptName: {}", dongCode, aptName);
-            return houseService.getDealsByDongAndAptName(dongCode, aptName);
-        } else if (dongCode != null) {
-            log.debug("dongCode: {}", dongCode);
-            return houseService.getDealsByDong(dongCode);
-        } else {
-            log.debug("aptName: {}", aptName);
-            return houseService.getDealsByAptName(aptName);
         }
     }
 
