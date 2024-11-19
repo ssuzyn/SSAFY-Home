@@ -1,11 +1,7 @@
 package com.ssafy.server.config;
 
-import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.converter.FormHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -49,12 +45,14 @@ public class WebConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**") // 모든 경로에 적용
-                .excludePathPatterns(
+                .excludePathPatterns( // 해당 경로 제외
                     "/user/login", 
                     "/user/register", 
                     "/swagger-ui/**", // Swagger UI 경로
                     "/v3/api-docs/**", // API Docs 경로
-                    "/v3/api-docs" // 추가적인 API Docs 경로
+                    "/v3/api-docs", // 추가적인 API Docs 경로
+                    "/map/**",
+                    "/house/**"
                 );
     }
 

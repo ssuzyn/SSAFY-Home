@@ -19,18 +19,8 @@ public class HouseServiceImpl implements HouseService{
 	}
 
 	@Override
-	public List<HouseDealResponseDto> getDealsByDong(String dongCode) {
-		return houseMapper.getDealsByDong(dongCode);
-	}
-
-	@Override
-	public List<HouseDealResponseDto> getDealsByAptName(String aptName) {
-		return houseMapper.getDealsByAptName(aptName);
-	}
-	
-	@Override
-	public List<HouseDealResponseDto> getDealsByDongAndAptName(String dongCode, String aptName) {
-		return houseMapper.getDealsByDongAndAptName(dongCode, aptName);
+	public List<HouseDealResponseDto> getDeals(String dongCode, String aptName) {
+		return houseMapper.getDeals(dongCode, aptName);
 	}
 
 	@Override
