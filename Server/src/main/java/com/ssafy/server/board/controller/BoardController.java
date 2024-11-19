@@ -89,8 +89,10 @@ public class BoardController {
     // Q&A 게시글 검색
     @GetMapping("/search")
     @Operation(summary = "게시글 검색", description = "키워드를 사용하여 게시글을 검색합니다.")
-    public ResponseEntity<List<BoardDto>> searchBoard(@RequestParam String keyword) {
-        List<BoardDto> results = boardService.searchBoard(keyword);
+    public ResponseEntity<List<BoardDto>> searchBoard(
+            @RequestParam String type,
+            @RequestParam String keyword) {
+        List<BoardDto> results = boardService.searchBoard(type, keyword);
         log.info("게시글 검색: 키워드 '{}', 결과 개수: {}", keyword, results.size());
         return ResponseEntity.ok(results);
     }

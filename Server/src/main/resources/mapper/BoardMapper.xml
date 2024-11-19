@@ -44,8 +44,24 @@
     </select>
 
     <!-- Q&A 검색 필터링 -->
-    <select id="searchBoard" parameterType="string" resultType="BoardDto">
-        SELECT * FROM board WHERE subject LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%')
+    <select id="searchBoard" parameterType="map" resultType="BoardDto">
+        SELECT * FROM board
+        WHERE
+        <choose>
+            <when test="type == 'title'">
+                subject LIKE CONCAT('%', #{keyword}, '%')
+            </when>
+            <when test="type == 'content'">
+                content LIKE CONCAT('%', #{keyword}, '%')
+            </when>
+            <when test="type == 'title_content'">
+                (subject LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+            </when>
+            <when test="type == 'nickname'">
+                user_id LIKE CONCAT('%', #{keyword}, '%')
+            </when>
+        </choose>
     </select>
+
 
 </mapper>

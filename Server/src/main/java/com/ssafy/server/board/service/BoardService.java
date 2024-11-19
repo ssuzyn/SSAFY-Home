@@ -28,5 +28,5 @@ public interface BoardService {
     List<CommentDto> getCommentsByArticleNo(int articleNo);
 
     // Q&A 검색 필터링
-    List<BoardDto> searchBoard(String keyword);
+    List<BoardDto> searchBoard(String type, String keyword);
 }

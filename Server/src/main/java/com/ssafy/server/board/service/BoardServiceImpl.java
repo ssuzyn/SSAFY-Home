@@ -58,7 +58,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<BoardDto> searchBoard(String keyword) {
-        return boardMapper.searchBoard(keyword);
+    public List<BoardDto> searchBoard(String type, String keyword) {
+        return boardMapper.searchBoard(type, keyword);
     }
 }
