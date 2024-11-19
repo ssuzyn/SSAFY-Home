@@ -9,7 +9,7 @@
     <div class="flex-1 relative">
       <!-- 지도 영역 (항상 전체 영역 차지) -->
       <div class="absolute inset-0">
-        <PropertyMap
+        <LocationMap
           :properties="searchResults"
           :selected-property="selectedProperty"
           @select-property="handlePropertySelect"
@@ -81,7 +81,7 @@
 import { ref } from "vue";
 import LocationSelect from "@/components/property/LocationSelect.vue";
 import PropertyList from "@/components/property/PropertyList.vue";
-import PropertyMap from "@/components/property/PropertyMap.vue";
+import LocationMap from "@/components/map/LocationMap.vue";
 import PropertyDetailModal from "@/components/property/PropertyDetailModal.vue";
 
 const searchResults = ref([]);
