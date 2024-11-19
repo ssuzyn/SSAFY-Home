@@ -16,6 +16,7 @@ const emit = defineEmits(["selectProperty"]);
 
 const map = ref(null);
 const markers = ref([]);
+const geocoder = ref(null);
 
 const initMap = () => {
   const container = document.getElementById("map");
@@ -25,28 +26,50 @@ const initMap = () => {
   };
   
   map.value = new kakao.maps.Map(container, options);
-  addMarkers();
+  geocoder.value = new kakao.maps.services.Geocoder();
+
+  if (props.properties && props.properties.length > 0) {
+    addMarkers();
+  }
 };
 
 const addMarkers = () => {
   clearMarkers();
   if (!props.properties || !map.value) return;
 
+  const bounds = new kakao.maps.LatLngBounds();
+  let processedCount = 0;
+  const totalProperties = props.properties.length;
+
   props.properties.forEach((property) => {
-    const latlng = new kakao.maps.LatLng(
-      property.location.lat,
-      property.location.lng
-    );
-    const marker = new kakao.maps.Marker({
-      map: map.value,
-      position: latlng,
-      title: property.name,
-    });
+    const address = property.roadNmAddr || property.jibunAddr; // 도로명 주소나 지번 주소 사용
+    if (!address) return;
 
-    markers.value.push(marker);
+    geocoder.value.addressSearch(address, (result, status) => {
+      processedCount++;
+      
+      if (status === kakao.maps.services.Status.OK) {
+        const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+        
+        const marker = new kakao.maps.Marker({
+          map: map.value,
+          position: coords,
+          title: property.aptNm,
+          clickable: true,
+        });
 
-    kakao.maps.event.addListener(marker, "click", () => {
-      emit("selectProperty", property);
+        bounds.extend(coords);
+        markers.value.push(marker);
+
+        kakao.maps.event.addListener(marker, "click", () => {
+          emit("selectProperty", property);
+        });
+
+        // 모든 마커가 처리되었을 때 지도 범위 조정
+        if (processedCount === totalProperties) {
+          map.value.setBounds(bounds);
+        }
+      }
     });
   });
 };
@@ -56,23 +79,34 @@ const clearMarkers = () => {
   markers.value = [];
 };
 
-watch(() => props.properties, addMarkers, { deep: true });
+watch(
+  () => props.properties,
+  (newVal) => {
+    if (newVal && map.value) {
+      addMarkers();
+    }
+  },
+  { deep: true }
+);
 
 watch(
   () => props.selectedProperty,
   (newVal) => {
     if (newVal && map.value) {
-      const latlng = new kakao.maps.LatLng(
-        newVal.location.lat,
-        newVal.location.lng
-      );
-      map.value.setCenter(latlng);
-      map.value.setLevel(3);
+      const address = newVal.roadNmAddr || newVal.jibunAddr;
+      if (!address) return;
+
+      geocoder.value.addressSearch(address, (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+          map.value.panTo(coords);
+          map.value.setLevel(3);
+        }
+      });
     }
   }
 );
 
-// Load Kakao Maps API
 const loadKakaoMapsScript = () => {
   return new Promise((resolve, reject) => {
     if (window.kakao && window.kakao.maps) {
@@ -81,7 +115,7 @@ const loadKakaoMapsScript = () => {
     }
 
     const script = document.createElement("script");
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_SERVICE_KEY}&autoload=false`;
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_SERVICE_KEY}&autoload=false&libraries=services`;
     
     script.onload = () => {
       kakao.maps.load(() => {
