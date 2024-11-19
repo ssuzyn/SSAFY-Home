@@ -7,15 +7,19 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ssafy.server.house.dto.ApartmentInfoDto;
 import com.ssafy.server.house.dto.HouseDealRequestDto;
 import com.ssafy.server.house.dto.HouseDealResponseDto;
 import com.ssafy.server.house.service.HouseService;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +34,24 @@ public class HouseController {
     public HouseController(HouseService houseService) {
         this.houseService = houseService;
     }
+    
+    @GetMapping("/get/{aptSeq}")
+    @Operation(summary = "특정 아파트 거래 정보 조회", description = "aptSeq를 기준으로 아파트 기본 정보와 실거래 데이터를 반환합니다.")
+    public ResponseEntity<ApartmentInfoDto> getDealByAptNm(@PathVariable String aptSeq) {
+        log.info("아파트 거래 정보 조회 요청: aptSeq={}", aptSeq);
+
+        // 서비스 계층에서 아파트 정보와 거래 정보 조회
+        ApartmentInfoDto apartmentInfo = houseService.getApartmentInfo(aptSeq);
+
+        if (apartmentInfo == null) {
+            log.warn("아파트 정보를 찾을 수 없음: aptSeq={}", aptSeq);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+
+        log.info("아파트 정보 반환 성공: {}", apartmentInfo);
+        return ResponseEntity.ok(apartmentInfo);
+    }
+
 
     @PostMapping("/getDeals")
     public ResponseEntity<Map<String, Object>> getDeals(@RequestBody HouseDealRequestDto houseDealRequestDto) {

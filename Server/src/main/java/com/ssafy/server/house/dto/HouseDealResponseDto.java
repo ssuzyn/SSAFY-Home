@@ -12,6 +12,7 @@ import lombok.ToString;
 @ToString
 @Schema(title = "HouseDealResponseDto", description = "최신 거래 내역을 나타내는 DTO")
 public class HouseDealResponseDto {
+	private String aptSeq;
     private String aptNm;
     private String floor;
     private double excluUseAr;
