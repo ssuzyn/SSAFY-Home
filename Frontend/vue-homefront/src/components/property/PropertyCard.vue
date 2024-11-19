@@ -1,12 +1,13 @@
 <template>
   <div 
-    class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+    class="bg-gray-50 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer
+            border-b border-gray-200 mx-2 my-3"
     @click="$emit('click')"
   >
     <div class="flex justify-between items-start">
       <div class="space-y-1">
         <h3 class="text-lg font-semibold text-gray-900">{{ property.name }}</h3>
-        <p class="text-xl font-bold text-blue-600">
+        <p class="text-xl font-bold text-black-600">
           {{ formatPrice(property.price) }}
         </p>
         <div class="flex items-center gap-2 text-sm text-gray-600">
@@ -19,29 +20,20 @@
         <div v-if="property.address" class="text-sm text-gray-500">
           {{ property.address }}
         </div>
-        <div class="flex items-center gap-2 text-xs text-gray-400 mt-2">
-          <template v-if="property.maintenanceFee">
-            <span>관리비 {{ formatPrice(property.maintenanceFee) }}/월</span>
-            <span class="text-gray-300">·</span>
-          </template>
-          <template v-if="property.parking">
-            <span>주차 {{ property.parking }}대</span>
-          </template>
-        </div>
       </div>
       <span class="text-sm text-gray-500">{{ formatDate(property.date) }}</span>
     </div>
-    <template v-if="property.description">
+    <!-- <template v-if="property.description">
       <div class="mt-3 pt-3 border-t border-gray-200">
         <p class="text-sm text-gray-600">
           {{ property.description }}
         </p>
       </div>
-    </template>
+    </template> -->
     <template v-if="property.agency || property.registrationNumber">
       <div class="mt-3 flex justify-between items-center text-xs text-gray-500">
         <span v-if="property.agency">중개사무소: {{ property.agency }}</span>
-        <span v-if="property.registrationNumber">등록번호: {{ property.registrationNumber }}</span>
+        <!-- <span v-if="property.registrationNumber">등록번호: {{ property.registrationNumber }}</span> -->
       </div>
     </template>
   </div>
