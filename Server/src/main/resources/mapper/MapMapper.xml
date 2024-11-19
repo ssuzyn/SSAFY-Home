@@ -4,24 +4,46 @@
 
 <mapper namespace="com.ssafy.server.map.mapper.MapMapper">
 
-<resultMap id="sidoGugun" type="sidoGugunCodeDto">
-		<result column="sido_code" property="sidoCode"/>
-		<result column="sido_name" property="sidoName"/>
-		<result column="gugun_code" property="gugunCode"/>
-		<result column="gugun_name" property="gugunName"/>
+	<resultMap id="sidoGugun" type="sidoGugunCodeDto">
+		<result column="sido_code" property="sidoCode" />
+		<result column="sido_name" property="sidoName" />
+		<result column="gugun_code" property="gugunCode" />
+		<result column="gugun_name" property="gugunName" />
+	</resultMap>
+	
+	<resultMap id="dong" type="dongCodeDto" >
+		<result column="dong_code" property="dongCode"/>
+		<result column="dong_name" property="dongName"/>
 	</resultMap>
 
 	<select id="getSido" resultMap="sidoGugun">
-		select left(sido_code,2) sido_code, sido_name
-		from sidocodes
+		select
+			left(sido_code,2)
+			sido_code, sido_name
+		from 
+			sidocodes
 		order by sido_code
 	</select>
-	
-	<select id="getGugunInSido" parameterType="string" resultMap="sidoGugun">
-		select left(gugun_code,5) gugun_code, gugun_name
-		from guguncodes
+
+	<select id="getGugunInSido" parameterType="string"
+		resultMap="sidoGugun">
+		select
+			left(gugun_code,5) gugun_code, gugun_name
+		from
+			guguncodes
 		where left(gugun_code,2) = #{sido}
 		order by gugun_code
 	</select>
-	
+
+	<select id="getDongInGugun" parameterType="string"
+		resultMap="dong">
+		select
+			dong_code, dong_name
+		from
+			dongcodes
+		where left(dong_code,5) = #{gugun}
+			and dong_name is not null
+		order by dong_code
+	</select>
+
 </mapper>

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.ssafy.server.map.dto.DongCodeDto;
 import com.ssafy.server.map.dto.SidoGugunCodeDto;
 import com.ssafy.server.map.mapper.MapMapper;
 
@@ -26,6 +27,11 @@ public class MapServiceImpl implements MapService {
 	@Override
 	public List<SidoGugunCodeDto> getGugunInSido(String sido) throws Exception {
 		return mapMapper.getGugunInSido(sido);
+	}
+
+	@Override
+	public List<DongCodeDto> getDongInGugun(String dong) throws Exception {
+		return mapMapper.getDongInGugun(dong);
 	}
 
 }
