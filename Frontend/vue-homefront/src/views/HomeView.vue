@@ -6,48 +6,25 @@
     </div>
     
     <!-- 메인 콘텐츠 영역 -->
-    <div class="flex-1 relative flex overflow-hidden">
+    <div class="flex-1 relative">
+      <!-- 지도 영역 (항상 전체 영역 차지) -->
+      <div class="absolute inset-0">
+        <PropertyMap
+          :properties="searchResults"
+          :selected-property="selectedProperty"
+          @select-property="handlePropertySelect"
+          class="h-full w-full"
+        />
+      </div>
+
       <!-- 왼쪽 사이드바 (PropertyList) -->
       <div 
-        class="h-full bg-white z-30 transform transition-transform duration-300 ease-in-out shadow-lg"
+        class="absolute h-full bg-white z-30 transform transition-transform duration-300 ease-in-out shadow-lg"
         :class="{
           'translate-x-0 w-[400px]': isSidebarOpen,
-          '-translate-x-full w-0': !isSidebarOpen
+          '-translate-x-full': !isSidebarOpen
         }"
       >
-        <!-- 토글 버튼 -->
-        <button 
-          @click="toggleSidebar"
-          class="absolute top-4 z-50 bg-white w-8 h-8 rounded-lg shadow-lg hover:bg-gray-50 flex items-center justify-center transition-all duration-300 ease-in-out"
-          :class="[
-            isSidebarOpen 
-              ? 'left-[400px]' 
-              : 'left-4'
-          ]"
-        >
-          <svg 
-            class="w-5 h-5 text-gray-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path 
-              v-if="isSidebarOpen"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-            /> 
-            <path 
-              v-else
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 5l7 7-7 7M5 5l7 7-7 7"
-            /> 
-          </svg>
-        </button>
-
         <!-- PropertyList -->
         <div class="h-full overflow-y-auto">
           <PropertyList
@@ -58,15 +35,38 @@
         </div>
       </div>
 
-      <!-- 지도 영역 -->
-      <div class="flex-1">
-        <PropertyMap
-          :properties="searchResults"
-          :selected-property="selectedProperty"
-          @select-property="handlePropertySelect"
-          class="h-full w-full"
-        />
-      </div>
+      <!-- 토글 버튼 -->
+      <button 
+        @click="toggleSidebar"
+        class="absolute top-4 z-50 bg-white w-8 h-8 rounded-lg shadow-lg hover:bg-gray-50 flex items-center justify-center transition-all duration-300 ease-in-out"
+        :class="[
+          isSidebarOpen 
+            ? 'left-[400px]' 
+            : 'left-4'
+        ]"
+      >
+        <svg 
+          class="w-5 h-5 text-gray-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path 
+            v-if="isSidebarOpen"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+          /> 
+          <path 
+            v-else
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 5l7 7-7 7M5 5l7 7-7 7"
+          /> 
+        </svg>
+      </button>
     </div>
 
     <PropertyDetailModal
@@ -86,7 +86,7 @@ import PropertyDetailModal from "@/components/property/PropertyDetailModal.vue";
 
 const searchResults = ref([]);
 const selectedProperty = ref(null);
-const isSidebarOpen = ref(true);
+const isSidebarOpen = ref(false);
 
 const handleSearchResult = (response) => {
   searchResults.value = Array.isArray(response) ? response : [];
