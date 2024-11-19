@@ -1,73 +1,57 @@
+<template>
+  <div class="grid grid-cols-1 gap-4 p-4">
+    <div v-if="!properties || properties.length === 0" class="text-center text-gray-500 py-8">
+      검색 결과가 없습니다.
+    </div>
+    <!-- properties가 배열인지 콘솔에 출력 -->
+    <div v-else>
+      <PropertyCard
+        v-for="property in properties"
+        :key="property.aptSeq + '-' + property.floor"
+        :property="transformProperty(property)"
+        @click="$emit('select-property', property)"
+      />
+    </div>
+  </div>
+</template>
+
 <script setup>
+import PropertyCard from './PropertyCard.vue';
+import { onMounted, watch } from 'vue';
+
 const props = defineProps({
   properties: {
     type: Array,
-    required: true,
-  },
+    required: true
+  }
 });
 
-const emit = defineEmits(["selectProperty"]);
+// props 변경 감시
+watch(() => props.properties, (newProps) => {
+  console.log('PropertyList received properties:', newProps);
+}, { deep: true });
 
-const selectProperty = (property) => {
-  emit("selectProperty", property);
+const transformProperty = (deal) => {
+  console.log('Transforming property:', deal); // 변환 전 데이터 확인
+  const transformed = {
+    name: deal.aptNm,
+    saleType: '매매',
+    price: parseAmount(deal.dealAmount),
+    size: Math.round(deal.excluUseAr),
+    type: '아파트',
+    floor: deal.floor,
+    date: new Date(deal.dealYear, deal.dealMonth - 1, deal.dealDay),
+    description: `전용 ${deal.excluUseAr}㎡, ${deal.floor}층`,
+    registrationNumber: deal.aptSeq
+  };
+  console.log('Transformed property:', transformed); // 변환 후 데이터 확인
+  return transformed;
 };
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+const parseAmount = (amount) => {
+  if (!amount) return 0;
+  return parseInt(amount.replace(/,/g, '')) * 10000;
 };
 
-const formatPrice = (price) => {
-  return new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: "KRW",
-  }).format(price);
-};
+defineEmits(['select-property']);
 </script>
-
-<template>
-  <div class="bg-white h-full overflow-auto">
-    <div class="px-4 py-5 sm:px-6">
-      <h3 class="text-lg leading-6 font-medium text-gray-900">매물 목록</h3>
-    </div>
-    <ul class="divide-y divide-gray-200">
-      <li
-        v-for="property in properties"
-        :key="property.id"
-        class="px-4 py-4 sm:px-6 hover:bg-gray-50 cursor-pointer"
-        @click="selectProperty(property)"
-      >
-        <div class="flex items-center justify-between">
-          <p class="text-sm font-medium text-orange-600 truncate">
-            {{ property.name }}
-          </p>
-          <div class="ml-2 flex-shrink-0 flex">
-            <p
-              class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"
-            >
-              {{ formatDate(property.date) }}
-            </p>
-          </div>
-        </div>
-        <div class="mt-2 sm:flex sm:justify-between">
-          <div class="sm:flex">
-            <p class="flex items-center text-sm text-gray-500">
-              {{ property.size }}m² · {{ property.floor }}/{{
-                property.totalFloors
-              }}층
-            </p>
-          </div>
-          <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-            <p>
-              {{ formatPrice(property.price) }}
-            </p>
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-</template>

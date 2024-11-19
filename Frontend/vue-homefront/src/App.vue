@@ -1,10 +1,10 @@
 <script setup>
-import Header from './components/Header.vue';
+import AppHeader from '@/components/layout/AppHeader.vue';
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col bg-gray-50 w-full">
-    <Header />
+    <AppHeader />
     <main class="flex-grow w-full">
       <RouterView></RouterView>
     </main>

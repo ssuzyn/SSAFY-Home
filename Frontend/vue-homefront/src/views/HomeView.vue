@@ -1,51 +1,44 @@
+// HomeView.vue
 <script setup>
 import { ref } from "vue";
-import ApartmentInput from "@/components/property/ApartmentInput.vue";
 import LocationSelect from "@/components/property/LocationSelect.vue";
 import PropertyList from "@/components/property/PropertyList.vue";
 import PropertyMap from "@/components/property/PropertyMap.vue";
 import PropertyDetailModal from "@/components/property/PropertyDetailModal.vue";
 
-// ... existing properties data ...
-
+const searchResults = ref([]);
 const selectedProperty = ref(null);
 
+const handleSearchResult = (response) => {
+  console.log('Search results:', response);
+  // response가 이미 배열이므로 직접 할당
+  searchResults.value = Array.isArray(response) ? response : [];
+  console.log('Updated searchResults:', searchResults.value);
+  selectedProperty.value = null;
+};
+
 const handlePropertySelect = (property) => {
+  console.log('Selected property:', property);
   selectedProperty.value = property;
-};
-
-const handleNavBarSearch = (query) => {
-  console.log("Nav bar search:", query);
-  // Implement nav bar search logic here
-};
-
-const handleFilterSearch = (filters) => {
-  console.log("Filter search:", filters);
-  // Implement filter search logic here
-  // Example:
-  // const filteredProperties = properties.value.filter(property => {
-  //   return (
-  //     (!filters.city || property.location.city === filters.city) &&
-  //     (!filters.district || property.location.district === filters.district) &&
-  //     (!filters.dong || property.location.dong === filters.dong) &&
-  //     (!filters.query || property.name.includes(filters.query))
-  //   )
-  // })
 };
 </script>
 
 <template>
-  <div class="flex flex-col h-screen">
-    <ApartmentInput @search="handleNavBarSearch" />
-    <LocationSelect @search="handleFilterSearch" />
+  <div class="flex flex-col h-screen pt-16">
+    <LocationSelect @search-result="handleSearchResult" />
     <div class="flex flex-1 overflow-hidden">
+      <!-- 검색 결과 개수 표시 -->
+      <div v-if="searchResults.length" class="absolute top-20 left-4 text-sm text-gray-500">
+        검색 결과: {{ searchResults.length }}건
+      </div>
+      
       <PropertyList
-        :properties="properties"
+        :properties="searchResults"
         @select-property="handlePropertySelect"
-        class="w-[400px] border-r"
+        class="w-[400px] border-r overflow-y-auto"
       />
       <PropertyMap
-        :properties="properties"
+        :properties="searchResults"
         :selected-property="selectedProperty"
         @select-property="handlePropertySelect"
         class="flex-1"

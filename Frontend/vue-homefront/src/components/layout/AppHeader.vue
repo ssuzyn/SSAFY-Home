@@ -1,5 +1,5 @@
 <script setup>
-import { useAuth } from '../stores/auth';
+import { useAuth } from '@/stores/auth';
 import { computed } from 'vue';
 
 const { isLoggedIn, logout } = useAuth();
