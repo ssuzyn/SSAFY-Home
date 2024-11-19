@@ -42,7 +42,7 @@
 		from
 			dongcodes
 		where left(dong_code,5) = #{gugun}
-			and dong_name is not null
+				and dong_name is not null
 		order by dong_code
 	</select>
 
