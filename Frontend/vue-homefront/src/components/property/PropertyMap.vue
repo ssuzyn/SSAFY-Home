@@ -16,6 +16,7 @@ const emit = defineEmits(["selectProperty"]);
 
 const map = ref(null);
 const markers = ref([]);
+const geocoder = ref(null);
 
 const initMap = () => {
   const container = document.getElementById("map");
@@ -25,20 +26,10 @@ const initMap = () => {
   };
   
   map.value = new kakao.maps.Map(container, options);
-  
-  // 지도가 생성된 후에 마커를 추가
+  geocoder.value = new kakao.maps.services.Geocoder();
+
   if (props.properties && props.properties.length > 0) {
     addMarkers();
-    
-    // 초기 바운드 설정
-    const bounds = new kakao.maps.LatLngBounds();
-    props.properties.forEach((property) => {
-      bounds.extend(new kakao.maps.LatLng(
-        property.location.lat,
-        property.location.lng
-      ));
-    });
-    map.value.setBounds(bounds);
   }
 };
 
@@ -46,22 +37,39 @@ const addMarkers = () => {
   clearMarkers();
   if (!props.properties || !map.value) return;
 
+  const bounds = new kakao.maps.LatLngBounds();
+  let processedCount = 0;
+  const totalProperties = props.properties.length;
+
   props.properties.forEach((property) => {
-    const latlng = new kakao.maps.LatLng(
-      property.location.lat,
-      property.location.lng
-    );
-    const marker = new kakao.maps.Marker({
-      map: map.value,
-      position: latlng,
-      title: property.name,
-      clickable: true, // 클릭 이벤트 활성화
-    });
+    const address = property.roadNmAddr || property.jibunAddr; // 도로명 주소나 지번 주소 사용
+    if (!address) return;
 
-    markers.value.push(marker);
+    geocoder.value.addressSearch(address, (result, status) => {
+      processedCount++;
+      
+      if (status === kakao.maps.services.Status.OK) {
+        const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+        
+        const marker = new kakao.maps.Marker({
+          map: map.value,
+          position: coords,
+          title: property.aptNm,
+          clickable: true,
+        });
 
-    kakao.maps.event.addListener(marker, "click", () => {
-      emit("selectProperty", property);
+        bounds.extend(coords);
+        markers.value.push(marker);
+
+        kakao.maps.event.addListener(marker, "click", () => {
+          emit("selectProperty", property);
+        });
+
+        // 모든 마커가 처리되었을 때 지도 범위 조정
+        if (processedCount === totalProperties) {
+          map.value.setBounds(bounds);
+        }
+      }
     });
   });
 };
@@ -71,40 +79,30 @@ const clearMarkers = () => {
   markers.value = [];
 };
 
-// properties가 변경될 때마다 마커 다시 생성
 watch(
   () => props.properties,
   (newVal) => {
     if (newVal && map.value) {
       addMarkers();
-      
-      // 모든 마커가 보이도록 바운드 조정
-      if (newVal.length > 0) {
-        const bounds = new kakao.maps.LatLngBounds();
-        newVal.forEach((property) => {
-          bounds.extend(new kakao.maps.LatLng(
-            property.location.lat,
-            property.location.lng
-          ));
-        });
-        map.value.setBounds(bounds);
-      }
     }
   },
   { deep: true }
 );
 
-// 선택된 속성이 변경될 때 지도 중심 이동
 watch(
   () => props.selectedProperty,
   (newVal) => {
     if (newVal && map.value) {
-      const latlng = new kakao.maps.LatLng(
-        newVal.location.lat,
-        newVal.location.lng
-      );
-      map.value.panTo(latlng); // setCenter 대신 panTo 사용하여 부드러운 이동
-      map.value.setLevel(3);
+      const address = newVal.roadNmAddr || newVal.jibunAddr;
+      if (!address) return;
+
+      geocoder.value.addressSearch(address, (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+          map.value.panTo(coords);
+          map.value.setLevel(3);
+        }
+      });
     }
   }
 );
@@ -117,7 +115,7 @@ const loadKakaoMapsScript = () => {
     }
 
     const script = document.createElement("script");
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_SERVICE_KEY}&autoload=false&libraries=services,clusterer`; // libraries 추가
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_SERVICE_KEY}&autoload=false&libraries=services`;
     
     script.onload = () => {
       kakao.maps.load(() => {
