@@ -1,16 +1,17 @@
 <template>
-  <div class="grid grid-cols-1 gap-4 p-4">
-    <div v-if="!properties || properties.length === 0" class="text-center text-gray-500 py-8">
+  <div class="grid grid-cols-2 gap-3 p-4">
+    <div v-if="!properties || properties.length === 0" class="col-span-2 text-center text-gray-500 py-8">
       검색 결과가 없습니다.
     </div>
-    <!-- properties가 배열인지 콘솔에 출력 -->
-    <div v-else>
-      <PropertyCard
-        v-for="property in properties"
-        :key="property.aptSeq + '-' + property.floor"
-        :property="transformProperty(property)"
-        @click="$emit('select-property', property)"
-      />
+    <div v-else class="col-span-2">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <PropertyCard
+          v-for="property in properties"
+          :key="property.aptSeq + '-' + property.floor"
+          :property="transformProperty(property)"
+          @click="$emit('select-property', property)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -32,7 +33,7 @@ watch(() => props.properties, (newProps) => {
 }, { deep: true });
 
 const transformProperty = (deal) => {
-  console.log('Transforming property:', deal); // 변환 전 데이터 확인
+  console.log('Transforming property:', deal);
   const transformed = {
     name: deal.aptNm,
     saleType: '매매',
@@ -44,7 +45,7 @@ const transformProperty = (deal) => {
     description: `전용 ${deal.excluUseAr}㎡, ${deal.floor}층`,
     registrationNumber: deal.aptSeq
   };
-  console.log('Transformed property:', transformed); // 변환 후 데이터 확인
+  console.log('Transformed property:', transformed);
   return transformed;
 };
 

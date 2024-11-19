@@ -1,64 +1,59 @@
 <template>
   <div 
-    class="bg-gray-50 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer
-            border-b border-gray-200 mx-2 my-3"
+    class="bg-gray-100 rounded-lg shadow-sm hover:shadow-md
+    transition-shadow duration-200 cursor-pointer overflow-hidden"
     @click="$emit('click')"
   >
-    <div class="flex justify-between items-start">
-      <div class="space-y-1">
-        <h3 class="text-lg font-semibold text-gray-900">{{ property.name }}</h3>
-        <p class="text-xl font-bold text-black-600">
+    <div class="p-3 flex flex-col">
+      <div class="text-medium font-medium text-gray-900 mb-2">{{ property.name }}</div>
+      
+      <div class="flex flex-col">
+        <div class="text-xl font-bold text-gray-900 mb-2">
           {{ formatPrice(property.price) }}
-        </p>
-        <div class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="text-sm">만</span>
+        </div>
+        
+        <div class="flex items-center gap-2 text-xs text-gray-600">
           <span>{{ property.size }}m²</span>
-          <span class="text-gray-300">·</span>
+          <span class="text-gray-300 mx-1">·</span>
           <span>{{ property.type }}</span>
-          <span class="text-gray-300">·</span>
+          <span class="text-gray-300 mx-1">·</span>
           <span>{{ property.floor }}층</span>
         </div>
-        <div v-if="property.address" class="text-sm text-gray-500">
-          {{ property.address }}
+      </div>
+
+      <div class="mt-2 text-2xs text-gray-500">
+        <div v-if="property.recentDeals" class="mb-0.5">
+          최근 6개월 거래 {{ property.recentDeals }}건
+        </div>
+        <div v-if="property.dealPercent">
+          최고 대비 실거래 {{ property.dealPercent }}%
         </div>
       </div>
-      <span class="text-sm text-gray-500">{{ formatDate(property.date) }}</span>
+
+      <div class="mt-2 text-xs text-gray-500">
+        {{ formatDate(property.date) }}
+      </div>
     </div>
-    <!-- <template v-if="property.description">
-      <div class="mt-3 pt-3 border-t border-gray-200">
-        <p class="text-sm text-gray-600">
-          {{ property.description }}
-        </p>
-      </div>
-    </template> -->
-    <template v-if="property.agency || property.registrationNumber">
-      <div class="mt-3 flex justify-between items-center text-xs text-gray-500">
-        <span v-if="property.agency">중개사무소: {{ property.agency }}</span>
-        <!-- <span v-if="property.registrationNumber">등록번호: {{ property.registrationNumber }}</span> -->
-      </div>
-    </template>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue';
+
 const props = defineProps({
   property: {
     type: Object,
     required: true,
     default: () => ({
       name: '',
-      saleType: '',
       price: 0,
       size: 0,
-      type: '',
+      type: '아파트',
       floor: 0,
-      totalFloors: 0,
-      address: '',
-      maintenanceFee: 0,
-      parking: 0,
+      recentDeals: 0,
+      dealPercent: 0,
       date: new Date(),
-      description: '',
-      agency: '',
-      registrationNumber: ''
     })
   }
 });
@@ -74,7 +69,7 @@ const formatPrice = (price) => {
     result += `${billion}억 `;
   }
   if (million > 0) {
-    result += `${million}만`;
+    result += `${million}`;
   }
   if (billion === 0 && million === 0) {
     result = '0';
