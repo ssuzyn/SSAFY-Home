@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES6", // ES6 이상으로 설정
+    "lib": ["DOM", "ES2015"], // 필요한 라이브러리 추가
+    "moduleResolution": "node",
+    "module": "ESNext",
+    "strict": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}
