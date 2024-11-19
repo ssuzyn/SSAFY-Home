@@ -31,5 +31,5 @@ public interface BoardMapper {
     List<CommentDto> getCommentsByArticleNo(@Param("articleNo") int articleNo);
 
     // Q&A 검색 필터링
-    List<BoardDto> searchBoard(@Param("keyword") String keyword);
+    List<BoardDto> searchBoard(@Param("type") String type, @Param("keyword") String keyword);
 }
