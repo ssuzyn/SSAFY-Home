@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
-import SearchNavBar from "@/components/property/search/SearchNavBar.vue";
-import SearchFilter from "@/components/property/search/SearchFilter.vue";
+import ApartmentInput from "@/components/property/ApartmentInput.vue";
+import LocationSelect from "@/components/property/LocationSelect.vue";
 import PropertyList from "@/components/property/PropertyList.vue";
 import PropertyMap from "@/components/property/PropertyMap.vue";
 import PropertyDetailModal from "@/components/property/PropertyDetailModal.vue";
@@ -36,8 +36,8 @@ const handleFilterSearch = (filters) => {
 
 <template>
   <div class="flex flex-col h-screen">
-    <SearchNavBar @search="handleNavBarSearch" />
-    <SearchFilter @search="handleFilterSearch" />
+    <ApartmentInput @search="handleNavBarSearch" />
+    <LocationSelect @search="handleFilterSearch" />
     <div class="flex flex-1 overflow-hidden">
       <PropertyList
         :properties="properties"
