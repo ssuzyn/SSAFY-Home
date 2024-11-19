@@ -67,7 +67,6 @@ watch(selectedGugun, (newGugun) => {
   }
 });
 
-// components/property/LocationSelect.vue
 const handleSearch = () => {
   getHouseDeals(
     {
@@ -85,6 +84,21 @@ const handleSearch = () => {
       emit('search-result', []);
     }
   );
+};
+
+const resetAll = () => {
+  // 선택된 값들 초기화
+  selectedSido.value = null;  // 또는 undefined
+  selectedGugun.value = null; // 또는 undefined
+  selectedDong.value = null;  // 또는 undefined
+  searchQuery.value = '';
+  
+  // 리스트 초기화
+  gugunList.value = [];
+  dongList.value = [];
+  
+  // 검색 결과 초기화
+  emit('search-result', []);
 };
 </script>
 
@@ -123,6 +137,14 @@ const handleSearch = () => {
           placeholder="아파트명을 검색하세요"
           @search="handleSearch"
         />
+
+        <!-- 리셋 버튼 추가 -->
+        <button
+          class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200"
+          @click="resetAll"
+        >
+          초기화
+        </button>
       </div>
     </div>
   </div>

@@ -25,7 +25,21 @@ const initMap = () => {
   };
   
   map.value = new kakao.maps.Map(container, options);
-  addMarkers();
+  
+  // 지도가 생성된 후에 마커를 추가
+  if (props.properties && props.properties.length > 0) {
+    addMarkers();
+    
+    // 초기 바운드 설정
+    const bounds = new kakao.maps.LatLngBounds();
+    props.properties.forEach((property) => {
+      bounds.extend(new kakao.maps.LatLng(
+        property.location.lat,
+        property.location.lng
+      ));
+    });
+    map.value.setBounds(bounds);
+  }
 };
 
 const addMarkers = () => {
@@ -41,6 +55,7 @@ const addMarkers = () => {
       map: map.value,
       position: latlng,
       title: property.name,
+      clickable: true, // 클릭 이벤트 활성화
     });
 
     markers.value.push(marker);
@@ -56,8 +71,30 @@ const clearMarkers = () => {
   markers.value = [];
 };
 
-watch(() => props.properties, addMarkers, { deep: true });
+// properties가 변경될 때마다 마커 다시 생성
+watch(
+  () => props.properties,
+  (newVal) => {
+    if (newVal && map.value) {
+      addMarkers();
+      
+      // 모든 마커가 보이도록 바운드 조정
+      if (newVal.length > 0) {
+        const bounds = new kakao.maps.LatLngBounds();
+        newVal.forEach((property) => {
+          bounds.extend(new kakao.maps.LatLng(
+            property.location.lat,
+            property.location.lng
+          ));
+        });
+        map.value.setBounds(bounds);
+      }
+    }
+  },
+  { deep: true }
+);
 
+// 선택된 속성이 변경될 때 지도 중심 이동
 watch(
   () => props.selectedProperty,
   (newVal) => {
@@ -66,13 +103,12 @@ watch(
         newVal.location.lat,
         newVal.location.lng
       );
-      map.value.setCenter(latlng);
+      map.value.panTo(latlng); // setCenter 대신 panTo 사용하여 부드러운 이동
       map.value.setLevel(3);
     }
   }
 );
 
-// Load Kakao Maps API
 const loadKakaoMapsScript = () => {
   return new Promise((resolve, reject) => {
     if (window.kakao && window.kakao.maps) {
@@ -81,7 +117,7 @@ const loadKakaoMapsScript = () => {
     }
 
     const script = document.createElement("script");
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_SERVICE_KEY}&autoload=false`;
+    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${import.meta.env.VITE_KAKAO_MAP_SERVICE_KEY}&autoload=false&libraries=services,clusterer`; // libraries 추가
     
     script.onload = () => {
       kakao.maps.load(() => {
