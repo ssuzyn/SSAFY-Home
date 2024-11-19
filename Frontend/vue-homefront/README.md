@@ -33,3 +33,58 @@ npm run build
 ```sh
 npm run lint
 ```
+
+```
+vue-homefront
+├─ .editorconfig
+├─ .gitignore
+├─ eslint.config.js
+├─ index.html
+├─ jsconfig.json
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.cjs
+├─ public
+│  ├─ favicon.ico
+│  └─ houselogo.ico
+├─ README.md
+├─ src
+│  ├─ App.vue
+│  ├─ assets
+│  │  ├─ base.css
+│  │  ├─ logo.svg
+│  │  └─ main.css
+│  ├─ components
+│  │  ├─ Header.vue
+│  │  ├─ icons
+│  │  │  ├─ IconCommunity.vue
+│  │  │  ├─ IconDocumentation.vue
+│  │  │  ├─ IconEcosystem.vue
+│  │  │  ├─ IconSupport.vue
+│  │  │  └─ IconTooling.vue
+│  │  ├─ LoginForm.vue
+│  │  ├─ MainPage.vue
+│  │  ├─ MyPageContent.vue
+│  │  ├─ PropertyDetailModal.vue
+│  │  ├─ PropertyList.vue
+│  │  ├─ PropertyMap.vue
+│  │  ├─ QnABoard.vue
+│  │  ├─ SearchFilter.vue
+│  │  ├─ SearchNavBar.vue
+│  │  └─ SignUpForm.vue
+│  ├─ main.js
+│  ├─ router
+│  │  └─ index.js
+│  ├─ stores
+│  │  ├─ auth.js
+│  │  └─ counter.js
+│  └─ views
+│     ├─ HomeView.vue
+│     ├─ LoginView.vue
+│     ├─ MyPageView.vue
+│     ├─ QnAView.vue
+│     └─ SignupView.vue
+├─ tailwind.config.js
+└─ vite.config.js
+
+```

@@ -1,10 +1,9 @@
+import HomeView from '@/views/HomeView.vue'
+import LoginView from '@/views/LoginView.vue'
+import MyPageView from '@/views/MyPageView.vue'
+import QnAView from '@/views/QnAView.vue'
+import SignupView from '@/views/SignupView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '../views/LoginView.vue'
-import MyPageView from '../views/MyPageView.vue'
-import QnAView from '../views/QnAView.vue'
-import HomeView from '../views/HomeView.vue'
-import SignUpForm from '@/components/SignUpForm.vue'
-
 const routes = [
   {
     path: '/',
@@ -29,7 +28,7 @@ const routes = [
   {
     path:'/signup',
     name:'SignUp',
-    component: SignUpForm
+    component: SignupView
   }
 ]
 
