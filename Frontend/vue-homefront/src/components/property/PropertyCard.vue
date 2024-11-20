@@ -14,9 +14,9 @@
         </div>
         
         <div class="flex items-center gap-2 text-xs text-gray-600">
-          <span>{{ property.size }}m²</span>
-          <span class="text-gray-300 mx-1">·</span>
           <span>{{ property.type }}</span>
+          <span class="text-gray-300 mx-1">·</span>
+          <span>{{ property.size }}m²</span>
           <span class="text-gray-300 mx-1">·</span>
           <span>{{ property.floor }}층</span>
         </div>

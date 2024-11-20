@@ -51,7 +51,7 @@ const getRecentSize = () => {
       
       <!-- Modal -->
       <div class="fixed inset-0 flex items-center justify-center p-4">
-        <div class="relative bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div class="relative bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b">
             <h3 class="text-xl font-semibold text-gray-900">
