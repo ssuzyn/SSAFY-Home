@@ -8,7 +8,7 @@ const links = computed(() => {
   const baseLinks = [
     { name: 'Q&A', path: '/qna' }
   ];
-  
+
   if (isLoggedIn) {
     return [
       { name: '로그아웃', action: logout },
@@ -34,16 +34,16 @@ const greeting = computed(() => {
       <router-link to="/" class="text-2xl font-bold text-orange-500">HOUSE-TOSS</router-link>
       <div class="flex items-center space-x-6">
         <span v-if="isLoggedIn" class="text-gray-600">{{ greeting }}</span>
-        <nav class="flex items-center space-x-6">                       
+        <nav class="flex items-center space-x-6">
           <template v-for="link in links" :key="link.name">
-            <router-link 
+            <router-link
               v-if="link.path"
               :to="link.path"
               class="text-gray-600 hover:text-orange-500 transition-colors"
             >
               {{ link.name }}
             </router-link>
-            <button 
+            <button
               v-else
               @click="link.action"
               class="text-gray-600 hover:text-orange-500 transition-colors"

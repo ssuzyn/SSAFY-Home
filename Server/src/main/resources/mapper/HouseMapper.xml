@@ -92,12 +92,13 @@
 	        houseinfos hi ON lhd.apt_seq = hi.apt_seq
 	    <where>
 	        <if test="dongCode != null and dongCode != ''">
-	            AND hi.dong_code = #{dongCode}
+	            AND hi.dong_code LIKE CONCAT(#{dongCode}, '%')
 	        </if>
 	        <if test="aptName != null and aptName != ''">
 	            AND hi.apt_nm LIKE CONCAT('%', #{aptName}, '%')
 	        </if>
 	    </where>
+	    ORDER BY lhd.deal_year DESC, lhd.deal_month DESC, lhd.deal_day DESC
 	</select>
 	
 

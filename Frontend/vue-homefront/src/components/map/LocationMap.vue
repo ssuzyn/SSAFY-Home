@@ -30,6 +30,18 @@ const props = defineProps({
   selectedProperty: {
     type: Object,
     default: null
+  },
+  selectedMarkerInfo: {
+    type: Object,
+    default: null
+  },
+  centerPosition: {
+    type: Object,
+    default: null
+  },
+  zoomLevel: {
+    type: Number,
+    default: 15
   }
 });
 
@@ -80,6 +92,16 @@ watch(() => props.selectedProperty, (newProperty) => {
   }
 }, { deep: true });
 
+// centerPosition이나 zoomLevel이 변경될 때마다 지도 업데이트
+watch([() => props.centerPosition, () => props.zoomLevel], ([newCenter, newZoom]) => {
+  if (map.value && newCenter) {
+    // 지도 중심과 줌 레벨 변경
+    const moveLatLng = new kakao.maps.LatLng(newCenter.lat, newCenter.lng);
+    map.value.setCenter(moveLatLng);
+    map.value.setLevel(newZoom); // 카카오맵은 레벨이 반대로 동작하므로 변환
+  }
+}, { deep: true });
+
 const initializeKakaoMap = () => {
   if (window.kakao && window.kakao.maps) {
     initMap();
@@ -95,7 +117,7 @@ const initMap = () => {
   const container = document.getElementById("map");
   const options = {
     center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-    level: 5
+    level: 3
   };
   map = new window.kakao.maps.Map(container, options);
   // map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);    
