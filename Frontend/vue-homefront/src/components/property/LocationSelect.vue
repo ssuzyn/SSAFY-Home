@@ -68,13 +68,25 @@ watch(selectedGugun, (newGugun) => {
 });
 
 const handleSearch = () => {
+  // 선택된 가장 하위 지역 코드를 사용
+  let searchCode = '';
+  if (selectedDong.value?.code) {
+    searchCode = selectedDong.value.code;  // 동이 선택된 경우
+  } else if (selectedGugun.value?.code) {
+    searchCode = selectedGugun.value.code;  // 구/군까지만 선택된 경우
+  } else if (selectedSido.value?.code) {
+    searchCode = selectedSido.value.code;   // 시/도까지만 선택된 경우
+  }
+
   getHouseDeals(
     {
-      dongCode: selectedDong.value?.code || '',
-      aptNm: searchQuery.value || ''
+      dongCode: searchCode,
+      aptNm: searchQuery.value || '',
+      searchLevel: selectedDong.value ? 'dong' : 
+                  selectedGugun.value ? 'gugun' : 
+                  selectedSido.value ? 'sido' : 'all'
     },
     (response) => {
-      // response.data가 배열인지 확인
       const results = response.data?.data || [];
       console.log('Search results:', results);
       emit('search-result', results);
