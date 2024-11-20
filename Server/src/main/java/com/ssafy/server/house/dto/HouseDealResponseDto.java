@@ -20,6 +20,7 @@ public class HouseDealResponseDto {
     private int dealYear;
     private int dealMonth;
     private int dealDay;
+    private int dealCount;
     private String latitude;
     private String longitude;
 }
