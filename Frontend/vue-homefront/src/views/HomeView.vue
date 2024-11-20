@@ -12,7 +12,9 @@
         <LocationMap
           :properties="searchResults"
           :selected-property="selectedProperty"
-          @select-property="handlePropertySelect"
+          :center-position="mapCenter" 
+          :zoom-level="mapZoom"
+          @select-property="handleMarkerClick"
           class="h-full w-full"
         />
       </div>
@@ -29,7 +31,7 @@
           <PropertyList
             v-show="isSidebarOpen"
             :properties="searchResults"
-            @select-property="handlePropertySelect"
+            @select-property="handleListClick"
           />
         </div>
       </div>
@@ -59,7 +61,6 @@
       </button>
     </div>
 
-    <!-- 매물 상세 모달 - z-index를 높게 설정하여 모든 요소 위에 표시 -->
     <PropertyDetailModal
       v-if="isDetailModalOpen"
       :open="isDetailModalOpen"
@@ -82,12 +83,11 @@ const selectedProperty = ref(null);
 const isSidebarOpen = ref(false);
 const isDetailModalOpen = ref(false);
 const detailData = ref(null);
+const mapCenter = ref(null);
+const mapZoom = ref(15);
 
-const handleSearchResult = (response) => {
-  searchResults.value = Array.isArray(response) ? response : [];
-  selectedProperty.value = null;
-  isSidebarOpen.value = true;
-};
+const DETAIL_ZOOM_LEVEL = 3; // 상세 보기 시 줌 레벨
+const selectedMarkerInfo = ref(null); // 선택된 마커의 인포윈도우 상태
 
 const fetchPropertyDetail = async (aptSeq) => {
   try {
@@ -104,9 +104,34 @@ const parseAmount = (amount) => {
   return parseInt(amount.replace(/,/g, '')) * 10000;
 };
 
-const handlePropertySelect = async (property) => {
+// 리스트 클릭 처리 - 지도 이동 & 인포윈도우 표시
+const handleListClick = (property) => {
+  selectedProperty.value = property;
+  
+  // 선택된 property의 위도/경도 있는 경우에만 지도 이동
+  if (property.latitude && property.longitude) {
+    mapCenter.value = {
+      lat: parseFloat(property.latitude),
+      lng: parseFloat(property.longitude)
+    };
+    mapZoom.value = 3; // 마커가 잘 보일 정도의 줌 레벨
+  }
+};
+
+// 마커 클릭 처리
+const handleMarkerClick = async (property) => {
   try {
-    console.log('Property selected:', property); // aptSeq 확인
+    selectedProperty.value = property;
+    selectedMarkerInfo.value = null; // 마커 클릭 시는 인포윈도우 닫기
+    
+    if (property.latitude && property.longitude) {
+      mapCenter.value = {
+        lat: parseFloat(property.latitude),
+        lng: parseFloat(property.longitude)
+      };
+      mapZoom.value = DETAIL_ZOOM_LEVEL;
+    }
+    
     const detail = await fetchPropertyDetail(property.aptSeq);
     detailData.value = {
       ...detail,
@@ -116,10 +141,19 @@ const handlePropertySelect = async (property) => {
       }))
     };
     isDetailModalOpen.value = true;
-    selectedProperty.value = property;
   } catch (error) {
     console.error('Failed to fetch property details:', error);
   }
+};
+
+// 검색 결과 처리시 상태 초기화
+const handleSearchResult = (response) => {
+  searchResults.value = Array.isArray(response) ? response : [];
+  selectedProperty.value = null;
+  selectedMarkerInfo.value = null; // 인포윈도우 상태 초기화
+  mapCenter.value = null;
+  mapZoom.value = 7;
+  isSidebarOpen.value = true;
 };
 
 const closeDetailModal = () => {
