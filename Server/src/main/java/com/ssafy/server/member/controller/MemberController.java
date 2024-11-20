@@ -56,6 +56,7 @@ public class MemberController {
                 String refreshToken = jwtUtil.createRefreshToken(loginUser.getUserId());
                 log.debug("access token : {}", accessToken);
                 log.debug("refresh token : {}", refreshToken);
+//                System.out.println(accessToken);
 
 //				발급받은 refresh token 을 DB에 저장.
                 memberService.saveRefreshToken(loginUser.getUserId(), refreshToken);
