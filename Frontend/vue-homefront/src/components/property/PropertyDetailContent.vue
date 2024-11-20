@@ -14,7 +14,7 @@
             class="h-6 w-6"
             :class="{ 
               'text-red-500 fill-red-500': isFavorite,
-              'text-gray-400': !isFavorite 
+              'text-gray-400 fill-none': !isFavorite 
             }"
             viewBox="0 0 24 24" 
             stroke="currentColor" 
