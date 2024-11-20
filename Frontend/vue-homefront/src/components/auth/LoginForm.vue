@@ -79,19 +79,47 @@
   </template>
   
   <script setup>
-  import { ref, reactive } from 'vue'
-  import { XCircle, Eye, EyeOff } from 'lucide-vue-next'
-  
-  const showPassword = ref(false)
-  
-  const formData = reactive({
-    username: '',
-    password: '',
-    rememberMe: false
-  })
-  
-  const handleLogin = () => {
-    console.log('로그인 시도:', formData)
-    // 여기에 로그인 로직 구현
+import { ref, reactive } from 'vue'
+import { XCircle, Eye, EyeOff } from 'lucide-vue-next'
+import { useAuth } from '@/stores/auth'
+import { useRouter } from 'vue-router'
+
+const auth = useAuth()
+const router = useRouter()
+
+const showPassword = ref(false)
+const isLoading = ref(false)
+const errorMessage = ref('')
+
+const formData = reactive({
+  username: '',
+  password: '',
+  rememberMe: false
+})
+
+const handleLogin = async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    const { success, error } = await auth.login(
+      formData.username,
+      formData.password,
+      formData.rememberMe
+    )
+
+    if (success) {
+      console.log('로그인 성공')
+      router.push('/')  // 로그인 성공 시 홈페이지로 이동
+    } else {
+      console.error('로그인 실패:', error)
+      errorMessage.value = error || '로그인에 실패했습니다. 다시 시도해주세요.'
+    }
+  } catch (error) {
+    console.error('로그인 오류:', error)
+    errorMessage.value = '로그인 중 오류가 발생했습니다. 나중에 다시 시도해주세요.'
+  } finally {
+    isLoading.value = false
   }
-  </script>
+}
+</script>
