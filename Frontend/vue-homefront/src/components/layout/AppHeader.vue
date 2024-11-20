@@ -1,8 +1,13 @@
 <script setup>
 import { useAuth } from "@/stores/auth";
 import { computed } from "vue";
+import { StarFilled } from '@ant-design/icons-vue';
+import { useInterestDrawer } from '@/stores/interestDrawer';
+
 
 const { isLoggedIn, logout } = useAuth();
+
+const interestDrawer = useInterestDrawer();
 
 const links = computed(() => {
   const baseLinks = [
@@ -22,19 +27,26 @@ const links = computed(() => {
     ];
   }
 });
+
+const toggleInterestDrawer = () => {
+  interestDrawer.toggle();
+};
 </script>
 
 <template>
   <header class="fixed top-0 left-0 right-0 bg-white border-b z-50">
     <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-      <a
-        href="/"
-        class="text-2xl font-bold text-orange-500"
-        @click="() => (window.location.href = '/')"
-      >
+      <a href="/" class="text-2xl font-bold text-orange-500">
         HOUSE-TOSS
       </a>
       <nav class="flex items-center space-x-6">
+        <button 
+          @click="toggleInterestDrawer" 
+          class="flex items-center space-x-2 hover:bg-gray-50 px-3 py-2 rounded-md"
+        >
+          <StarFilled :class="{ 'text-orange-500': interestDrawer.isVisible }" />
+          <span class="text-sm"> 관심 매물</span>
+        </button>
         <template v-for="link in links" :key="link.name">
           <router-link
             v-if="link.path"
