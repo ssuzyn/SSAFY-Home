@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.server.interest.mapper.InterestMapper">
+
+  <resultMap id="InterestApt" type="interestAptDto">
+    <result property="aptSeq" column="apt_seq" />
+    <result property="aptName" column="apt_nm" />
+    <result property="latestDealAmount" column="latest_deal_amount" />
+    <result property="prevDealAmount" column="prev_deal_amount" />
+    <result property="priceChangeRate" column="price_change_rate" />
+  </resultMap>
+
+
+  <insert id="insertInterest">
+    INSERT INTO interest_apt (user_id, apt_seq)
+    VALUES (#{userId}, #{aptSeq})
+  </insert>
+
+  <delete id="deleteInterest">
+    DELETE FROM interest_apt
+    WHERE user_id = #{userId}
+      AND apt_seq = #{aptSeq}
+  </delete>
+
+  <select id="existsInterest" resultType="boolean">
+    SELECT EXISTS (
+      SELECT 1
+      FROM interest_apt
+      WHERE user_id = #{userId}
+        AND apt_seq = #{aptSeq}
+    )
+  </select>
+
+  <select id="getInterestApts" resultMap="InterestApt">
+    SELECT
+      ia.apt_seq,
+      hp.apt_nm,
+      hp.latest_deal_amount,
+      hp.prev_deal_amount,
+      hp.price_change_rate,
+    FROM
+      interest_apt ia
+        JOIN
+      house_price_stats hp
+      ON
+        ia.apt_seq = hp.apt_seq
+    WHERE
+      ia.user_id = #{userId}
+</select>
+
+
+</mapper>

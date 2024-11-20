@@ -134,6 +134,7 @@ public class MemberController {
 
         try {
             String userId = (String) request.getAttribute("userId");
+
             updateDto.setUserId(userId);
 
             memberService.updateUserInfo(updateDto);
