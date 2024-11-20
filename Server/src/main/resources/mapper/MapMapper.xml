@@ -32,7 +32,7 @@
 		from
 			guguncodes
 		where left(gugun_code,2) = #{sido}
-		order by gugun_code
+		order by gugun_name
 	</select>
 
 	<select id="getDongInGugun" parameterType="string"
@@ -43,7 +43,7 @@
 			dongcodes
 		where left(dong_code,5) = #{gugun}
 				and dong_name is not null
-		order by dong_code
+		order by dong_name
 	</select>
 
 </mapper>

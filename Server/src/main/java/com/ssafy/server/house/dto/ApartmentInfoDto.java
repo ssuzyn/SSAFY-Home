@@ -19,6 +19,7 @@ public class ApartmentInfoDto {
     private String dongNm;
     private String latitude;
     private String longitude;
+    private String dealCount;
     private List<DealInfoDto> deals;
 
 }

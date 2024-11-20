@@ -1,24 +1,32 @@
 <template>
   <div class="grid grid-cols-2 gap-3 p-4">
     <div v-if="!properties || properties.length === 0" class="col-span-2 text-center text-gray-500 py-8">
-      검색 결과가 없습니다.
+      <NoDataModal 
+        :open="showNoDataModal" 
+        @close="closeModal" 
+      />
     </div>
     <div v-else class="col-span-2">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <PropertyCard
+        <div 
           v-for="property in properties"
           :key="property.aptSeq + '-' + property.floor"
-          :property="transformProperty(property)"
-          @click="$emit('select-property', property)"
-        />
+          class="cursor-pointer"
+          @click="handlePropertyClick(property)"
+        >
+          <PropertyCard
+            :property="transformProperty(property)"
+          />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import PropertyCard from './PropertyCard.vue';
-import { onMounted, watch } from 'vue';
+import PropertyCard from '@/components/property/PropertyCard.vue';
+import NoDataModal from '@/components/property/NoDataModal.vue';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
   properties: {
@@ -27,14 +35,15 @@ const props = defineProps({
   }
 });
 
-// props 변경 감시
+const emit = defineEmits(['select-property']);
+
 watch(() => props.properties, (newProps) => {
   console.log('PropertyList received properties:', newProps);
 }, { deep: true });
 
 const transformProperty = (deal) => {
-  console.log('Transforming property:', deal);
-  const transformed = {
+  return {
+    aptSeq: deal.aptSeq,
     name: deal.aptNm,
     saleType: '매매',
     price: parseAmount(deal.dealAmount),
@@ -43,10 +52,9 @@ const transformProperty = (deal) => {
     floor: deal.floor,
     date: new Date(deal.dealYear, deal.dealMonth - 1, deal.dealDay),
     description: `전용 ${deal.excluUseAr}㎡, ${deal.floor}층`,
-    registrationNumber: deal.aptSeq
+    registrationNumber: deal.aptSeq,
+    dealCount: deal.dealCount
   };
-  console.log('Transformed property:', transformed);
-  return transformed;
 };
 
 const parseAmount = (amount) => {
@@ -54,5 +62,9 @@ const parseAmount = (amount) => {
   return parseInt(amount.replace(/,/g, '')) * 10000;
 };
 
-defineEmits(['select-property']);
+const handlePropertyClick = (property) => {
+  console.log('Property clicked:', property);
+  emit('select-property', property);
+};
+
 </script>

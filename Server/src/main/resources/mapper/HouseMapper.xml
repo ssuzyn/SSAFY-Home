@@ -13,6 +13,7 @@
         <result property="dealYear" column="deal_year"/>
         <result property="dealMonth" column="deal_month"/>
         <result property="dealDay" column="deal_day"/>
+        <result property="dealCount" column="deal_count"/>
         <result property="latitude" column="latitude"/>
         <result property="longitude" column="longitude"/>
     </resultMap>
@@ -20,9 +21,10 @@
     <resultMap id="ApartmentInfoMap" type="com.ssafy.server.house.dto.ApartmentInfoDto">
         <result property="aptSeq" column="apt_seq"/>
         <result property="aptNm" column="apt_nm"/>
+        <result property="dongNm" column="umd_nm"/>
         <result property="latitude" column="latitude"/>
         <result property="longitude" column="longitude"/>
-        <result property="dongNm" column="umd_nm"/>
+        <result property="dealCount" column="deal_count"/>
     </resultMap>
 
     <!-- DealInfoDto에 맞는 resultMap 정의 -->
@@ -34,21 +36,22 @@
     </resultMap>
     
     
-    <!-- 아파트 기본 정보 조회 -->
+    <!-- [상세 내역] 아파트 기본 정보 조회 -->
     <select id="getApartmentInfo" parameterType="string" resultMap="ApartmentInfoMap">
         SELECT 
-            apt_seq,
-            apt_nm,
-            latitude,
-            longitude,
-            umd_nm
-        FROM 
-            houseinfos
-        WHERE 
-            apt_seq = #{aptSeq};
+		    h.apt_seq,
+		    h.apt_nm,
+		    h.latitude,
+		    h.longitude,
+		    h.umd_nm,
+		    (SELECT deal_count FROM latest_housedeals hd WHERE hd.apt_seq = h.apt_seq) as deal_count
+		FROM 
+		    houseinfos h
+		WHERE 
+		    h.apt_seq = #{aptSeq};
     </select>
 
-    <!-- 아파트 거래 정보 조회 -->
+    <!-- [상세 내역] 아파트 거래 정보 조회 -->
     <select id="getDealInfo" parameterType="string" resultMap="DealInfoMap">
         SELECT 
             floor,
@@ -76,6 +79,7 @@
 	        lhd.deal_year,
 	        lhd.deal_month,
 	        lhd.deal_day,
+	        lhd.deal_count,
 	        hi.latitude,
 	        hi.longitude
 	    FROM

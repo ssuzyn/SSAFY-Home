@@ -23,8 +23,8 @@
       </div>
 
       <div class="mt-2 text-2xs text-gray-500">
-        <div v-if="property.recentDeals" class="mb-0.5">
-          최근 6개월 거래 {{ property.recentDeals }}건
+        <div class="text-xs mb-0.5">
+          총 거래 {{ property.dealCount }}건
         </div>
         <div v-if="property.dealPercent">
           최고 대비 실거래 {{ property.dealPercent }}%
@@ -51,7 +51,7 @@ const props = defineProps({
       size: 0,
       type: '아파트',
       floor: 0,
-      recentDeals: 0,
+      dealCount: 0,
       dealPercent: 0,
       date: new Date(),
     })
