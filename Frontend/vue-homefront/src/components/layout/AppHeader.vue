@@ -2,13 +2,13 @@
 import { useAuth } from '@/stores/auth';
 import { computed } from 'vue';
 
-const { isLoggedIn, logout } = useAuth();
+const { isLoggedIn, logout, user } = useAuth();
 
 const links = computed(() => {
   const baseLinks = [
     { name: 'Q&A', path: '/qna' }
   ];
-
+  
   if (isLoggedIn) {
     return [
       { name: '로그아웃', action: logout },
@@ -22,12 +22,18 @@ const links = computed(() => {
     ];
   }
 });
+const greeting = computed(() => {
+  console.log(user);
+  return isLoggedIn && user ? `안녕하세요, ${user['userName']}님!` : '공백';
+});
 </script>
 
 <template>
-    <header class="fixed top-0 left-0 right-0 bg-white border-b z-50">
-      <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-        <router-link to="/" class="text-2xl font-bold text-orange-500">HOUSE-TOSS</router-link>
+  <header class="fixed top-0 left-0 right-0 bg-white border-b z-50">
+    <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+      <router-link to="/" class="text-2xl font-bold text-orange-500">HOUSE-TOSS</router-link>
+      <div class="flex items-center space-x-6">
+        <span v-if="isLoggedIn" class="text-gray-600">{{ greeting }}</span>
         <nav class="flex items-center space-x-6">                       
           <template v-for="link in links" :key="link.name">
             <router-link 
@@ -47,6 +53,6 @@ const links = computed(() => {
           </template>
         </nav>
       </div>
-    </header>
-  </template>
-  
+    </div>
+  </header>
+</template>
