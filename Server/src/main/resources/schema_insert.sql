@@ -180,3 +180,42 @@ LOCK TABLES `sidocodes` WRITE;
 INSERT INTO `sidocodes` VALUES ('4200000000','강원도'),('4100000000','경기도'),('4800000000','경상남도'),('4700000000','경상북도'),('2900000000','광주광역시'),('2700000000','대구광역시'),('3000000000','대전광역시'),('2600000000','부산광역시'),('1100000000','서울특별시'),('3611000000','세종특별자치시'),('3100000000','울산광역시'),('2800000000','인천광역시'),('4600000000','전라남도'),('4500000000','전라북도'),('5000000000','제주특별자치도'),('4400000000','충청남도'),('4300000000','충청북도');
 /*!40000 ALTER TABLE `sidocodes` ENABLE KEYS */;
 UNLOCK TABLES;
+
+CREATE TABLE house_price_stats (
+    apt_seq VARCHAR(20) NOT NULL,
+    apt_nm VARCHAR(100),
+    latest_deal_amount VARCHAR(10),
+    prev_deal_amount VARCHAR(10),
+    price_change_rate DECIMAL(8,1),
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (apt_seq),
+    FOREIGN KEY (apt_seq) REFERENCES houseinfos(apt_seq)
+);
+
+INSERT INTO house_price_stats (
+    apt_seq,
+    apt_nm,
+    latest_deal_amount,
+    prev_deal_amount,
+    price_change_rate
+)
+WITH RankedDeals AS (
+    SELECT
+        hd.apt_seq,
+        hi.apt_nm,
+        hd.deal_amount,
+        ROW_NUMBER() OVER (PARTITION BY hd.apt_seq ORDER BY deal_year DESC, deal_month DESC, deal_day DESC) as rn
+    FROM housedeals hd
+             JOIN houseinfos hi ON hd.apt_seq = hi.apt_seq
+)
+SELECT
+    r1.apt_seq,
+    r1.apt_nm,
+    r1.deal_amount as latest_deal_amount,
+    r2.deal_amount as prev_deal_amount,
+    ROUND((CAST(REPLACE(r1.deal_amount, ',', '') AS DECIMAL(10,0)) -
+           CAST(REPLACE(r2.deal_amount, ',', '') AS DECIMAL(10,0))) /
+          CAST(REPLACE(r2.deal_amount, ',', '') AS DECIMAL(10,0)) * 100, 1) as price_change_rate
+FROM RankedDeals r1
+         LEFT JOIN RankedDeals r2 ON r1.apt_seq = r2.apt_seq AND r2.rn = 2
+WHERE r1.rn = 1;
