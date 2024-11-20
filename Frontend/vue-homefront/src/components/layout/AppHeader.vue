@@ -4,13 +4,24 @@ import { computed } from "vue";
 
 const { isLoggedIn, logout } = useAuth();
 
-const links = computed(() => [
-  isLoggedIn.value
-    ? { name: "로그아웃", action: logout }
-    : { name: "로그인", path: "/login" },
-  { name: "마이페이지", path: "/mypage" },
-  { name: "Q&A", path: "/qna" },
-]);
+const links = computed(() => {
+  const baseLinks = [
+    { name: 'Q&A', path: '/qna' }
+  ];
+
+  if (isLoggedIn) {
+    return [
+      { name: '로그아웃', action: logout },
+      { name: '마이페이지', path: '/mypage' },
+      ...baseLinks
+    ];
+  } else {
+    return [
+      { name: '로그인', path: '/login' },
+      ...baseLinks
+    ];
+  }
+});
 </script>
 
 <template>
