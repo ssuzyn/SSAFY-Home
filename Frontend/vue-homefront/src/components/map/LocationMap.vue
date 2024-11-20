@@ -105,7 +105,8 @@ const initMap = () => {
   clusterer = new window.kakao.maps.MarkerClusterer({
     map: map,
     averageCenter: true,
-    minLevel: 5
+    minLevel: 4,
+    texts: (size) => `${size}건`
   });
 
   // 장소 검색 객체 생성
@@ -199,41 +200,28 @@ const removePlaceMarkers = () => {
 };
 
 const createInfoWindow = (property) => {
- // 같은 위치의 거래들 찾기
- const sameLocationDeals = props.properties.filter(p => 
-   p.latitude === property.latitude && 
-   p.longitude === property.longitude
- );
+  const content = `
+    <div class="bg-white p-2 rounded-lg shadow-lg min-w-[200px]">
+      <div class="font-medium text-gray-900">${property.aptNm}</div>
+      <div class="text-sm text-gray-600">
+        ${property.floor}층 | ${Math.round(property.excluUseAr)}㎡
+      </div>
+      <div class="text-lg font-bold text-gray-900">
+        ${formatPrice(parseAmount(property.dealAmount))}만
+      </div>
+      <div class="text-xs text-gray-500">
+        ${property.dealYear}.${String(property.dealMonth).padStart(2, '0')}.${String(property.dealDay).padStart(2, '0')}
+      </div>
+      <div class="text-xs text-gray-500 mt-1">
+        총 ${property.dealCount}건의 거래
+      </div>
+    </div>
+  `;
 
- // 최신 거래 찾기
- const latestDeal = sameLocationDeals.reduce((latest, current) => {
-   const currentDate = new Date(current.dealYear, current.dealMonth - 1, current.dealDay);
-   const latestDate = new Date(latest.dealYear, latest.dealMonth - 1, latest.dealDay);
-   return currentDate > latestDate ? current : latest;
- }, sameLocationDeals[0]);
-
- const content = `
-   <div class="bg-white p-2 rounded-lg shadow-lg min-w-[200px]">
-     <div class="font-medium text-gray-900">${latestDeal.aptNm}</div>
-     <div class="text-sm text-gray-600">
-       ${latestDeal.floor}층 | ${Math.round(latestDeal.excluUseAr)}㎡
-     </div>
-     <div class="text-lg font-bold text-gray-900">
-       ${formatPrice(parseAmount(latestDeal.dealAmount))}만
-     </div>
-     <div class="text-xs text-gray-500">
-       ${latestDeal.dealYear}.${String(latestDeal.dealMonth).padStart(2, '0')}.${String(latestDeal.dealDay).padStart(2, '0')}
-     </div>
-     <div class="text-xs text-gray-500 mt-1">
-       총 ${sameLocationDeals.length}건의 거래
-     </div>
-   </div>
- `;
-
- return new window.kakao.maps.InfoWindow({
-   content: content,
-   removable: true
- });
+  return new window.kakao.maps.InfoWindow({
+    content: content,
+    removable: true
+  });
 };
 
 const updateMarkers = (properties) => {
