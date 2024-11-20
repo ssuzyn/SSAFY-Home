@@ -1,4 +1,6 @@
 <script setup>
+import PriceTrendChart from "@/components/property/PriceTrendChart.vue";
+
 const props = defineProps({
   open: {
     type: Boolean,
@@ -17,29 +19,38 @@ const closeModal = () => {
 };
 
 const formatDate = (dateString) => {
-  return dateString.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1년 $2월 $3일');
+  return dateString.replace(/(\d{4})-(\d{2})-(\d{2})/, "$1년 $2월 $3일");
 };
 
 const formatPrice = (amount) => {
-  return new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: "KRW",
-    maximumFractionDigits: 0
-  }).format(amount);
+  // 1억 이상인 경우
+  if (amount >= 100000000) {
+    const uk = Math.floor(amount / 100000000); // 억 단위
+    const man = Math.floor((amount % 100000000) / 10000); // 만 단위
+    if (man > 0) {
+      return `${uk}억 ${man}만원`;
+    }
+    return `${uk}억원`;
+  }
+  // 1억 미만인 경우
+  else {
+    const man = Math.floor(amount / 10000);
+    return `${man}만원`;
+  }
 };
 
 const getRecentPrice = () => {
   if (props.propertyDetail.deals && props.propertyDetail.deals.length > 0) {
     return formatPrice(props.propertyDetail.deals[0].dealAmount);
   }
-  return '가격정보 없음';
+  return "가격정보 없음";
 };
 
 const getRecentSize = () => {
   if (props.propertyDetail.deals && props.propertyDetail.deals.length > 0) {
     return props.propertyDetail.deals[0].excluUseAr;
   }
-  return '-';
+  return "-";
 };
 </script>
 
@@ -47,23 +58,39 @@ const getRecentSize = () => {
   <Transition appear>
     <div v-if="open" class="fixed inset-0 z-[100]">
       <!-- Backdrop -->
-      <div class="fixed inset-0 bg-black/30" aria-hidden="true" @click="closeModal" />
-      
+      <div
+        class="fixed inset-0 bg-black/30"
+        aria-hidden="true"
+        @click="closeModal"
+      />
+
       <!-- Modal -->
       <div class="fixed inset-0 flex items-center justify-center p-4">
-        <div class="relative bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div
+          class="relative bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        >
           <!-- Header -->
           <div class="flex items-center justify-between p-4 border-b">
             <h3 class="text-xl font-semibold text-gray-900">
               {{ propertyDetail.aptNm }}
             </h3>
-            <button 
+            <button
               @click="closeModal"
               class="text-gray-400 hover:text-gray-500 focus:outline-none"
             >
               <span class="sr-only">Close</span>
-              <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -89,28 +116,58 @@ const getRecentSize = () => {
                   <p class="font-medium">{{ propertyDetail.dealCount }}건</p>
                 </div>
               </div>
+              <br>
+              <!-- 차트 섹션 -->
+              <div class="my-10 border-b pb-8">
+                <PriceTrendChart :deals="propertyDetail.deals" />
+              </div>
+              <br>
 
               <!-- 거래 내역 -->
               <div class="mt-6">
-                <h4 class="text-lg font-medium mb-3">거래 내역</h4>
+                <h4 class="text-lg font-bold mb-3">거래 내역</h4>
                 <div class="overflow-x-auto">
                   <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                       <tr>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">거래일</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">층</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">면적</th>
-                        <th class="px-3 py-2 text-left text-xs font-medium text-gray-500">거래금액</th>
+                        <th
+                          class="px-3 py-2 text-left text-xs font-medium text-gray-500"
+                        >
+                          거래일
+                        </th>
+                        <th
+                          class="px-3 py-2 text-left text-xs font-medium text-gray-500"
+                        >
+                          층
+                        </th>
+                        <th
+                          class="px-3 py-2 text-left text-xs font-medium text-gray-500"
+                        >
+                          면적
+                        </th>
+                        <th
+                          class="px-3 py-2 text-left text-xs font-medium text-gray-500"
+                        >
+                          거래금액
+                        </th>
                       </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                      <tr v-for="deal in propertyDetail.deals" 
-                          :key="deal.dealDate + deal.floor" 
-                          class="hover:bg-gray-50">
-                        <td class="px-3 py-2 text-sm">{{ formatDate(deal.dealDate) }}</td>
+                      <tr
+                        v-for="deal in propertyDetail.deals"
+                        :key="deal.dealDate + deal.floor"
+                        class="hover:bg-gray-50"
+                      >
+                        <td class="px-3 py-2 text-sm">
+                          {{ formatDate(deal.dealDate) }}
+                        </td>
                         <td class="px-3 py-2 text-sm">{{ deal.floor }}층</td>
-                        <td class="px-3 py-2 text-sm">{{ deal.excluUseAr }}㎡</td>
-                        <td class="px-3 py-2 text-sm">{{ formatPrice(deal.dealAmount) }}</td>
+                        <td class="px-3 py-2 text-sm">
+                          {{ deal.excluUseAr }}㎡
+                        </td>
+                        <td class="px-3 py-2 text-sm">
+                          {{ formatPrice(deal.dealAmount) }}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
