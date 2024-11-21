@@ -1,6 +1,8 @@
 package com.ssafy.server.config;
 
+import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -20,26 +22,6 @@ public class WebConfiguration implements WebMvcConfigurer {
         super();
         this.jwtInterceptor = jwtInterceptor;
     }
-
-//    @Override
-//    public void addCorsMappings(CorsRegistry registry) {
-////		default 설정.
-////		Allow all origins.
-////		Allow "simple" methods GET, HEAD and POST.
-////		Allow all headers.
-////		Set max age to 1800 seconds (30 minutes).
-//        registry
-//            .addMapping("/**")
-////            .allowedOrigins("*")
-//			.allowedOrigins("http://localhost:5173", "http://localhost:5174","http://127.0.0.1:5174","http://127.0.0.1:5173")
-//            .allowedMethods(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.PUT.name(),
-//                HttpMethod.DELETE.name(), HttpMethod.HEAD.name(), HttpMethod.OPTIONS.name(),
-//                HttpMethod.PATCH.name())
-//			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD")
-//			.allowCredentials(true)
-//			.allowedHeaders("*")
-//            .maxAge(1800); // Pre-flight Caching
-//    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -75,9 +57,8 @@ public class WebConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/img/**").addResourceLocations("classpath:/static/assets/img/");
         registry.addResourceHandler("/*.html**").addResourceLocations("classpath:/static/");
         registry.addResourceHandler("/uploads/**")
-            .addResourceLocations("classpath:/static/uploads/")
-            .setCachePeriod(3600)
-            .resourceChain(true);
+            .addResourceLocations("file:/")
+            .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS));
     }
 
 }
