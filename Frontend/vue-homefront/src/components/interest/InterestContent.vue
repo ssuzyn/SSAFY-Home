@@ -34,14 +34,14 @@ const closeDrawer = () => {
       <div class="relative">
         <button 
           @click="closeDrawer"
-          class="absolute left-2 top-4 p-2 hover:bg-gray-100 rounded-full"
+          class="absolute left-2 top-4 p-2 text-black hover:bg-gray-100 rounded-full"
         >
           <close-outlined />
         </button>
       </div>
 
       <div class="drawer-header">
-        <div class="header-title">
+        <div class="header-title text-black">
           <span v-if="isLoggedIn">총 {{ store.totalCount() }}개의 관심 매물이 있어요!</span>
           <span v-else>로그인이 필요한 서비스입니다!</span>
         </div>
