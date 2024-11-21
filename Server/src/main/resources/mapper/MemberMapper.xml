@@ -10,6 +10,9 @@
 		<result column="user_pwd" property="userPwd"/>
 		<result column="email_id" property="emailId"/>
 		<result column="email_domain" property="emailDomain"/>
+		<result column="gender" property="gender"/>
+		<result column="age" property="age"/>
+		<result column="phone_number" property="phoneNumber"/>
 	</resultMap>
 
 	<!-- 로그인 -->
@@ -21,8 +24,8 @@
 
 	<!-- 회원 가입 -->
 	<insert id="register" parameterType="map">
-		INSERT INTO members (user_id, user_name, user_pwd, email_id, email_domain, join_date)
-		VALUES (#{userId}, #{userName}, #{userPwd}, #{emailId}, #{emailDomain}, NOW());
+		INSERT INTO members (user_id, user_name, user_pwd, email_id, email_domain, join_date, gender, age, phone_number)
+		VALUES (#{userId}, #{userName}, #{userPwd}, #{emailId}, #{emailDomain}, NOW(), #{gender}, #{age}, #{phoneNumber});
 	</insert>
 
 	<!-- 회원 정보 조회 -->
@@ -30,8 +33,12 @@
 		SELECT
 			user_id,
 			user_name,
+			user_pwd,
 			email_id,
-			email_domain
+			email_domain,
+			gender,
+			age,
+			phone_number
 		FROM
 			members
 		WHERE
@@ -45,7 +52,10 @@
             user_name = #{userName},
             user_pwd = #{userPwd},
             email_id = #{emailId},
-            email_domain = #{emailDomain}
+            email_domain = #{emailDomain},
+						gender = #{gender},
+						age = #{age},
+						phone_number = #{phoneNumber}
         WHERE
             user_id = #{userId}
 	</update>
