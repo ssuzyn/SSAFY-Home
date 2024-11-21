@@ -25,7 +25,7 @@ const closeDrawer = () => {
   <div 
     class="fixed right-0 top-0 h-full bg-white z-30 transform transition-transform duration-300 ease-in-out shadow-lg"
     :class="{
-      'translate-x-0 w-[320px]': store.isVisible,
+      'translate-x-0 w-[360px]': store.isVisible,
       'translate-x-full': !store.isVisible
     }"
     style="top: 130px;"
@@ -69,7 +69,10 @@ const closeDrawer = () => {
         <template v-else>
           <div v-for="property in store.favorites" :key="property.aptSeq" class="property-item">
             <div class="mb-1">
-              <span class="text-gray-600 text-sm">{{ property.name }}</span>
+              <span class="text-gray-600 text-sm">{{ property.dongName }}</span>
+            </div>
+            <div class="mb-1">
+              <span class="text-gray-600 text-medium">{{ property.aptName }}</span>
             </div>
             <div class="flex items-center justify-between">
               <div class="flex items-center">
