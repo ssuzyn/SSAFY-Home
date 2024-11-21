@@ -160,6 +160,8 @@
   import { useAuth } from "@/stores/auth";
   import { useAxiosStore } from "@/stores/axiosStore";
   import { useRouter } from "vue-router";
+  import { message } from "ant-design-vue";
+
   
   const router = useRouter();
   const auth = useAuth();
@@ -250,11 +252,11 @@
         selectedFile.value = null;
       }
   
-      alert("변경사항이 성공적으로 저장되었습니다.");
-      router.push({ name: 'UserProfile' });
+      message.success("변경사항이 성공적으로 저장되었습니다.");
+      router.push({ name: 'MyPage' });
     } catch (error) {
       console.error("변경사항 저장 중 오류 발생:", error);
-      alert("변경사항 저장 중 오류가 발생했습니다: " + error.message);
+      message.error("변경사항 저장 중 오류가 발생했습니다:"|| error.response?.data?.message);
     }
   };
   </script>
