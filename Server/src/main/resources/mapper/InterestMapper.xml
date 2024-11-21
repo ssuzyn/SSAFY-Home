@@ -38,7 +38,7 @@
       hp.apt_nm,
       hp.latest_deal_amount,
       hp.prev_deal_amount,
-      hp.price_change_rate,
+      hp.price_change_rate
     FROM
       interest_apt ia
         JOIN
