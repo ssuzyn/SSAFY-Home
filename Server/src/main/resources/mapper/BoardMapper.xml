@@ -3,14 +3,59 @@
 
 <mapper namespace="com.ssafy.server.board.mapper.BoardMapper">
 
+    <!-- 게시글 resultMap -->
+    <resultMap id="boardResultMap" type="com.ssafy.server.board.dto.BoardDto">
+        <id property="articleNo" column="article_no" />
+        <result property="userId" column="user_id" />
+        <result property="subject" column="subject" />
+        <result property="content" column="content" />
+        <result property="hit" column="hit" />
+        <result property="registerTime" column="register_time" />
+    </resultMap>
+
+    <!-- 댓글 resultMap -->
+    <resultMap id="commentResultMap" type="com.ssafy.server.board.dto.CommentDto">
+        <id property="commentId" column="comment_id" />
+        <result property="articleNo" column="article_no" />
+        <result property="userId" column="user_id" />
+        <result property="content" column="content" />
+        <result property="registerTime" column="register_time" />
+    </resultMap>
+
+
+    <!-- 전체 게시글 목록 조회 -->
+    <select id="getAllBoards" resultMap="boardResultMap">
+        SELECT
+            article_no,
+            user_id,
+            subject,
+            content,
+            hit,
+            register_time
+        FROM
+            board
+        ORDER BY
+            register_time DESC;
+    </select>
+
     <!-- Q&A CRUD -->
     <insert id="createBoard" parameterType="BoardDto">
         INSERT INTO board (user_id, subject, content, hit, register_time)
         VALUES (#{userId}, #{subject}, #{content}, #{hit}, CURRENT_TIMESTAMP)
     </insert>
 
-    <select id="getBoard" parameterType="int" resultType="BoardDto">
-        SELECT * FROM board WHERE article_no = #{articleNo}
+    <select id="getBoard" parameterType="int" resultMap="boardResultMap">
+        SELECT
+            article_no,
+            user_id,
+            subject,
+            content,
+            hit,
+            register_time
+        FROM
+            board
+        WHERE
+            article_no = #{articleNo};
     </select>
 
     <update id="updateBoard" parameterType="BoardDto">
@@ -39,12 +84,12 @@
     </delete>
 
     <!-- Q&A 글별 댓글 조회 -->
-    <select id="getCommentsByArticleNo" parameterType="int" resultType="CommentDto">
+    <select id="getCommentsByArticleNo" parameterType="int" resultMap="commentResultMap">
         SELECT * FROM comments WHERE article_no = #{articleNo}
     </select>
 
     <!-- Q&A 검색 필터링 -->
-    <select id="searchBoard" parameterType="map" resultType="BoardDto">
+    <select id="searchBoard" parameterType="map" resultMap="boardResultMap">
         SELECT * FROM board
         WHERE
         <choose>
@@ -62,6 +107,5 @@
             </when>
         </choose>
     </select>
-
 
 </mapper>

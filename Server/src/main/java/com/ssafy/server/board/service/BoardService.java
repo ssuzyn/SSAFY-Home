@@ -7,6 +7,9 @@ import java.util.List;
 
 public interface BoardService {
 
+    // 전체 게시글 목록 조회
+    List<BoardDto> getAllBoards();
+
     // Q&A CRUD
     void createBoard(BoardDto boardDto);
 
