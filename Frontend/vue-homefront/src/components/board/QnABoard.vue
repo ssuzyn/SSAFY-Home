@@ -4,7 +4,10 @@
       <!-- 상단 제목과 버튼 영역 -->
       <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl text-black font-bold">부동산 QnA</h1>
-        <button @click="openNewQuestionDialog" class="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 flex items-center">
+        <button 
+          @click="openNewQuestionDialog" 
+          class="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 flex items-center"
+        >
           <Plus class="mr-2 h-4 w-4" />
           질문하기
         </button>
@@ -154,9 +157,11 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { Plus, ChevronRight } from 'lucide-vue-next'
 import { useBoard } from '@/stores/board'
 import { useAuth } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 
 const board = useBoard()
 const auth = useAuth()
+const router = useRouter()
 
 const popularQuestions = [
   "전세 사기 예방하는 방법",
@@ -170,7 +175,11 @@ const newQuestion = reactive({ subject: '', content: '' })
 const newAnswer = ref('')
 
 onMounted(async () => {
-  await board.fetchAllQuestions()
+  try {
+    await board.fetchAllQuestions()
+  } catch (error) {
+    console.error('Failed to fetch questions:', error)
+  }
 })
 
 const handleSearch = () => {
@@ -182,6 +191,13 @@ const handleSearch = () => {
 }
 
 const openNewQuestionDialog = () => {
+  if (!auth.isLoggedIn) {
+    if (confirm('로그인이 필요한 서비스입니다. 로그인 하시겠습니까?')) {
+      router.push('/login')
+    }
+    return
+  }
+  
   showNewQuestionDialog.value = true
 }
 
@@ -202,6 +218,13 @@ const handleNewQuestion = async () => {
 }
 
 const openQuestionDetailDialog = async (articleNo) => {
+  if (!auth.isLoggedIn) {
+    if (confirm('로그인이 필요한 서비스입니다. 로그인 하시겠습니까?')) {
+      router.push('/login')
+    }
+    return
+  }
+  
   await board.getQuestionDetails(articleNo)
   await board.fetchComments(articleNo)
 }
@@ -249,9 +272,9 @@ watch(() => board.selectedQuestion, (newVal) => {
   if (newVal) {
     console.log('Selected question updated:', newVal)
   }
-})
+}, { deep: true })
 
 watch(() => board.comments, (newVal) => {
   console.log('Comments updated:', newVal)
-})
+}, { deep: true })
 </script>

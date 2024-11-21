@@ -124,7 +124,12 @@ const resetAll = () => {
           placeholder="시/도"
           value-key="sidoCode"
           label-key="sidoName"
-          class="bg-white"
+          class="bg-white border-2 border-gray-300 rounded-lg shadow-md transition-all"
+          :class="[
+            selectedSido 
+              ? 'bg-orange-50 border-orange-500 text-orange-700' 
+              : 'hover:border-orange-300'
+          ]"
         />
 
         <BaseSelect
@@ -134,7 +139,12 @@ const resetAll = () => {
           placeholder="구/군"
           value-key="gugunCode"
           label-key="gugunName"
-          class="bg-white"
+          class="bg-white border-2 border-gray-300 rounded-lg shadow-md transition-all"
+          :class="[
+            selectedGugun 
+              ? 'bg-orange-50 border-orange-500 text-orange-700' 
+              : 'hover:border-orange-300'
+          ]"
         />
 
         <BaseSelect
@@ -144,17 +154,34 @@ const resetAll = () => {
           placeholder="동"
           value-key="dongCode"
           label-key="dongName"
-          class="bg-white"
+          class="bg-white border-2 border-gray-300 rounded-lg shadow-md transition-all"
+          :class="[
+            selectedDong 
+              ? 'bg-orange-50 border-orange-500 text-orange-700' 
+              : 'hover:border-orange-300'
+          ]"
         />
 
         <SearchInput
           v-model="searchQuery"
           placeholder="아파트명을 검색하세요"
           @search="handleSearch"
+          class="bg-white border-2 border-gray-300 rounded-lg shadow-md transition-all"
+          :class="[
+            searchQuery 
+              ? 'bg-orange-50 border-orange-500' 
+              : 'hover:border-orange-300'
+          ]"
         />
 
         <button
-          class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200"
+          class="px-4 py-2 text-sm font-semibold bg-white border-2 border-gray-300 
+                 rounded-lg shadow-md transition-all duration-200"
+          :class="[
+            selectedSido || selectedGugun || selectedDong || searchQuery
+              ? 'bg-orange-50 border-orange-400 text-orange-600 hover:bg-orange-100'
+              : 'text-gray-700 hover:border-orange-300'
+          ]"
           @click="resetAll"
         >
           초기화
