@@ -24,6 +24,7 @@ export const useAuth = defineStore('auth', () => {
     } else {
       user.value = null;
       localStorage.removeItem('user');
+      window.location.href = '/';
     }
     
   };
@@ -102,8 +103,6 @@ export const useAuth = defineStore('auth', () => {
 
   const logout = () => {
     setToken(null);
-    user.value = null;
-    localStorage.removeItem('user');
   };
 
   const validateToken = async () => {
