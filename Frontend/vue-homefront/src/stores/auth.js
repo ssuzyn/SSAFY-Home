@@ -4,8 +4,8 @@ import axios from 'axios'
 import { useRouter } from 'vue-router';
 
 // axios 인스턴스 생성
-const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:8080/user',
+export const axiosInstance = axios.create({
+  baseURL: 'http://127.0.0.1:8080',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ export const useAuth = defineStore('auth', () => {
   axiosInstance.interceptors.request.use(
     (config) => {
       const currentToken = token.value;
-      if (currentToken && !config.url.endsWith('/login')) {
+      if (currentToken && !config.url.endsWith('/user/login')) {
         config.headers['Authorization'] = `Bearer ${currentToken}`;
       }
       return config;
@@ -48,7 +48,7 @@ export const useAuth = defineStore('auth', () => {
     if (newToken) {
       localStorage.setItem('token', newToken);
       try {
-        const response = await axiosInstance.get('/info');
+        const response = await axiosInstance.get('/user/info');
         user.value = { username: response.data['userInfo'] };
       } catch (error) {
         console.error('User info 요청 실패:', error);
@@ -64,7 +64,7 @@ export const useAuth = defineStore('auth', () => {
 
   const login = async (userId, userPwd, rememberMe) => {
     try {
-      const response = await axiosInstance.post('/login', { 
+      const response = await axiosInstance.post('/user/login', { 
         userId, 
         userPwd 
       });
@@ -99,7 +99,7 @@ export const useAuth = defineStore('auth', () => {
   const validateToken = async () => {
     if (token.value) {
       try {
-        await axiosInstance.get('/info');
+        await axiosInstance.get('/user/info');
       } catch (error) {
         logout();
       }
