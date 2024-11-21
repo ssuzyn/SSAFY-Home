@@ -3,8 +3,8 @@ import { ref, computed } from 'vue'
 import axios from 'axios'
 
 // axios 인스턴스 생성
-const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:8080/user',
+export const axiosInstance = axios.create({
+  baseURL: 'http://127.0.0.1:8080',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -20,7 +20,7 @@ export const useAuth = defineStore('auth', () => {
   axiosInstance.interceptors.request.use(
     (config) => {
       const currentToken = token.value;
-      if (currentToken && !config.url.endsWith('/login')) {
+      if (currentToken && !config.url.endsWith('/user/login')) {
         config.headers['Authorization'] = `Bearer ${currentToken}`;
       }
       return config;
@@ -28,12 +28,10 @@ export const useAuth = defineStore('auth', () => {
     (error) => Promise.reject(error)
   );
 
-  // 응답 인터셉터 추가 (토큰 만료 등 처리)
   axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
       if (error.response?.status === 401) {
-        // 토큰 만료 등으로 인한 인증 오류
         logout();
       }
       return Promise.reject(error);
@@ -46,13 +44,13 @@ export const useAuth = defineStore('auth', () => {
     if (newToken) {
       localStorage.setItem('token', newToken);
       try {
-        const response = await axiosInstance.get('/info');
+        const response = await axiosInstance.get('/user/info');  // 경로 수정
         user.value = response.data['userInfo'];
-        localStorage.setItem('user', JSON.stringify(user.value)); // 사용자 정보 저장
+        localStorage.setItem('user', JSON.stringify(user.value));
       } catch (error) {
         console.error('User info 요청 실패:', error);
         user.value = null;
-        localStorage.removeItem('user'); // 실패 시 사용자 정보 삭제
+        localStorage.removeItem('user');
       }
     } else {
       localStorage.removeItem('token');
@@ -64,7 +62,7 @@ export const useAuth = defineStore('auth', () => {
 
   const fetchUserInfo = async () => {
     try {
-      const response = await axiosInstance.get('/info');
+      const response = await axiosInstance.get('/user/info');  // 경로 수정
       user.value = response.data.userInfo;
       localStorage.setItem('user', JSON.stringify(user.value));
     } catch (error) {
@@ -76,7 +74,7 @@ export const useAuth = defineStore('auth', () => {
   
   const updateUserInfo = async (updateData) => {
     try {
-      await axiosInstance.put('/update', updateData);
+      await axiosInstance.put('/user/update', updateData);  // 경로 수정
       await fetchUserInfo();
       return { success: true };
     } catch (error) {
@@ -92,7 +90,7 @@ export const useAuth = defineStore('auth', () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      await axiosInstance.post('/uploadProfile', formData, {
+      await axiosInstance.post('/user/uploadProfile', formData, {  // 경로 수정
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       await fetchUserInfo();
@@ -108,7 +106,7 @@ export const useAuth = defineStore('auth', () => {
 
   const login = async (userId, userPwd, rememberMe) => {
     try {
-      const response = await axiosInstance.post('/login', { 
+      const response = await axiosInstance.post('/user/login', {  // 이미 올바른 경로
         userId, 
         userPwd 
       });
@@ -139,21 +137,19 @@ export const useAuth = defineStore('auth', () => {
     user.value = null;
   };
 
-  // 초기 로드시 토큰 유효성 검증
   const validateToken = async () => {
     if (token.value) {
       try {
-        const response = await axiosInstance.get('/info');
+        const response = await axiosInstance.get('/user/info');  // 경로 수정
         user.value = response.data['userInfo'];
-        localStorage.setItem('user', JSON.stringify(user.value)); // 서버에서 확인 후 다시 저장
+        localStorage.setItem('user', JSON.stringify(user.value));
       } catch (error) {
         console.error('토큰 검증 실패:', error);
-        logout(); // 유효하지 않으면 로그아웃
+        logout();
       }
     }
   };
 
-  // 컴포넌트 마운트시 호출
   validateToken();
 
   return {

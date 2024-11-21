@@ -1,5 +1,7 @@
 <script setup>
 import AppHeader from '@/components/layout/AppHeader.vue';
+import InterestContent from '@/components/interest/InterestContent.vue';
+
 </script>
 
 <template>
@@ -9,6 +11,10 @@ import AppHeader from '@/components/layout/AppHeader.vue';
       <RouterView></RouterView>
     </main>
   </div>
+  <div>
+    <InterestContent />
+  </div>
+  
 </template>
 
 

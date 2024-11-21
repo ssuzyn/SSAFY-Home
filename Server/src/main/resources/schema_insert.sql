@@ -101,56 +101,6 @@ UPDATE houseinfos h
     JOIN dongcodes d ON CONCAT(h.sgg_cd, h.umd_cd) = d.dong_code
     SET h.dong_code = d.dong_code;
 
-CREATE TABLE IF NOT EXISTS `latest_housedeals` (
-                                                   `no` INT NOT NULL AUTO_INCREMENT,
-                                                   `apt_seq` VARCHAR(20) NOT NULL,
-    `apt_dong` VARCHAR(40) NULL DEFAULT NULL,
-    `floor` VARCHAR(3) NULL DEFAULT NULL,
-    `deal_year` INT NOT NULL,
-    `deal_month` INT NOT NULL,
-    `deal_day` INT NOT NULL,
-    `exclu_use_ar` DECIMAL(7,2) NULL DEFAULT NULL,
-    `deal_amount` VARCHAR(10) NULL DEFAULT NULL,
-    PRIMARY KEY (`no`),
-    UNIQUE KEY `unique_apt_floor` (`apt_seq`, `floor`)
-    )
-    ENGINE = InnoDB
-    DEFAULT CHARACTER SET = utf8mb4
-    COLLATE = utf8mb4_0900_ai_ci;
-
-INSERT IGNORE INTO `latest_housedeals` (`apt_seq`, `apt_dong`, `floor`, `deal_year`, `deal_month`, `deal_day`, `exclu_use_ar`, `deal_amount`)
-SELECT
-    hd.`apt_seq`,
-    hd.`apt_dong`,
-    hd.`floor`,
-    hd.`deal_year`,
-    hd.`deal_month`,
-    hd.`deal_day`,
-    hd.`exclu_use_ar`,
-    hd.`deal_amount`
-FROM
-    `housedeals` hd
-        JOIN (
-        SELECT
-            `apt_seq`,
-            `floor`,
-            MAX(CONCAT(`deal_year`, LPAD(`deal_month`, 2, '0'), LPAD(`deal_day`, 2, '0'))) AS latest_date
-        FROM
-            `housedeals`
-        GROUP BY
-            `apt_seq`, `floor`
-    ) latest ON
-        hd.`apt_seq` = latest.`apt_seq`
-            AND hd.`floor` = latest.`floor`
-            AND CONCAT(hd.`deal_year`, LPAD(hd.`deal_month`, 2, '0'), LPAD(hd.`deal_day`, 2, '0')) = latest.latest_date;
-
-ALTER TABLE `latest_housedeals`
-    ADD CONSTRAINT `fk_latest_housedeals_apt_seq`
-        FOREIGN KEY (`apt_seq`)
-            REFERENCES `houseinfos` (`apt_seq`)
-            ON DELETE CASCADE
-            ON UPDATE CASCADE;
-
 LOCK TABLES `members` WRITE;
 /*!40000 ALTER TABLE `members` DISABLE KEYS */;
 INSERT INTO members (user_id, user_name, user_pwd, email_id, email_domain, join_date)
@@ -180,3 +130,118 @@ LOCK TABLES `sidocodes` WRITE;
 INSERT INTO `sidocodes` VALUES ('4200000000','강원도'),('4100000000','경기도'),('4800000000','경상남도'),('4700000000','경상북도'),('2900000000','광주광역시'),('2700000000','대구광역시'),('3000000000','대전광역시'),('2600000000','부산광역시'),('1100000000','서울특별시'),('3611000000','세종특별자치시'),('3100000000','울산광역시'),('2800000000','인천광역시'),('4600000000','전라남도'),('4500000000','전라북도'),('5000000000','제주특별자치도'),('4400000000','충청남도'),('4300000000','충청북도');
 /*!40000 ALTER TABLE `sidocodes` ENABLE KEYS */;
 UNLOCK TABLES;
+
+INSERT INTO interest_apt (user_id, apt_seq) VALUES
+                                                ('snoopy', '11110-100'),
+                                                ('snoopy', '11110-102'),
+                                                ('snoopy', '11110-2445'),
+                                                ('snoopy', '11140-1039'),
+                                                ('snoopy', '11140-1217'),
+                                                ('snoopy', '11140-1300'),
+                                                ('snoopy', '48123-156');
+
+
+CREATE TABLE `latest_housedeals` (
+                                     `no` INT NOT NULL AUTO_INCREMENT,
+                                     `apt_seq` VARCHAR(20) NOT NULL,
+                                     `apt_dong` VARCHAR(40) NULL DEFAULT NULL,
+                                     `floor` VARCHAR(3) NULL DEFAULT NULL,
+                                     `deal_year` INT NULL DEFAULT NULL,
+                                     `deal_month` INT NULL DEFAULT NULL,
+                                     `deal_day` INT NULL DEFAULT NULL,
+                                     `exclu_use_ar` DECIMAL(7,2) NULL DEFAULT NULL,
+                                     `deal_amount` VARCHAR(10) NULL DEFAULT NULL,
+                                     `deal_count` INT NULL DEFAULT NULL,
+                                     PRIMARY KEY (`no`),
+                                     UNIQUE KEY `uk_apt_seq` (`apt_seq`),  -- apt_seq에 UNIQUE 제약조건 추가
+                                     CONSTRAINT `fk_latest_housedeals_apt_seq`
+                                         FOREIGN KEY (`apt_seq`)
+                                             REFERENCES `houseinfos` (`apt_seq`)
+                                             ON DELETE CASCADE
+                                             ON UPDATE CASCADE
+);
+
+
+INSERT IGNORE INTO latest_housedeals (
+    apt_seq,
+    apt_dong,
+    floor,
+    deal_year,
+    deal_month,
+    deal_day,
+    exclu_use_ar,
+    deal_amount,
+    deal_count
+)
+SELECT
+    hd.apt_seq,
+    hd.apt_dong,
+    hd.floor,
+    hd.deal_year,
+    hd.deal_month,
+    hd.deal_day,
+    hd.exclu_use_ar,
+    hd.deal_amount,
+    counts.total_deals
+FROM housedeals hd
+         JOIN (
+    SELECT apt_seq,
+           MAX(CONCAT(deal_year, LPAD(deal_month, 2, '0'), LPAD(deal_day, 2, '0'))) AS latest_date
+    FROM housedeals
+    GROUP BY apt_seq
+) latest ON hd.apt_seq = latest.apt_seq
+    AND CONCAT(hd.deal_year, LPAD(hd.deal_month, 2, '0'), LPAD(hd.deal_day, 2, '0')) = latest.latest_date
+         JOIN (
+    SELECT apt_seq, COUNT(*) as total_deals
+    FROM housedeals
+    GROUP BY apt_seq
+) counts ON hd.apt_seq = counts.apt_seq;
+
+
+CREATE TABLE house_price_stats (
+                                   apt_seq VARCHAR(20) NOT NULL,
+                                   apt_nm VARCHAR(100),
+                                   latest_deal_amount VARCHAR(10),
+                                   prev_deal_amount VARCHAR(10),
+                                   price_change_rate DECIMAL(8,1),
+                                   deal_count INT NULL DEFAULT NULL,
+                                   last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                   PRIMARY KEY (apt_seq),
+                                   FOREIGN KEY (apt_seq) REFERENCES houseinfos(apt_seq)
+);
+
+
+INSERT INTO house_price_stats (
+    apt_seq,
+    apt_nm,
+    latest_deal_amount,
+    prev_deal_amount,
+    price_change_rate,
+    deal_count
+)
+WITH ranked_deals AS (
+    SELECT
+        hd.apt_seq,
+        hd.deal_amount,
+        ROW_NUMBER() OVER (PARTITION BY hd.apt_seq ORDER BY deal_year DESC, deal_month DESC, deal_day DESC) as rn
+    FROM housedeals hd
+)
+SELECT
+    r1.apt_seq,
+    hi.apt_nm,
+    r1.deal_amount as latest_deal_amount,
+    r2.deal_amount as prev_deal_amount,
+    CASE
+        WHEN r2.deal_amount IS NOT NULL
+            THEN ROUND(
+                (CAST(REPLACE(r1.deal_amount, ',', '') AS DECIMAL(10,0)) -
+                 CAST(REPLACE(r2.deal_amount, ',', '') AS DECIMAL(10,0))) /
+                CAST(REPLACE(r2.deal_amount, ',', '') AS DECIMAL(10,0)) * 100,
+                1)
+        ELSE 0
+        END AS price_change_rate,
+    COUNT(*) OVER (PARTITION BY r1.apt_seq) as deal_count
+FROM ranked_deals r1
+         JOIN houseinfos hi ON r1.apt_seq = hi.apt_seq
+         LEFT JOIN ranked_deals r2 ON r1.apt_seq = r2.apt_seq AND r2.rn = 2
+WHERE r1.rn = 1;
