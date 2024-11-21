@@ -115,7 +115,7 @@ const resetAll = () => {
 </script>
 
 <template>
-  <div class="bg-white border-b">
+  <div class="bg-transparent">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
       <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
         <BaseSelect
@@ -124,6 +124,7 @@ const resetAll = () => {
           placeholder="시/도"
           value-key="sidoCode"
           label-key="sidoName"
+          class="bg-white"
         />
 
         <BaseSelect
@@ -133,6 +134,7 @@ const resetAll = () => {
           placeholder="구/군"
           value-key="gugunCode"
           label-key="gugunName"
+          class="bg-white"
         />
 
         <BaseSelect
@@ -142,6 +144,7 @@ const resetAll = () => {
           placeholder="동"
           value-key="dongCode"
           label-key="dongName"
+          class="bg-white"
         />
 
         <SearchInput
@@ -150,7 +153,6 @@ const resetAll = () => {
           @search="handleSearch"
         />
 
-        <!-- 리셋 버튼 추가 -->
         <button
           class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors duration-200"
           @click="resetAll"

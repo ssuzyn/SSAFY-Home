@@ -1,24 +1,22 @@
 <template>
-  <div class="flex flex-col h-screen pt-16">
-    <!-- 상단 영역 -->
-    <div class="relative z-50">
+  <div class="flex flex-col h-screen pt-16 bg-transparent">
+    <div class="absolute inset-0">
+      <LocationMap
+        :properties="searchResults"
+        :selected-property="selectedProperty"
+        :center-position="mapCenter" 
+        :zoom-level="mapZoom"
+        @select-property="handleMarkerClick"
+        class="h-full w-full"
+      />
+    </div>
+
+    <div class="relative z-50 bg-transparent">
       <LocationSelect @search-result="handleSearchResult" />
     </div>
     
     <!-- 메인 콘텐츠 영역 -->
     <div class="flex-1 relative">
-      <!-- 지도 영역 -->
-      <div class="absolute inset-0">
-        <LocationMap
-          :properties="searchResults"
-          :selected-property="selectedProperty"
-          :center-position="mapCenter" 
-          :zoom-level="mapZoom"
-          @select-property="handleMarkerClick"
-          class="h-full w-full"
-        />
-      </div>
-
       <!-- 왼쪽 사이드바 -->
       <div 
         class="absolute h-full bg-white z-30 transform transition-transform duration-300 ease-in-out shadow-lg"
