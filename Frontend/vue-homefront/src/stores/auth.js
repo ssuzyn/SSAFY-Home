@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, computed, toRaw } from 'vue'
+import { ref, computed } from 'vue'
 import axios from 'axios'
-import { useRouter } from 'vue-router';
 
 // axios 인스턴스 생성
 export const axiosInstance = axios.create({
@@ -14,8 +13,7 @@ export const axiosInstance = axios.create({
 
 export const useAuth = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || null)
-  const user = ref(null)
-  const router = useRouter();
+  const user = ref(JSON.parse(localStorage.getItem('user')) || null)
   const isLoggedIn = computed(() => !!token.value)
 
   // axios 인터셉터 설정
@@ -30,41 +28,85 @@ export const useAuth = defineStore('auth', () => {
     (error) => Promise.reject(error)
   );
 
-  // 응답 인터셉터 추가 (토큰 만료 등 처리)
   axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
       if (error.response?.status === 401) {
-        // 토큰 만료 등으로 인한 인증 오류
         logout();
       }
       return Promise.reject(error);
     }
   );
 
-  const  setToken = async (newToken) => {
+  const setToken = async (newToken) => {
     token.value = newToken;
   
     if (newToken) {
       localStorage.setItem('token', newToken);
       try {
-        const response = await axiosInstance.get('/user/info');
-        user.value = { username: response.data['userInfo'] };
+        const response = await axiosInstance.get('/user/info');  // 경로 수정
+        user.value = response.data['userInfo'];
+        localStorage.setItem('user', JSON.stringify(user.value));
       } catch (error) {
         console.error('User info 요청 실패:', error);
         user.value = null;
+        localStorage.removeItem('user');
       }
     } else {
       localStorage.removeItem('token');
       user.value = null;
+      localStorage.removeItem('user');
     }
     location.reload();
   };
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await axiosInstance.get('/user/info');  // 경로 수정
+      user.value = response.data.userInfo;
+      localStorage.setItem('user', JSON.stringify(user.value));
+    } catch (error) {
+      console.error('User info 요청 실패:', error);
+      user.value = null;
+      localStorage.removeItem('user');
+    }
+  };
   
+  const updateUserInfo = async (updateData) => {
+    try {
+      await axiosInstance.put('/user/update', updateData);  // 경로 수정
+      await fetchUserInfo();
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to update user info:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.message || '정보 업데이트에 실패했습니다.' 
+      };
+    }
+  };
+
+  const uploadProfileImage = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      await axiosInstance.post('/user/uploadProfile', formData, {  // 경로 수정
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      await fetchUserInfo();
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to upload profile image:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.message || '프로필 이미지 업로드에 실패했습니다.' 
+      };
+    }
+  };
 
   const login = async (userId, userPwd, rememberMe) => {
     try {
-      const response = await axiosInstance.post('/user/login', { 
+      const response = await axiosInstance.post('/user/login', {  // 이미 올바른 경로
         userId, 
         userPwd 
       });
@@ -95,18 +137,19 @@ export const useAuth = defineStore('auth', () => {
     user.value = null;
   };
 
-  // 초기 로드시 토큰 유효성 검증
   const validateToken = async () => {
     if (token.value) {
       try {
-        await axiosInstance.get('/user/info');
+        const response = await axiosInstance.get('/user/info');  // 경로 수정
+        user.value = response.data['userInfo'];
+        localStorage.setItem('user', JSON.stringify(user.value));
       } catch (error) {
+        console.error('토큰 검증 실패:', error);
         logout();
       }
     }
   };
 
-  // 컴포넌트 마운트시 호출
   validateToken();
 
   return {
@@ -114,5 +157,8 @@ export const useAuth = defineStore('auth', () => {
     isLoggedIn,
     login,
     logout,
+    fetchUserInfo,
+    updateUserInfo,
+    uploadProfileImage
   }
 })
