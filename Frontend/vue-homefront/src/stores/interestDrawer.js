@@ -4,10 +4,18 @@ import { message } from 'ant-design-vue';
 import { useAxiosStore } from './axiosStore';
 
 export const useInterestDrawer = defineStore('interestDrawer', () => {
-  const axiosStore = useAxiosStore();
   const isVisible = ref(false);
   const favorites = ref([]);
   const loading = ref(false);
+
+  // axiosStore는 메서드 내부에서 호출
+  const getAxiosStore = () => {
+    const axiosStore = useAxiosStore();
+    if (!axiosStore) {
+      throw new Error('AxiosStore not initialized');
+    }
+    return axiosStore;
+  };
 
   const isFavorite = (aptSeq) => {
     return favorites.value.some(item => item.aptSeq === aptSeq);
@@ -22,7 +30,9 @@ export const useInterestDrawer = defineStore('interestDrawer', () => {
     try {
       loading.value = true;
       console.log('Making API request...');
+      const axiosStore = getAxiosStore();
       const response = await axiosStore.get('/interest-apt/list');
+
       console.log('API Response:', response.data);
       if (response.data.data) {
         favorites.value = response.data.data.map(item => ({
@@ -47,6 +57,7 @@ export const useInterestDrawer = defineStore('interestDrawer', () => {
     
     try {
       loading.value = true;
+      const axiosStore = useAxiosStore(); // useAxiosStore를 직접 호출하여 가져오기
       const isCurrentlyFavorite = isFavorite(aptSeq);
       
       if (isCurrentlyFavorite) {
@@ -66,6 +77,7 @@ export const useInterestDrawer = defineStore('interestDrawer', () => {
     }
   };
 
+  
   const toggleDrawer = () => {
     isVisible.value = !isVisible.value;
   };

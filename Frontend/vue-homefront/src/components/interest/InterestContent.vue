@@ -1,20 +1,21 @@
 <script setup>
 import { StarFilled, CloseOutlined } from '@ant-design/icons-vue';
 import { useInterestDrawer } from '@/stores/interestDrawer';
+import { storeToRefs } from 'pinia';
 import { useAuth } from "@/stores/auth";
 import { onMounted, watch } from 'vue';
+import InterestButton from "./InterestButton.vue";
 
 const store = useInterestDrawer();
+const { favorites } = storeToRefs(store);
 const auth = useAuth();
 
-
-
-watch(() => store.isVisible, (newVal) => {
-  console.log('drawer visibility changed:', newVal);
-  if (newVal && auth.isLoggedIn) {
+onMounted(() => {
+  if (auth.isLoggedIn) {
     store.initialize();
   }
 });
+
 
 const closeDrawer = () => {
   store.isVisible = false;
@@ -67,7 +68,7 @@ const closeDrawer = () => {
           로딩 중...
         </div>
         <template v-else>
-          <div v-for="property in store.favorites" :key="property.aptSeq" class="property-item">
+          <div v-for="property in favorites" :key="property.aptSeq" class="property-item">
             <div class="mb-1">
               <span class="text-gray-600 text-sm">{{ property.dongName }}</span>
             </div>
@@ -90,12 +91,10 @@ const closeDrawer = () => {
                   <span v-else>▼</span>
                   {{ Math.abs(property.change) }}%
                 </div>
-                <button 
+                <InterestButton 
+                  :apt-seq="property.aptSeq" 
                   class="interest-btn text-blue-500"
-                  @click="store.toggleFavorite(property.aptSeq)"
-                >
-                  <StarFilled />
-                </button>
+                />
               </div>
             </div>
             <div class="mt-2 border-b pb-4"></div>
