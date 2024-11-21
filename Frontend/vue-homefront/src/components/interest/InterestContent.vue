@@ -28,7 +28,7 @@ const closeDrawer = () => {
       'translate-x-0 w-[360px]': store.isVisible,
       'translate-x-full': !store.isVisible,
     }"
-    style="top: 130px"
+    style="top: 55px"
   >
     <div class="h-full overflow-y-auto">
       <div class="relative">

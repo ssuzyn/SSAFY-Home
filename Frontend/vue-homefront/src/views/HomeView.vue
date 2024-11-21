@@ -1,6 +1,18 @@
 <template>
-  <div class="flex flex-col h-screen pt-16 bg-transparent">
-    <div class="absolute inset-0">
+  <div class="flex flex-col h-screen">
+    <!-- 헤더 영역 -->
+    <div class="h-16">
+      <!-- AppHeader 컴포넌트 -->
+    </div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="flex-1 relative">
+      <!-- 검색 영역 - 상단에 고정 -->
+      <div class="absolute top-0 left-0 right-0 z-10">
+        <LocationSelect @search-result="handleSearchResult" />
+      </div>
+
+      <!-- 지도 영역 -->
       <LocationMap
         :properties="searchResults"
         :selected-property="selectedProperty"
@@ -9,17 +21,10 @@
         @select-property="handleMarkerClick"
         class="h-full w-full"
       />
-    </div>
 
-    <div class="relative z-50 bg-transparent">
-      <LocationSelect @search-result="handleSearchResult" />
-    </div>
-    
-    <!-- 메인 콘텐츠 영역 -->
-    <div class="flex-1 relative">
-      <!-- 왼쪽 사이드바 -->
+      <!-- 슬라이딩 PropertyList -->
       <div 
-        class="absolute h-full bg-white z-30 transform transition-transform duration-300 ease-in-out shadow-lg"
+        class="absolute top-0 h-full bg-white z-20 transform transition-transform duration-300 ease-in-out shadow-lg"
         :class="{
           'translate-x-0 w-[400px]': isSidebarOpen,
           '-translate-x-full': !isSidebarOpen
@@ -37,8 +42,8 @@
       <!-- 토글 버튼 -->
       <button 
         @click="toggleSidebar"
-        class="absolute top-4 z-50 bg-white w-8 h-8 rounded-lg shadow-lg hover:bg-gray-50 flex items-center justify-center transition-all duration-300 ease-in-out"
-        :class="[isSidebarOpen ? 'left-[400px]' : 'left-4']"
+        class="absolute top-2 z-30 bg-white w-8 h-8 rounded-lg shadow-lg hover:bg-gray-50 flex items-center justify-center transition-all duration-300 ease-in-out"
+        :class="[isSidebarOpen ? 'left-[400px]' : 'left-2']"
       >
         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path 
@@ -57,6 +62,21 @@
           /> 
         </svg>
       </button>
+
+      <!-- 오른쪽 InterestContent 슬라이딩 - top 위치 조정 -->
+      <div 
+        class="absolute top-[55px] right-0 h-[calc(100vh-55px)] bg-white z-20 transform transition-transform duration-300 ease-in-out shadow-lg"
+        :class="{
+          'translate-x-0 w-[400px]': isInterestOpen,
+          'translate-x-full': !isInterestOpen
+        }"
+      >
+        <!-- overflow-y-auto를 InterestContent에 직접 적용하도록 수정 -->
+        <InterestContent 
+          v-show="isInterestOpen" 
+          class="h-full overflow-y-auto"
+        />
+      </div>
     </div>
 
     <PropertyDetailModal
@@ -85,7 +105,7 @@ const mapCenter = ref(null);
 const mapZoom = ref(15);
 
 const DETAIL_ZOOM_LEVEL = 3; // 상세 보기 시 줌 레벨
-const selectedMarkerInfo = ref(null); // 선택된 마커의 인포윈도우 상태
+const selectedMarkerInfo = ref(null); // 선��된 마커의 인포윈도우 상태
 
 const fetchPropertyDetail = async (aptSeq) => {
   try {
