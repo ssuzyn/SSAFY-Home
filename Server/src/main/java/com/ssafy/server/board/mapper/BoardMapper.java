@@ -10,6 +10,9 @@ import java.util.List;
 @Mapper
 public interface BoardMapper {
 
+    // 전체 게시글 목록 조회
+    List<BoardDto> getAllBoards();
+
     // Q&A CRUD
     int createBoard(BoardDto boardDto);
 

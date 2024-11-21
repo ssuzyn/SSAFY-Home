@@ -22,7 +22,7 @@ const closeDrawer = () => {
 </script>
 
 <template>
-  <div 
+  <div
     class="fixed right-0 top-0 h-full bg-white z-30 transform transition-transform duration-300 ease-in-out shadow-lg"
     :class="{
       'translate-x-0 w-[360px]': store.isVisible,
@@ -32,9 +32,9 @@ const closeDrawer = () => {
   >
     <div class="h-full overflow-y-auto">
       <div class="relative">
-        <button 
+        <button
           @click="closeDrawer"
-          class="absolute left-2 top-4 p-2 hover:bg-gray-100 rounded-full"
+          class="absolute left-2 top-4 p-2 text-black hover:bg-gray-100 rounded-full"
         >
           <close-outlined />
         </button>
@@ -52,9 +52,9 @@ const closeDrawer = () => {
           <p >관심 매물 서비스를 이용하시려면</p>
           <p>로그인해주세요.</p>
         </div>
-        
-        <router-link 
-          to="/login" 
+
+        <router-link
+          to="/login"
           class="inline-block px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
           @click="closeDrawer"
         >
@@ -79,9 +79,9 @@ const closeDrawer = () => {
                 <h3 class="text-lg font-medium">{{ property.latestPrice }}만원</h3>
               </div>
               <div class="flex items-center space-x-3">
-                <div 
+                <div
                   class="price-change"
-                  :class="{ 
+                  :class="{
                     'bg-red-50 text-red-500': property.change > 0,
                     'bg-blue-50 text-blue-500': property.change < 0
                   }"
@@ -90,7 +90,7 @@ const closeDrawer = () => {
                   <span v-else>▼</span>
                   {{ Math.abs(property.change) }}%
                 </div>
-                <button 
+                <button
                   class="interest-btn text-blue-500"
                   @click="store.toggleFavorite(property.aptSeq)"
                 >

@@ -8,7 +8,7 @@
         :key="cat.id"
         :id="cat.id"
         :data-order="cat.order"
-        class="px-4 py-2 flex items-center cursor-pointer hover:bg-gray-100 transition-colors"
+        class="px-4 py-2 text-black flex items-center cursor-pointer hover:bg-gray-100 transition-colors"
         :class="{ 'bg-blue-50': currCategory === cat.id }"
         @click="onClickCategory(cat.id)"
       >
@@ -451,4 +451,5 @@ const parseAmount = (amount) => {
 #category li.on {
  background: #eef6fd;
 }
+
 </style>

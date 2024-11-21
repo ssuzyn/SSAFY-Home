@@ -2,19 +2,19 @@
     <div class="grid grid-cols-2 gap-4">
       <div>
         <p class="text-sm text-gray-500">지역</p>
-        <p class="font-medium">{{ propertyDetail.dongNm }}</p>
+        <p class="font-medium text-black">{{ propertyDetail.dongNm }}</p>
       </div>
       <div>
         <p class="text-sm text-gray-500">전용면적</p>
-        <p class="font-medium">{{ recentSize }}㎡</p>
+        <p class="font-medium text-black">{{ recentSize }}㎡</p>
       </div>
       <div>
         <p class="text-sm text-gray-500">최근 거래가</p>
-        <p class="font-medium">{{ recentPrice }}</p>
+        <p class="font-medium text-black">{{ recentPrice }}</p>
       </div>
       <div>
         <p class="text-sm text-gray-500">총 거래건수</p>
-        <p class="font-medium">{{ propertyDetail.dealCount }}건</p>
+        <p class="font-medium text-black">{{ propertyDetail.dealCount }}건</p>
       </div>
     </div>
   </template>
