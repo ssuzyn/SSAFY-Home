@@ -4,6 +4,7 @@ import { computed } from "vue";
 import { StarFilled } from '@ant-design/icons-vue';
 import { useInterestDrawer } from '@/stores/interestDrawer';
 import { useRoute } from 'vue-router';
+import { message } from "ant-design-vue";
 
 const auth = useAuth();
 const interestDrawer = useInterestDrawer();
@@ -105,25 +106,3 @@ const totalInterests = computed(() => {
   </header>
 </template>
 
-<style scoped>
-/* 링크의 기본 색상과 밑줄 제거 */
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* 방문한 링크의 색상 변경 방지 */
-a:visited {
-  color: inherit;
-}
-
-/* 호버 시 기본 색상 변경 방지 */
-a:hover {
-  color: inherit;
-}
-
-/* 포커스 시 기본 아웃라인 제거 */
-a:focus {
-  outline: none;
-}
-</style>

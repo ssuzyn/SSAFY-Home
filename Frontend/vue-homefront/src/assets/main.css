@@ -11,20 +11,6 @@
   font-weight: normal;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
-}
-
 @media (min-width: 1024px) {
   body {
     display: flex;
@@ -36,4 +22,24 @@ a,
     grid-template-columns: 1fr 1fr;
     padding: 0 0rem;
   }
+}
+
+/* 로고를 제외한 모든 링크에 대한 스타일 */
+a:not(.text-orange-500) {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+a:not(.text-orange-500):hover {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+a:not(.text-orange-500):visited {
+  color: inherit !important;
+}
+
+a:not(.text-orange-500):focus {
+  color: inherit !important;
+  outline: none !important;
 }
