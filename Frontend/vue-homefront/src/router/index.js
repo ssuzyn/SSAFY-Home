@@ -1,8 +1,9 @@
 import HomeView from '@/views/HomeView.vue';
 import LoginView from '@/views/LoginView.vue';
-import MyPageView from '@/views/MyPageView.vue';
 import QnAView from '@/views/QnAView.vue';
 import SignupView from '@/views/SignupView.vue';
+import MyPageContent from '@/components/mypage/MyPageContent.vue';
+import UpdatedProfilePage from '@/components/mypage/UpdatedProfilePage.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuth } from '@/stores/auth'; // Pinia store 가져오기
 
@@ -20,7 +21,12 @@ const routes = [
   {
     path: '/mypage',
     name: 'MyPage',
-    component: MyPageView,
+    component: MyPageContent,
+  },
+  {
+    path: '/mypage/edit',
+    name: 'UpdatedProfile',
+    component: UpdatedProfilePage,
   },
   {
     path: '/qna',
