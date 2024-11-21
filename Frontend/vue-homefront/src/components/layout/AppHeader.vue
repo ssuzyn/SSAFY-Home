@@ -29,7 +29,12 @@ const links = computed(() => {
 });
 
 const toggleInterestDrawer = () => {
-  interestDrawer.toggle();
+  if (!isLoggedIn) {
+    // 로그인되지 않은 경우에도 drawer를 열어서 로그인 유도 메시지를 보여줍니다
+    interestDrawer.toggleDrawer();
+  } else {
+    interestDrawer.toggleDrawer();
+  }
 };
 </script>
 
