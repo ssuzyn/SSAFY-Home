@@ -48,7 +48,6 @@ public class HouseController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        log.info("아파트 정보 반환 성공: {}", apartmentInfo);
         return ResponseEntity.ok(apartmentInfo);
     }
 
