@@ -22,4 +22,10 @@ public class UpdateRequestDto {
     private String emailId;
     @Schema(description = "이메일 도메인", example = "gmail.com")
     private String emailDomain;
+    @Schema(description = "성별", example = "F")
+    private String gender;
+    @Schema(description = "나이", example = "25")
+    private int age;
+    @Schema(description = "전화번호", example = "010-1234-5678")
+    private String phoneNumber;
 }

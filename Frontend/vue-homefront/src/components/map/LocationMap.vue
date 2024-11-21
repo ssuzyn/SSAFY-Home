@@ -45,7 +45,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['select-property']);
+const emit = defineEmits(['select-property', 'open-modal']);
 
 let map;
 let clusterer;
@@ -353,6 +353,7 @@ const updateMarkers = (properties) => {
         infowindows.value.forEach(info => info.close());
         infowindow.open(map, marker);
         emit('select-property', property);
+        emit('open-modal', property);
       });
 
       markers.value.push(marker);

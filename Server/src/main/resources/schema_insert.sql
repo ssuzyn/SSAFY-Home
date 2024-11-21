@@ -1,14 +1,19 @@
 use ssafyhome;
 
 CREATE TABLE members (
-                         user_id VARCHAR(50) PRIMARY KEY,             -- 사용자 ID
-                         user_name VARCHAR(100) NOT NULL,             -- 사용자 이름
-                         user_pwd VARCHAR(255) NOT NULL,              -- 비밀번호
-                         email_id VARCHAR(200) NOT NULL,              -- 이메일
-                         email_domain VARCHAR(100) NOT NULL,          -- 이메일 도메인
-                         join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- 가입일
-                         token VARCHAR(255) DEFAULT NULL              -- 토큰
+                         user_id VARCHAR(50) PRIMARY KEY,         -- 사용자 ID
+                         user_name VARCHAR(100) NOT NULL,         -- 사용자 이름
+                         user_pwd VARCHAR(255) NOT NULL,          -- 비밀번호
+                         email_id VARCHAR(200) NOT NULL,          -- 이메일
+                         email_domain VARCHAR(100) NOT NULL,      -- 이메일 도메
+                         gender ENUM('M', 'F') NOT NULL,          -- 성별 (M: 남성, F: 여성)
+                         age INT UNSIGNED NOT NULL,               -- 나이
+                         phone_number VARCHAR(15) NOT NULL,        -- 전화번호
+                         token VARCHAR(255) DEFAULT NULL,         -- 토큰
+                         join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- 가입일
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
 
 
 CREATE TABLE fileinfo (
@@ -103,10 +108,10 @@ UPDATE houseinfos h
 
 LOCK TABLES `members` WRITE;
 /*!40000 ALTER TABLE `members` DISABLE KEYS */;
-INSERT INTO members (user_id, user_name, user_pwd, email_id, email_domain, join_date)
+INSERT INTO members (user_id, user_name, user_pwd, email_id, email_domain, join_date, gender, age, phone_number)
 VALUES
-    ('admin', '관리자', '1234', 'admin', 'google.com', '2023-10-08 16:10:08'),
-    ('ssafy', '김싸피', '1234', 'ssafy', 'ssafy.com', '2023-10-08 16:10:08');
+    ('admin', '관리자', '1234', 'admin', 'google.com', '2023-10-08 16:10:08', 'M', 35, '010-1234-5678'),
+    ('ssafy', '김싸피', '1234', 'ssafy', 'ssafy.com', '2023-10-08 16:10:08', 'F', 27, '010-9876-5432');
 /*!40000 ALTER TABLE `members` ENABLE KEYS */;
 UNLOCK TABLES;
 

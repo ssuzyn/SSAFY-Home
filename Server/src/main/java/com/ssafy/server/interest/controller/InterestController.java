@@ -60,6 +60,8 @@ public class InterestController {
             }
 
             interestService.addInterest(userId, aptSeq);
+            log.info("관심 매물이 성공적으로 등록되었습니다. userId: {}, aptSeq: {}", userId, aptSeq);
+
             response.put("message", "관심 매물 등록이 완료되었습니다.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IllegalStateException e) {

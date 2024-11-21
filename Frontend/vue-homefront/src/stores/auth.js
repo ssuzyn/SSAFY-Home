@@ -15,6 +15,7 @@ export const useAuth = defineStore('auth', () => {
         const response = await axiosStore.get('/user/info');
         user.value = response.data['userInfo'];
         localStorage.setItem('user', JSON.stringify(user.value));
+        location.reload();
       } catch (error) {
         console.error('User info 요청 실패:', error);
         user.value = null;
@@ -23,8 +24,9 @@ export const useAuth = defineStore('auth', () => {
     } else {
       user.value = null;
       localStorage.removeItem('user');
+      window.location.href = '/';
     }
-    location.reload();
+    
   };
 
   const fetchUserInfo = async () => {
@@ -101,7 +103,6 @@ export const useAuth = defineStore('auth', () => {
 
   const logout = () => {
     setToken(null);
-    user.value = null;
   };
 
   const validateToken = async () => {
