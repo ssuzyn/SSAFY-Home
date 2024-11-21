@@ -45,7 +45,8 @@ public class WebConfiguration implements WebMvcConfigurer {
                     "/v3/api-docs/**", // API Docs 경로
                     "/v3/api-docs", // 추가적인 API Docs 경로
                     "/map/**",
-                    "/house/**"
+                    "/house/**",
+                    "/board/list"
                 );
     }
 
