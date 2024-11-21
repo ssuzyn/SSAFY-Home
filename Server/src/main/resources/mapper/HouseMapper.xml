@@ -38,17 +38,21 @@
     
     <!-- [상세 내역] 아파트 기본 정보 조회 -->
     <select id="getApartmentInfo" parameterType="string" resultMap="ApartmentInfoMap">
-        SELECT 
-		    h.apt_seq,
-		    h.apt_nm,
-		    h.latitude,
-		    h.longitude,
-		    h.umd_nm,
-		    (SELECT deal_count FROM latest_housedeals hd WHERE hd.apt_seq = h.apt_seq) as deal_count
-		FROM 
-		    houseinfos h
-		WHERE 
-		    h.apt_seq = #{aptSeq};
+        SELECT
+            h.apt_seq,
+            h.apt_nm,
+            h.latitude,
+            h.longitude,
+            h.umd_nm,
+            (SELECT deal_count
+             FROM latest_housedeals hd
+             WHERE hd.apt_seq = h.apt_seq
+                LIMIT 1) AS deal_count
+        FROM
+            houseinfos h
+        WHERE
+            h.apt_seq = #{aptSeq};
+
     </select>
 
     <!-- [상세 내역] 아파트 거래 정보 조회 -->

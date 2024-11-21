@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import { ref, computed, toRaw } from 'vue'
+import { ref, computed } from 'vue'
 import axios from 'axios'
-import { useRouter } from 'vue-router';
 
 // axios 인스턴스 생성
 const axiosInstance = axios.create({
@@ -14,8 +13,7 @@ const axiosInstance = axios.create({
 
 export const useAuth = defineStore('auth', () => {
   const token = ref(localStorage.getItem('token') || null)
-  const user = ref(null)
-  const router = useRouter();
+  const user = ref(JSON.parse(localStorage.getItem('user')) || null)
   const isLoggedIn = computed(() => !!token.value)
 
   // axios 인터셉터 설정
@@ -42,25 +40,71 @@ export const useAuth = defineStore('auth', () => {
     }
   );
 
-  const  setToken = async (newToken) => {
+  const setToken = async (newToken) => {
     token.value = newToken;
   
     if (newToken) {
       localStorage.setItem('token', newToken);
       try {
         const response = await axiosInstance.get('/info');
-        user.value = { username: response.data['userInfo'] };
+        user.value = response.data['userInfo'];
+        localStorage.setItem('user', JSON.stringify(user.value)); // 사용자 정보 저장
       } catch (error) {
         console.error('User info 요청 실패:', error);
         user.value = null;
+        localStorage.removeItem('user'); // 실패 시 사용자 정보 삭제
       }
     } else {
       localStorage.removeItem('token');
       user.value = null;
+      localStorage.removeItem('user');
     }
     location.reload();
   };
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await axiosInstance.get('/info');
+      user.value = response.data.userInfo;
+      localStorage.setItem('user', JSON.stringify(user.value));
+    } catch (error) {
+      console.error('User info 요청 실패:', error);
+      user.value = null;
+      localStorage.removeItem('user');
+    }
+  };
   
+  const updateUserInfo = async (updateData) => {
+    try {
+      await axiosInstance.put('/update', updateData);
+      await fetchUserInfo();
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to update user info:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.message || '정보 업데이트에 실패했습니다.' 
+      };
+    }
+  };
+
+  const uploadProfileImage = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      await axiosInstance.post('/uploadProfile', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      await fetchUserInfo();
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to upload profile image:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.message || '프로필 이미지 업로드에 실패했습니다.' 
+      };
+    }
+  };
 
   const login = async (userId, userPwd, rememberMe) => {
     try {
@@ -99,9 +143,12 @@ export const useAuth = defineStore('auth', () => {
   const validateToken = async () => {
     if (token.value) {
       try {
-        await axiosInstance.get('/info');
+        const response = await axiosInstance.get('/info');
+        user.value = response.data['userInfo'];
+        localStorage.setItem('user', JSON.stringify(user.value)); // 서버에서 확인 후 다시 저장
       } catch (error) {
-        logout();
+        console.error('토큰 검증 실패:', error);
+        logout(); // 유효하지 않으면 로그아웃
       }
     }
   };
@@ -114,5 +161,8 @@ export const useAuth = defineStore('auth', () => {
     isLoggedIn,
     login,
     logout,
+    fetchUserInfo,
+    updateUserInfo,
+    uploadProfileImage
   }
 })
