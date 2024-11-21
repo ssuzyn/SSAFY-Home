@@ -4,16 +4,16 @@ import { computed } from "vue";
 import { StarFilled } from '@ant-design/icons-vue';
 import { useInterestDrawer } from '@/stores/interestDrawer';
 
-const { isLoggedIn, logout, user } = useAuth();
+const auth = useAuth();
 const interestDrawer = useInterestDrawer();
 
 const links = computed(() => {
   const baseLinks = [
     { name: 'Q&A', path: '/qna' }
   ];
-  if (isLoggedIn) {
+  if (auth.isLoggedIn) {
     return [
-      { name: '로그아웃', action: logout },
+      { name: '로그아웃', action: auth.logout },
       { name: '마이페이지', path: '/mypage' },
       ...baseLinks
     ];
@@ -26,7 +26,7 @@ const links = computed(() => {
 });
 
 const toggleInterestDrawer = () => {
-  if (!isLoggedIn) {
+  if (!auth.isLoggedIn) {
     // 로그인되지 않은 경우에도 drawer를 열어서 로그인 유도 메시지를 보여줍니다
     interestDrawer.toggleDrawer();
   } else {
@@ -35,8 +35,8 @@ const toggleInterestDrawer = () => {
 };
 
 const greeting = computed(() => {
-  console.log(user);
-  return isLoggedIn && user ? `안녕하세요, ${user['userName']}님!` : '공백';
+  console.log(auth.user);
+  return auth.isLoggedIn && auth.user ? `안녕하세요, ${auth.user['userName']}님!` : '공백';
 });
 </script>
 
@@ -47,7 +47,7 @@ const greeting = computed(() => {
         HOUSE-TOSS
       </router-link>
       <div class="flex items-center space-x-6">
-        <span v-if="isLoggedIn" class="text-gray-600">{{ greeting }}</span>
+        <span v-if="auth.isLoggedIn" class="text-gray-600">{{ greeting }}</span>
         <nav class="flex items-center space-x-6">
           <button 
             @click="toggleInterestDrawer" 

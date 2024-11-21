@@ -5,13 +5,13 @@ import { useAuth } from "@/stores/auth";
 import { onMounted, watch } from 'vue';
 
 const store = useInterestDrawer();
-const { isLoggedIn } = useAuth();
+const auth = useAuth();
 
 
 
 watch(() => store.isVisible, (newVal) => {
   console.log('drawer visibility changed:', newVal);
-  if (newVal && isLoggedIn) {
+  if (newVal && auth.isLoggedIn) {
     store.initialize();
   }
 });
@@ -42,12 +42,12 @@ const closeDrawer = () => {
 
       <div class="drawer-header">
         <div class="header-title">
-          <span v-if="isLoggedIn">총 {{ store.totalCount() }}개의 관심 매물이 있어요!</span>
+          <span v-if="auth.isLoggedIn">총 {{ store.totalCount() }}개의 관심 매물이 있어요!</span>
           <span v-else>로그인이 필요한 서비스입니다!</span>
         </div>
       </div>
 
-      <div v-if="!isLoggedIn" class="p-4 text-center">
+      <div v-if="!auth.isLoggedIn" class="p-4 text-center">
         <div class="text-gray-600 mb-4">
           <p >관심 매물 서비스를 이용하시려면</p>
           <p>로그인해주세요.</p>
