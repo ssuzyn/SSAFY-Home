@@ -30,13 +30,19 @@ public class InterestController {
         Map<String, Object> response = new HashMap<>();
         try {
             String userId = (String) request.getAttribute("userId");
-            log.info("관심 매물 개수 : ", userId.isEmpty());
+            if (userId == null) {
+                response.put("message", "인증 정보가 올바르지 않습니다.");
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+
             List<InterestAptDto> list = interestService.getInterestApts(userId);
-            log.info("관심 매물 개수 : ", list.size());
+            log.info("관심 매물 조회 결과 개수: {}", list.size());
+
             response.put("message", "관심 매물 목록 조회가 완료되었습니다.");
             response.put("data", list);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
+            log.error("관심 매물 조회 중 오류 발생", e);
             response.put("message", "서버 오류가 발생했습니다.");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -48,6 +54,11 @@ public class InterestController {
         Map<String, Object> response = new HashMap<>();
         try {
             String userId = (String) request.getAttribute("userId");
+            if (userId == null) {
+                response.put("message", "인증 정보가 올바르지 않습니다.");
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+
             interestService.addInterest(userId, aptSeq);
             response.put("message", "관심 매물 등록이 완료되었습니다.");
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -55,6 +66,7 @@ public class InterestController {
             response.put("message", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            log.error("관심 매물 추가 중 오류 발생", e);
             response.put("message", "서버 오류가 발생했습니다.");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -66,6 +78,11 @@ public class InterestController {
         Map<String, Object> response = new HashMap<>();
         try {
             String userId = (String) request.getAttribute("userId");
+            if (userId == null) {
+                response.put("message", "인증 정보가 올바르지 않습니다.");
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+
             interestService.removeInterest(userId, aptSeq);
             response.put("message", "관심 매물이 삭제되었습니다.");
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -73,10 +90,9 @@ public class InterestController {
             response.put("message", e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            log.error("관심 매물 삭제 중 오류 발생", e);
             response.put("message", "서버 오류가 발생했습니다.");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }
