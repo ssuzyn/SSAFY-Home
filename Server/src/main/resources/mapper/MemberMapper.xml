@@ -72,6 +72,12 @@
 		where user_id = #{userId}
 	</update>
 
+	<select id="checkIdAvailability" parameterType="string" resultType="int">
+		SELECT COUNT(*)
+		FROM members
+		WHERE user_id = #{userId}
+	</select>
+
 	<select id="getRefreshToken" parameterType="string" resultType="string">
 		select token
 		from members

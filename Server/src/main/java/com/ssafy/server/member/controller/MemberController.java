@@ -7,14 +7,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ssafy.server.member.dto.LoginRequestDto;
@@ -197,6 +190,27 @@ public class MemberController {
         } catch (Exception e) {
             log.error("로그아웃 실패 : {}", e.getMessage(), e);
             resultMap.put("message", "로그아웃 중 문제가 발생했습니다.");
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(resultMap, status);
+    }
+
+    @GetMapping("/check-id/{userId}")
+    @Operation(summary = "아이디 중복 확인", description = "회원가입 시 아이디 중복 여부를 확인합니다.")
+    public ResponseEntity<Map<String, Object>> checkIdAvailability(
+            @PathVariable @Parameter(description = "확인할 아이디", required = true) String userId) {
+
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status = HttpStatus.OK;
+
+        try {
+            boolean isAvailable = memberService.checkIdAvailability(userId);
+            resultMap.put("available", isAvailable);
+            resultMap.put("message", isAvailable ? "사용 가능한 아이디입니다." : "이미 사용중인 아이디입니다.");
+        } catch (Exception e) {
+            log.error("아이디 중복 확인 중 에러 발생: {}", e.getMessage(), e);
+            resultMap.put("message", "아이디 확인 중 문제가 발생했습니다.");
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 

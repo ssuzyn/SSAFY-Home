@@ -71,5 +71,9 @@ public class MemberServiceImpl implements MemberService {
 		memberMapper.deleteRefreshToken(map);
 	}
 
-
+	@Override
+	public boolean checkIdAvailability(String userId) throws Exception {
+		int count = memberMapper.checkIdAvailability(userId);
+		return count == 0;
+	}
 }

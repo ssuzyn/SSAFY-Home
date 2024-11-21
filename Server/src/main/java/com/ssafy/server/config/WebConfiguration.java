@@ -40,7 +40,9 @@ public class WebConfiguration implements WebMvcConfigurer {
                 .addPathPatterns("/**") // 모든 경로에 적용
                 .excludePathPatterns( // 해당 경로 제외
                     "/user/login", 
-                    "/user/register", 
+                    "/user/signup",
+                    "/user/register",
+                    "/user/check-id/**",
                     "/swagger-ui/**", // Swagger UI 경로
                     "/v3/api-docs/**", // API Docs 경로
                     "/v3/api-docs", // 추가적인 API Docs 경로
