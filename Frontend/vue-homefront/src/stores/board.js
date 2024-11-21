@@ -1,19 +1,20 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { axiosInstance } from './auth'
+import { useAxiosStore } from './axiosStore'
 import { useAuth } from './auth'
 
 const API_URL = '/board'
 
 export const useBoard = defineStore('board', () => {
   const auth = useAuth()
+  const axiosStore = useAxiosStore()
   const questions = ref([])
   const selectedQuestion = ref(null)
   const comments = ref([])
 
   const fetchAllQuestions = async () => {
     try {
-      const response = await axiosInstance.get(`${API_URL}/list`)
+      const response = await axiosStore.get(`${API_URL}/list`)
       questions.value = response.data
       console.log(questions.value)
     } catch (error) {
@@ -23,7 +24,7 @@ export const useBoard = defineStore('board', () => {
 
   const fetchQuestions = async (type = '', keyword = '') => {
     try {
-      const response = await axiosInstance.get(`${API_URL}/search`, {
+      const response = await axiosStore.get(`${API_URL}/search`, {
         params: { type, keyword }
       })
       questions.value = response.data
@@ -34,7 +35,7 @@ export const useBoard = defineStore('board', () => {
 
   const createQuestion = async (boardDto) => {
     try {
-      await axiosInstance.post(API_URL, boardDto)
+      await axiosStore.post(API_URL, boardDto)
       await fetchAllQuestions()
     } catch (error) {
       console.error('Failed to create question:', error)
@@ -43,7 +44,7 @@ export const useBoard = defineStore('board', () => {
 
   const getQuestionDetails = async (articleNo) => {
     try {
-      const response = await axiosInstance.get(`${API_URL}/${articleNo}`)
+      const response = await axiosStore.get(`${API_URL}/${articleNo}`)
       console.log(response);
       selectedQuestion.value = response.data
       console.log('Question details:', selectedQuestion.value)
@@ -54,7 +55,7 @@ export const useBoard = defineStore('board', () => {
 
   const updateQuestion = async (boardDto) => {
     try {
-      await axiosInstance.put(API_URL, boardDto)
+      await axiosStore.put(API_URL, boardDto)
       await getQuestionDetails(boardDto.articleNo)
     } catch (error) {
       console.error('Failed to update question:', error)
@@ -63,7 +64,7 @@ export const useBoard = defineStore('board', () => {
 
   const deleteQuestion = async (articleNo) => {
     try {
-      await axiosInstance.delete(`${API_URL}/${articleNo}`)
+      await axiosStore.delete(`${API_URL}/${articleNo}`)
       await fetchAllQuestions()
     } catch (error) {
       console.error('Failed to delete question:', error)
@@ -72,7 +73,7 @@ export const useBoard = defineStore('board', () => {
 
   const fetchComments = async (articleNo) => {
     try {
-      const response = await axiosInstance.get(`${API_URL}/${articleNo}/comments`)
+      const response = await axiosStore.get(`${API_URL}/${articleNo}/comments`)
       comments.value = response.data
       console.log('Comments:', comments.value)
     } catch (error) {
@@ -82,7 +83,7 @@ export const useBoard = defineStore('board', () => {
 
   const createComment = async (commentDto) => {
     try {
-      await axiosInstance.post(`${API_URL}/comments`, commentDto)
+      await axiosStore.post(`${API_URL}/comments`, commentDto)
       await fetchComments(commentDto.articleNo)
     } catch (error) {
       console.error('Failed to create comment:', error)
@@ -91,7 +92,7 @@ export const useBoard = defineStore('board', () => {
 
   const deleteComment = async (commentId, articleNo) => {
     try {
-      await axiosInstance.delete(`${API_URL}/comments/${commentId}`)
+      await axiosStore.delete(`${API_URL}/comments/${commentId}`)
       await fetchComments(articleNo)
     } catch (error) {
       console.error('Failed to delete comment:', error)
