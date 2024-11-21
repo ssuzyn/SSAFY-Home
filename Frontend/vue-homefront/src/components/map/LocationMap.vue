@@ -51,6 +51,7 @@ let map;
 let clusterer;
 const markers = ref([]);
 const infowindows = ref([]);
+let tileLoadedListener = null;
 
 let ps = null; // 장소 검색 객체
 const currCategory = ref('');
@@ -75,22 +76,55 @@ watch(() => props.properties, (newProperties) => {
   updateMarkers(newProperties);
 }, { deep: true });
 
+
 // 선택된 property가 변경될 때 지도 중심 이동 및 인포윈도우 표시
 watch(() => props.selectedProperty, (newProperty) => {
   if (newProperty && newProperty.latitude && newProperty.longitude) {
-    const moveLatLon = new window.kakao.maps.LatLng(newProperty.latitude, newProperty.longitude);
-    map.panTo(moveLatLon);
-    
     // 기존 인포윈도우 모두 닫기
     infowindows.value.forEach(info => info.close());
     
-    // 선택된 마커의 인포윈도우 열기
-    const markerIndex = props.properties.findIndex(p => p.aptSeq === newProperty.aptSeq);
-    if (markerIndex >= 0 && infowindows.value[markerIndex]) {
-      infowindows.value[markerIndex].open(map, markers.value[markerIndex]);
+    // 선택된 마커의 위치 (살짝 위로 조정)
+    const lat = Number(newProperty.latitude);
+    const lng = Number(newProperty.longitude);
+    const moveLatLon = new window.kakao.maps.LatLng(
+      lat + 0.0002, // 위도를 살짝 위로 조정
+      lng
+    );
+
+    // 이전 이벤트 리스너 제거
+    if (tileLoadedListener) {
+      kakao.maps.event.removeListener(map, 'tilesloaded', tileLoadedListener);
     }
+
+    // 현재 지도 레벨이 3보다 크면 더 가깝게 조정
+    const currentLevel = map.getLevel();
+    if (currentLevel > 3) {
+      map.setLevel(2, {animate: true});
+    }
+
+    // 부드럽게 이동
+    map.panTo(moveLatLon);
+    
+    // 이동 완료 후 인포윈도우 표시
+    tileLoadedListener = function() {
+      setTimeout(() => {
+        const markerIndex = markers.value.findIndex(marker => 
+          marker.propertyData && marker.propertyData.aptSeq === newProperty.aptSeq
+        );
+        
+        if (markerIndex >= 0) {
+          infowindows.value[markerIndex].open(map, markers.value[markerIndex]);
+        }
+      }, 100);
+      
+      kakao.maps.event.removeListener(map, 'tilesloaded', tileLoadedListener);
+    };
+    
+    kakao.maps.event.addListener(map, 'tilesloaded', tileLoadedListener);
   }
 }, { deep: true });
+
+
 
 // centerPosition이나 zoomLevel이 변경될 때마다 지도 업데이트
 watch([() => props.centerPosition, () => props.zoomLevel], ([newCenter, newZoom]) => {
@@ -127,7 +161,7 @@ const initMap = () => {
   clusterer = new window.kakao.maps.MarkerClusterer({
     map: map,
     averageCenter: true,
-    minLevel: 4,
+    minLevel: 3,
     texts: (size) => `${size}건`
   });
 
@@ -262,19 +296,34 @@ const updateMarkers = (properties) => {
   let densestArea = null;
 
   // 새 마커 생성 및 밀도 계산
-  properties.forEach(property => {
-    if (property.latitude && property.longitude) {
+  const markersToAdd = properties.map(property => {
+    // 위도, 경도 유효성 검사 강화
+    const lat = Number(property.latitude);
+    const lng = Number(property.longitude);
+
+    if (isNaN(lat) || isNaN(lng) || !lat || !lng) {
+      console.warn('Invalid coordinates for property:', property.aptSeq, property.aptNm);
+      return null;
+    }
+
+    // 위도, 경도 범위 체크 (대한민국 기준)
+    if (lat < 33 || lat > 39 || lng < 124 || lng > 132) {
+      console.warn('Coordinates out of Korea range:', property.aptSeq, property.aptNm);
+      return null;
+    }
+
+    try {
       // 위치를 그리드 좌표로 변환 (0.01 단위로 구역 나누기)
-      const gridX = Math.floor(Number(property.longitude) * 100);
-      const gridY = Math.floor(Number(property.latitude) * 100);
+      const gridX = Math.floor(lng * 100);
+      const gridY = Math.floor(lat * 100);
       const gridKey = `${gridX},${gridY}`;
 
       // 그리드 영역의 마커 수 카운트
       if (!grid[gridKey]) {
         grid[gridKey] = {
           count: 0,
-          lat: Number(property.latitude),
-          lng: Number(property.longitude)
+          lat: lat,
+          lng: lng
         };
       }
       grid[gridKey].count++;
@@ -289,14 +338,14 @@ const updateMarkers = (properties) => {
       }
 
       // 마커 생성
-      const position = new window.kakao.maps.LatLng(
-        Number(property.latitude),
-        Number(property.longitude)
-      );
+      const position = new window.kakao.maps.LatLng(lat, lng);
       
       const marker = new window.kakao.maps.Marker({
         position: position
       });
+
+      // 마커에 property 데이터 저장
+      marker.propertyData = { ...property };
 
       const infowindow = createInfoWindow(property);
 
@@ -310,17 +359,25 @@ const updateMarkers = (properties) => {
       infowindows.value.push(infowindow);
 
       return marker;
+
+    } catch (error) {
+      console.error('Error creating marker for property:', property.aptSeq, error);
+      return null;
     }
-  });
+  }).filter(marker => marker !== null);
 
   // 클러스터러에 마커 추가
-  clusterer.addMarkers(markers.value);
+  if (markersToAdd.length > 0) {
+    clusterer.addMarkers(markersToAdd);
 
-  // 가장 밀집된 영역으로 지도 이동
-  if (densestArea) {
-    const center = new window.kakao.maps.LatLng(densestArea.lat, densestArea.lng);
-    map.setCenter(center);
-    map.setLevel(5);
+    // 가장 밀집된 영역으로 지도 이동
+    if (densestArea) {
+      const center = new window.kakao.maps.LatLng(densestArea.lat, densestArea.lng);
+      map.setCenter(center);
+      map.setLevel(5);
+    }
+  } else {
+    console.warn('No valid markers to add');
   }
 };
 

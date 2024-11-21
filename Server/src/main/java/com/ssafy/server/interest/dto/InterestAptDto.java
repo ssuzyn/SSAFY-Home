@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class InterestAptDto {
     private String aptSeq;
     private String aptName;
+    private String dongName;
     private String latestDealAmount;
     private String prevDealAmount;
     private double priceChangeRate;

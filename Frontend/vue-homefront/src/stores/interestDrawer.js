@@ -1,10 +1,10 @@
-// stores/interestDrawer.js
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { message } from 'ant-design-vue';
-import { axiosInstance } from '@/stores/auth';  // auth.js의 axiosInstance를 import
+import { useAxiosStore } from './axiosStore';
 
 export const useInterestDrawer = defineStore('interestDrawer', () => {
+  const axiosStore = useAxiosStore();
   const isVisible = ref(false);
   const favorites = ref([]);
   const loading = ref(false);
@@ -22,12 +22,13 @@ export const useInterestDrawer = defineStore('interestDrawer', () => {
     try {
       loading.value = true;
       console.log('Making API request...');
-      const response = await axiosInstance.get('/interest-apt/list');
+      const response = await axiosStore.get('/interest-apt/list');
       console.log('API Response:', response.data);
       if (response.data.data) {
         favorites.value = response.data.data.map(item => ({
           aptSeq: item.aptSeq,
-          name: item.aptName,
+          aptName: item.aptName,
+          dongName: item.dongName,
           latestPrice: item.latestDealAmount,
           prevPrice: item.prevDealAmount,
           change: item.priceChangeRate
@@ -49,11 +50,11 @@ export const useInterestDrawer = defineStore('interestDrawer', () => {
       const isCurrentlyFavorite = isFavorite(aptSeq);
       
       if (isCurrentlyFavorite) {
-        await axiosInstance.delete(`/interest-apt/delete/${aptSeq}`);
+        await axiosStore.delete(`/interest-apt/delete/${aptSeq}`);
         favorites.value = favorites.value.filter(item => item.aptSeq !== aptSeq);
         message.success('관심 매물이 삭제되었습니다');
       } else {
-        await axiosInstance.post(`/interest-apt/add/${aptSeq}`);
+        await axiosStore.post(`/interest-apt/add/${aptSeq}`);
         await initialize();
         message.success('관심 매물이 추가되었습니다');
       }

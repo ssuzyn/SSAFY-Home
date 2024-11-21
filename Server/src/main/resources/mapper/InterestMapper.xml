@@ -6,6 +6,7 @@
   <resultMap id="InterestApt" type="interestAptDto">
     <result property="aptSeq" column="apt_seq" />
     <result property="aptName" column="apt_nm" />
+    <result property="dongName" column="umd_nm" />
     <result property="latestDealAmount" column="latest_deal_amount" />
     <result property="prevDealAmount" column="prev_deal_amount" />
     <result property="priceChangeRate" column="price_change_rate" />
@@ -36,18 +37,17 @@
     SELECT
       ia.apt_seq,
       hp.apt_nm,
+      hi.umd_nm,
       hp.latest_deal_amount,
       hp.prev_deal_amount,
       hp.price_change_rate
     FROM
       interest_apt ia
-        JOIN
-      house_price_stats hp
-      ON
-        ia.apt_seq = hp.apt_seq
+        JOIN house_price_stats hp ON ia.apt_seq = hp.apt_seq
+        JOIN houseinfos hi ON ia.apt_seq = hi.apt_seq
     WHERE
       ia.user_id = #{userId}
-</select>
+  </select>
 
 
 </mapper>

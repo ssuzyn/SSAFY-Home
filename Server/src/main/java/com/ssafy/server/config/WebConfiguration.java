@@ -74,8 +74,10 @@ public class WebConfiguration implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/img/**").addResourceLocations("classpath:/static/assets/img/");
         registry.addResourceHandler("/*.html**").addResourceLocations("classpath:/static/");
-//        registry.addResourceHandler("/swagger-ui.html**").addResourceLocations("classpath:/META-INF/resources/swagger-ui.html");
-//        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/uploads/**")
+            .addResourceLocations("classpath:/static/uploads/")
+            .setCachePeriod(3600)
+            .resourceChain(true);
     }
 
 }
