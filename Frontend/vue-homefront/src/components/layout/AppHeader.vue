@@ -43,9 +43,9 @@ const greeting = computed(() => {
 <template>
   <header class="fixed top-0 left-0 right-0 bg-white border-b z-50">
     <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-      <router-link to="/" class="text-2xl font-bold text-orange-500">
+      <a href="/" class="text-2xl font-bold text-orange-500">
         HOUSE-TOSS
-      </router-link>
+      </a>
       <div class="flex items-center space-x-6">
         <span v-if="auth.isLoggedIn" class="text-gray-600">{{ greeting }}</span>
         <nav class="flex items-center space-x-6">
