@@ -90,9 +90,12 @@ import { useInterestDrawer } from "@/stores/interestDrawer";
 
 const interestStore = useInterestStore();
 const interestDrawerStore = useInterestDrawer();
+const axiosStore = useAxiosStore();
+const route = useRoute();
 
 // 상태 관리
-const searchResults = ref([]);
+const searchResults = ref([]); // 검색 결과용
+const interestProperty = ref(null); // 관심 매물용
 const selectedProperty = ref(null);
 const isSidebarOpen = ref(false);
 const isDetailModalOpen = ref(false);
@@ -102,76 +105,58 @@ const mapZoom = ref(15);
 
 const DETAIL_ZOOM_LEVEL = 3;
 
-const axiosStore = useAxiosStore();
-const route = useRoute();
+watch(() => interestStore.selectedProperty, (newProperty) => {
+  if (newProperty) {
+    // PropertyList의 transformProperty 함수에 맞는 데이터 구조로 변환
 
-const displayProperties = computed(() => {
-  if (interestStore.selectedProperty) {
-    return [...searchResults.value, interestStore.selectedProperty];
+    console.log('관심매물 property for PropertyList:', newProperty);
+
+    interestProperty.value = newProperty;
+    searchResults.value = [newProperty]; // 배열로 래핑
+    isSidebarOpen.value = true;
+
+    mapCenter.value = {
+      lat: parseFloat(newProperty.latitude),
+      lng: parseFloat(newProperty.longitude)
+    };
+    mapZoom.value = DETAIL_ZOOM_LEVEL;
+  } else {
+    interestProperty.value = null;
+    searchResults.value = [];
   }
-  return searchResults.value;
 });
 
-watch(
-  () => route.query,
-  async (newQuery) => {
-    if (newQuery.aptSeq && newQuery.lat && newQuery.lng) {
-      try {
-        const detail = await fetchPropertyDetail(newQuery.aptSeq);
-        
-        // 지도 중심 이동
-        mapCenter.value = {
-          lat: parseFloat(newQuery.lat),
-          lng: parseFloat(newQuery.lng)
-        };
-        mapZoom.value = DETAIL_ZOOM_LEVEL;
-        
-        // 상세 정보 모달 표시
-        detailData.value = detail;
-        isDetailModalOpen.value = true;
-      } catch (error) {
-        console.error('Failed to fetch property details:', error);
-      }
-    }
-  },
-  { immediate: true }  // 컴포넌트 마운트 시에도 실행
-);
-
-watch(() => interestStore.shouldShowDetail, (newValue) => {
-  if (newValue && interestStore.selectedProperty) {
-    // 선택된 관심 매물이 있으면 지도 중심 이동 및 모달 표시
-    const property = interestStore.selectedProperty;
-    if (property.latitude && property.longitude) {
-      mapCenter.value = {
-        lat: parseFloat(property.latitude),
-        lng: parseFloat(property.longitude)
-      };
-      mapZoom.value = DETAIL_ZOOM_LEVEL;
-    }
-    
-    // 상세 정보 모달 표시
-    detailData.value = property;
-    isDetailModalOpen.value = true;
+// 디버깅을 위한 추가 watch
+watch(() => searchResults.value, (newResults) => {
+  console.log('Search results updated:', newResults);
+  if (newResults.length > 0) {
+    console.log('First property in results:', newResults[0]);
   }
+}, { deep: true });
+
+// searchResults가 변경될 때마다 로그 출력
+// watch(() => searchResults.value, (newResults) => {
+//   console.log('Search results updated:', newResults);
+// }, { deep: true });
+
+// LocationMap에 전달할 properties 계산
+const displayProperties = computed(() => {
+  if (interestProperty.value) {
+    return [interestProperty.value];
+  }
+  return searchResults.value;
 });
 
 // API 호출
 const fetchPropertyDetail = async (aptSeq) => {
   try {
     const detail = await getHouseDetail(aptSeq);
-    // 받아온 데이터 구조 로깅
-    console.log('Received detail:', detail);
-    
     return {
       ...detail,
-      deals: detail.deals.map(deal => {
-        // 개별 deal 데이터 로깅
-        console.log('Processing deal:', deal);
-        return {
-          ...deal,
-          dealAmount: parseAmount(deal.dealAmount)
-        };
-      })
+      deals: detail.deals.map(deal => ({
+        ...deal,
+        dealAmount: parseAmount(deal.dealAmount)
+      }))
     };
   } catch (error) {
     console.error('Error fetching property detail:', error);
@@ -182,24 +167,15 @@ const fetchPropertyDetail = async (aptSeq) => {
 // 유틸리티 함수
 const parseAmount = (amount) => {
   if (!amount) return 0;
-  
-  // 이미 숫자인 경우
-  if (typeof amount === 'number') {
-    return amount * 10000;
-  }
-  
-  // 문자열인 경우 콤마 제거 후 변환
-  if (typeof amount === 'string') {
-    return parseInt(amount.replace(/,/g, '')) * 10000;
-  }
-  
+  if (typeof amount === 'number') return amount * 10000;
+  if (typeof amount === 'string') return parseInt(amount.replace(/,/g, '')) * 10000;
   return 0;
 };
 
 // 이벤트 핸들러
 const handleSearchResult = (response) => {
+  clearAllProperties();
   searchResults.value = Array.isArray(response) ? response : [];
-  selectedProperty.value = null;
   mapCenter.value = null;
   mapZoom.value = 7;
   isSidebarOpen.value = true;
@@ -228,23 +204,10 @@ const handleMarkerClick = async (property) => {
     }
     
     const detail = await fetchPropertyDetail(property.aptSeq);
-    // 변환된 데이터 로깅
-    console.log('Processed detail:', detail);
     detailData.value = detail;
     isDetailModalOpen.value = true;
   } catch (error) {
     console.error('Failed to fetch property details:', error);
-  }
-};
-
-const handleInterestPropertySelect = (property) => {
-  selectedProperty.value = property;
-  if (property.latitude && property.longitude) {
-    mapCenter.value = {
-      lat: parseFloat(property.latitude),
-      lng: parseFloat(property.longitude)
-    };
-    mapZoom.value = DETAIL_ZOOM_LEVEL;
   }
 };
 
@@ -256,11 +219,16 @@ const handleFavoriteToggle = async (propertyId) => {
   }
 };
 
+const clearAllProperties = () => {
+  selectedProperty.value = null;
+  interestProperty.value = null;
+  searchResults.value = [];
+  interestStore.clearSelection();
+};
+
 const closeDetailModal = () => {
   isDetailModalOpen.value = false;
   detailData.value = null;
-  selectedProperty.value = null;
-  interestStore.clearSelection();
 };
 
 const toggleSidebar = () => {

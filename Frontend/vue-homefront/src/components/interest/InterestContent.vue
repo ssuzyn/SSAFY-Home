@@ -95,7 +95,7 @@ watch(() => store.isVisible, (newValue) => {
             @click="handlePropertyClick(property)"
           >
             <div class="mb-1">
-              <span class="text-gray-600 text-sm">{{ property.dongName }}</span>
+              <span class="text-gray-600 text-sm">{{ property.dongNm }}</span>
             </div>
             <div class="mb-1">
               <span class="text-gray-600 text-medium">{{
