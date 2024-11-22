@@ -1,15 +1,15 @@
 <template>
-  <button 
+  <button
     class="p-2 rounded-full hover:bg-gray-100 transition-colors"
     @click="handleFavoriteClick"
   >
-    <StarFilled 
-      v-if="isInterested || localInterested" 
-      class="text-yellow-400 w-6 h-6 transform scale-125 transition-all" 
+    <StarFilled
+      v-if="isInterested || localInterested"
+      class="text-yellow-400 w-6 h-6 transform scale-125 transition-all"
     />
-    <StarOutlined 
-      v-else 
-      class="text-gray-400 w-6 h-6 transform scale-125 transition-all" 
+    <StarOutlined
+      v-else
+      class="text-gray-400 w-6 h-6 transform scale-125 transition-all"
     />
   </button>
 </template>
@@ -34,6 +34,8 @@ const handleFavoriteClick = async () => {
   localInterested.value = !isInterested.value;
   try {
     await interestStore.toggleFavorite(props.aptSeq);
+    // 관심 매물 목록 즉시 새로고침
+    interestStore.initialize();
   } catch (error) {
     localInterested.value = isInterested.value;
   }

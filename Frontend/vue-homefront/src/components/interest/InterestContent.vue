@@ -16,6 +16,12 @@ onMounted(() => {
   }
 });
 
+watch(() => store.isVisible, (newValue) => {
+  if (newValue && auth.isLoggedIn) {
+    store.initialize();
+  }
+});
+
 const closeDrawer = () => {
   store.isVisible = false;
 };
