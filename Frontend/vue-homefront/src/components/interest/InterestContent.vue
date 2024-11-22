@@ -99,7 +99,7 @@ watch(() => store.isVisible, (newValue) => {
             </div>
             <div class="mb-1">
               <span class="text-gray-600 text-medium">{{
-                property.aptName
+                property.aptNm
               }}</span>
             </div>
             <div class="flex items-center justify-between">
