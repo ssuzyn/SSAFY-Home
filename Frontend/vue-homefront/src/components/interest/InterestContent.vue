@@ -5,16 +5,28 @@ import { storeToRefs } from "pinia";
 import { useAuth } from "@/stores/auth";
 import { onMounted, watch } from "vue";
 import InterestButton from "./InterestButton.vue";
-import { useInterestStore } from "@/stores/interest";
+import { useInterestStore } from '@/stores/interest';
+import { getHouseDetail } from '@/api/house';
 
 const store = useInterestDrawer();
 const { favorites } = storeToRefs(store);
 const auth = useAuth();
-
 const interestStore = useInterestStore();
 
-const handlePropertyClick = (property) => {
-  interestStore.selectProperty(property);
+// 아파트 클릭 핸들러
+const handlePropertyClick = async (property) => {
+  try {
+    // 1. 먼저 백엔드에서 아파트 상세 정보를 가져옴
+    const detail = await getHouseDetail(property.aptSeq);
+    
+    // 2. 상세 정보에서 위도/경도를 포함한 정보를 store에 저장
+    interestStore.selectedProperty = {
+      ...property,
+      ...detail  // 여기에 위도/경도 등 상세 정보가 포함됨
+    };
+  } catch (error) {
+    console.error('Failed to fetch property details:', error);
+  }
 };
 
 onMounted(() => {
