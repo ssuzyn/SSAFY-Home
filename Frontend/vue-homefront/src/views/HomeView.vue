@@ -7,22 +7,22 @@
 
     <!-- 메인 콘텐츠 영역 -->
     <div class="flex-1 relative">
-      <!-- 검색 영역 - 상단에 고정 -->
+      <!-- 검색 영역 -->
       <div class="absolute top-0 left-0 right-0 z-10">
         <LocationSelect @search-result="handleSearchResult" />
       </div>
 
       <!-- 지도 영역 -->
       <LocationMap
-        :properties="searchResults"
+        :properties="displayProperties"
         :selected-property="selectedProperty"
         :center-position="mapCenter" 
         :zoom-level="mapZoom"
         @select-property="handleMarkerClick"
-        class="h-full w-full"
+        class="h-full w-full relative z-0"
       />
 
-      <!-- 슬라이딩 PropertyList -->
+      <!-- 검색결과 PropertyList -->
       <div 
         class="absolute top-0 h-full bg-white z-20 transform transition-transform duration-300 ease-in-out shadow-lg"
         :class="{
@@ -62,40 +62,36 @@
           /> 
         </svg>
       </button>
-
-      <!-- 오른쪽 InterestContent 슬라이딩 - top 위치 조정 -->
-      <div 
-        class="absolute top-[55px] right-0 h-[calc(100vh-55px)] bg-white z-20 transform transition-transform duration-300 ease-in-out shadow-lg"
-        :class="{
-          'translate-x-0 w-[400px]': isInterestOpen,
-          'translate-x-full': !isInterestOpen
-        }"
-      >
-        <!-- overflow-y-auto를 InterestContent에 직접 적용하도록 수정 -->
-        <InterestContent 
-          v-show="isInterestOpen" 
-          class="h-full overflow-y-auto"
-        />
-      </div>
     </div>
 
+    <!-- 상세 정보 모달 -->
     <PropertyDetailModal
       v-if="isDetailModalOpen"
       :open="isDetailModalOpen"
       :property-detail="detailData"
       @close="closeDetailModal"
+      @toggle-favorite="handleFavoriteToggle"
+      class="z-[60]"
     />
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import axios from 'axios';
+import { ref, computed, watch } from "vue";
+import { getHouseDetail } from '@/api/house';
+import { useRoute } from 'vue-router';
+import { useAxiosStore } from '@/stores/axiosStore';
+import { useInterestStore } from '@/stores/interest';
 import LocationSelect from "@/components/property/LocationSelect.vue";
 import PropertyList from "@/components/property/PropertyList.vue";
 import LocationMap from "@/components/map/LocationMap.vue";
 import PropertyDetailModal from "@/components/property/PropertyDetailModal.vue";
+import { useInterestDrawer } from "@/stores/interestDrawer";
 
+const interestStore = useInterestStore();
+const interestDrawerStore = useInterestDrawer();
+
+// 상태 관리
 const searchResults = ref([]);
 const selectedProperty = ref(null);
 const isSidebarOpen = ref(false);
@@ -104,44 +100,125 @@ const detailData = ref(null);
 const mapCenter = ref(null);
 const mapZoom = ref(15);
 
-const DETAIL_ZOOM_LEVEL = 3; // 상세 보기 시 줌 레벨
-const selectedMarkerInfo = ref(null); // 선��된 마커의 인포윈도우 상태
+const DETAIL_ZOOM_LEVEL = 3;
 
+const axiosStore = useAxiosStore();
+const route = useRoute();
+
+const displayProperties = computed(() => {
+  if (interestStore.selectedProperty) {
+    return [...searchResults.value, interestStore.selectedProperty];
+  }
+  return searchResults.value;
+});
+
+watch(
+  () => route.query,
+  async (newQuery) => {
+    if (newQuery.aptSeq && newQuery.lat && newQuery.lng) {
+      try {
+        const detail = await fetchPropertyDetail(newQuery.aptSeq);
+        
+        // 지도 중심 이동
+        mapCenter.value = {
+          lat: parseFloat(newQuery.lat),
+          lng: parseFloat(newQuery.lng)
+        };
+        mapZoom.value = DETAIL_ZOOM_LEVEL;
+        
+        // 상세 정보 모달 표시
+        detailData.value = detail;
+        isDetailModalOpen.value = true;
+      } catch (error) {
+        console.error('Failed to fetch property details:', error);
+      }
+    }
+  },
+  { immediate: true }  // 컴포넌트 마운트 시에도 실행
+);
+
+watch(() => interestStore.shouldShowDetail, (newValue) => {
+  if (newValue && interestStore.selectedProperty) {
+    // 선택된 관심 매물이 있으면 지도 중심 이동 및 모달 표시
+    const property = interestStore.selectedProperty;
+    if (property.latitude && property.longitude) {
+      mapCenter.value = {
+        lat: parseFloat(property.latitude),
+        lng: parseFloat(property.longitude)
+      };
+      mapZoom.value = DETAIL_ZOOM_LEVEL;
+    }
+    
+    // 상세 정보 모달 표시
+    detailData.value = property;
+    isDetailModalOpen.value = true;
+  }
+});
+
+// API 호출
 const fetchPropertyDetail = async (aptSeq) => {
   try {
-    const response = await axios.get(`http://localhost:8080/house/get/${aptSeq}`);
-    return response.data;
+    const detail = await getHouseDetail(aptSeq);
+    // 받아온 데이터 구조 로깅
+    console.log('Received detail:', detail);
+    
+    return {
+      ...detail,
+      deals: detail.deals.map(deal => {
+        // 개별 deal 데이터 로깅
+        console.log('Processing deal:', deal);
+        return {
+          ...deal,
+          dealAmount: parseAmount(deal.dealAmount)
+        };
+      })
+    };
   } catch (error) {
     console.error('Error fetching property detail:', error);
     throw error;
   }
 };
 
+// 유틸리티 함수
 const parseAmount = (amount) => {
   if (!amount) return 0;
-  return parseInt(amount.replace(/,/g, '')) * 10000;
+  
+  // 이미 숫자인 경우
+  if (typeof amount === 'number') {
+    return amount * 10000;
+  }
+  
+  // 문자열인 경우 콤마 제거 후 변환
+  if (typeof amount === 'string') {
+    return parseInt(amount.replace(/,/g, '')) * 10000;
+  }
+  
+  return 0;
 };
 
-// 리스트 클릭 처리 - 지도 이동 & 인포윈도우 표시
+// 이벤트 핸들러
+const handleSearchResult = (response) => {
+  searchResults.value = Array.isArray(response) ? response : [];
+  selectedProperty.value = null;
+  mapCenter.value = null;
+  mapZoom.value = 7;
+  isSidebarOpen.value = true;
+};
+
 const handleListClick = (property) => {
   selectedProperty.value = property;
-  
-  // 선택된 property의 위도/경도 있는 경우에만 지도 이동
   if (property.latitude && property.longitude) {
     mapCenter.value = {
       lat: parseFloat(property.latitude),
       lng: parseFloat(property.longitude)
     };
-    mapZoom.value = 3; // 마커가 잘 보일 정도의 줌 레벨
+    mapZoom.value = DETAIL_ZOOM_LEVEL;
   }
 };
 
-// 마커 클릭 처리
 const handleMarkerClick = async (property) => {
   try {
     selectedProperty.value = property;
-    selectedMarkerInfo.value = null; // 마커 클릭 시는 인포윈도우 닫기
-    
     if (property.latitude && property.longitude) {
       mapCenter.value = {
         lat: parseFloat(property.latitude),
@@ -151,32 +228,39 @@ const handleMarkerClick = async (property) => {
     }
     
     const detail = await fetchPropertyDetail(property.aptSeq);
-    detailData.value = {
-      ...detail,
-      deals: detail.deals.map(deal => ({
-        ...deal,
-        dealAmount: parseAmount(deal.dealAmount)
-      }))
-    };
+    // 변환된 데이터 로깅
+    console.log('Processed detail:', detail);
+    detailData.value = detail;
     isDetailModalOpen.value = true;
   } catch (error) {
     console.error('Failed to fetch property details:', error);
   }
 };
 
-// 검색 결과 처리시 상태 초기화
-const handleSearchResult = (response) => {
-  searchResults.value = Array.isArray(response) ? response : [];
-  selectedProperty.value = null;
-  selectedMarkerInfo.value = null; // 인포윈도우 상태 초기화
-  mapCenter.value = null;
-  mapZoom.value = 7;
-  isSidebarOpen.value = true;
+const handleInterestPropertySelect = (property) => {
+  selectedProperty.value = property;
+  if (property.latitude && property.longitude) {
+    mapCenter.value = {
+      lat: parseFloat(property.latitude),
+      lng: parseFloat(property.longitude)
+    };
+    mapZoom.value = DETAIL_ZOOM_LEVEL;
+  }
+};
+
+const handleFavoriteToggle = async (propertyId) => {
+  try {
+    await interestDrawerStore.toggleFavorite(propertyId);
+  } catch (error) {
+    console.error('Failed to toggle favorite:', error);
+  }
 };
 
 const closeDetailModal = () => {
   isDetailModalOpen.value = false;
   detailData.value = null;
+  selectedProperty.value = null;
+  interestStore.clearSelection();
 };
 
 const toggleSidebar = () => {

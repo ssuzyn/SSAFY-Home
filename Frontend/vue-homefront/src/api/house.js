@@ -1,4 +1,6 @@
 import { localAxios } from "@/util/http-commons";
+import { useAxiosStore } from '@/stores/axiosStore';
+
 
 const local = localAxios();
 
@@ -21,12 +23,14 @@ function getHouseDeals(param, success, fail) {
 
 export async function getHouseDetail(aptSeq) {
   try {
-    const response = await http.get(`/house/get/${aptSeq}`);
+    const axiosStore = useAxiosStore();
+    const response = await axiosStore.get(`/house/get/${aptSeq}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching house detail:', error);
     throw error;
   }
 }
+
 
 export { getHouseDeals };

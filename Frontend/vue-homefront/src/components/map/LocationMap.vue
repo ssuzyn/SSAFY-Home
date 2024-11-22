@@ -45,7 +45,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['select-property', 'open-modal']);
+const emit = defineEmits(['select-property']);
 
 let map;
 let clusterer;
@@ -353,7 +353,6 @@ const updateMarkers = (properties) => {
         infowindows.value.forEach(info => info.close());
         infowindow.open(map, marker);
         emit('select-property', property);
-        emit('open-modal', property);
       });
 
       markers.value.push(marker);
@@ -397,6 +396,8 @@ const parseAmount = (amount) => {
   if (!amount) return 0;
   return parseInt(amount.replace(/,/g, '')) * 10000;
 };
+
+
 </script>
 
 <style scoped>
