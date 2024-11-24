@@ -72,6 +72,25 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
+	public String findUserId(String name, String email) throws Exception {
+		Map<String, String> params = new HashMap<>();
+		params.put("name", name);
+		String[] emailParts = email.split("@");
+		params.put("emailId", emailParts[0]);
+		params.put("emailDomain", emailParts[1]);
+		return memberMapper.findUserId(params);
+	}
+
+	@Override
+	public void resetPassword(String name, String userId, String newPassword) throws Exception {
+		Map<String, String> params = new HashMap<>();
+		params.put("name", name);
+		params.put("userId", userId);
+		params.put("newPassword", newPassword);
+		memberMapper.resetPassword(params);
+	}
+
+	@Override
 	public boolean checkIdAvailability(String userId) throws Exception {
 		int count = memberMapper.checkIdAvailability(userId);
 		return count == 0;

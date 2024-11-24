@@ -42,6 +42,8 @@ public class WebConfiguration implements WebMvcConfigurer {
                     "/user/login", 
                     "/user/signup",
                     "/user/register",
+                    "/user/resetpassword",
+                    "/user/findid",
                     "/user/check-id/**",
                     "/swagger-ui/**", // Swagger UI 경로
                     "/v3/api-docs/**", // API Docs 경로

@@ -265,4 +265,50 @@ public class MemberController {
 
         return new ResponseEntity<>(resultMap, status);
     }
+
+    @Operation(summary = "아이디 찾기", description = "이름과 이메일을 이용하여 아이디를 찾습니다.")
+    @PostMapping("/findid")
+    public ResponseEntity<Map<String, Object>> findUserId(
+            @RequestBody @Parameter(description = "이름과 이메일 정보", required = true) Map<String, String> request) {
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status;
+
+        try {
+            String userId = memberService.findUserId(request.get("name"), request.get("email"));
+            if (userId != null) {
+                resultMap.put("userId", userId);
+                resultMap.put("message", "아이디를 찾았습니다.");
+                status = HttpStatus.OK;
+            } else {
+                resultMap.put("message", "일치하는 사용자 정보가 없습니다.");
+                status = HttpStatus.NOT_FOUND;
+            }
+        } catch (Exception e) {
+            log.error("아이디 찾기 중 에러 발생: {}", e.getMessage(), e);
+            resultMap.put("message", "아이디 찾기 중 문제가 발생했습니다.");
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(resultMap, status);
+    }
+
+    @Operation(summary = "비밀번호 재설정", description = "이름과 아이디를 확인하고 새 비밀번호 1234로 재설정합니다.")
+    @PostMapping("/resetpassword")
+    public ResponseEntity<Map<String, Object>> resetPassword(
+            @RequestBody @Parameter(description = "이름, 아이디, 새 비밀번호 정보", required = true) Map<String, String> request) {
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status;
+
+        try {
+            memberService.resetPassword(request.get("name"), request.get("userId"), request.get("newPassword"));
+            resultMap.put("message", "비밀번호가 성공적으로 재설정되었습니다.");
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            log.error("비밀번호 재설정 중 에러 발생: {}", e.getMessage(), e);
+            resultMap.put("message", "비밀번호 재설정 중 문제가 발생했습니다.");
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return new ResponseEntity<>(resultMap, status);
+    }
 }
