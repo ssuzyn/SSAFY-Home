@@ -3,8 +3,8 @@
     <div id="map" class="w-full h-full"></div>
     <!-- 카테고리 -->
     <ul id="category" class="absolute top-4 right-4 bg-white rounded-lg shadow-lg overflow-hidden z-10">
-      <li 
-        v-for="cat in categories" 
+      <li
+        v-for="cat in categories"
         :key="cat.id"
         :id="cat.id"
         :data-order="cat.order"
@@ -21,6 +21,7 @@
 
 <script setup>
 import { ref, watch, onMounted } from "vue";
+import { useInterestStore } from '@/stores/interest';
 
 const props = defineProps({
   properties: {
@@ -65,6 +66,7 @@ const categories = [
   { id: 'CS2', name: '편의점', order: 5, iconClass: 'category_store' }
 ];
 
+const interestStore = useInterestStore();
 
 onMounted(() => {
   initializeKakaoMap();
@@ -82,7 +84,7 @@ watch(() => props.selectedProperty, (newProperty) => {
   if (newProperty && newProperty.latitude && newProperty.longitude) {
     // 기존 인포윈도우 모두 닫기
     infowindows.value.forEach(info => info.close());
-    
+
     // 선택된 마커의 위치 (살짝 위로 조정)
     const lat = Number(newProperty.latitude);
     const lng = Number(newProperty.longitude);
@@ -104,22 +106,22 @@ watch(() => props.selectedProperty, (newProperty) => {
 
     // 부드럽게 이동
     map.panTo(moveLatLon);
-    
+
     // 이동 완료 후 인포윈도우 표시
     tileLoadedListener = function() {
       setTimeout(() => {
-        const markerIndex = markers.value.findIndex(marker => 
+        const markerIndex = markers.value.findIndex(marker =>
           marker.propertyData && marker.propertyData.aptSeq === newProperty.aptSeq
         );
-        
+
         if (markerIndex >= 0) {
           infowindows.value[markerIndex].open(map, markers.value[markerIndex]);
         }
       }, 100);
-      
+
       kakao.maps.event.removeListener(map, 'tilesloaded', tileLoadedListener);
     };
-    
+
     kakao.maps.event.addListener(map, 'tilesloaded', tileLoadedListener);
   }
 }, { deep: true });
@@ -154,7 +156,7 @@ const initMap = () => {
     level: 3
   };
   map = new window.kakao.maps.Map(container, options);
-  // map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);    
+  // map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);
 
 
   // 클러스터러 초기화
@@ -186,13 +188,13 @@ const searchPlaces = () => {
   removePlaceMarkers();
 
   ps.categorySearch(
-    currCategory.value, 
+    currCategory.value,
     (data, status) => {
       if (status === window.kakao.maps.services.Status.OK) {
         displayPlaces(data);
       }
     },
-    { 
+    {
       bounds: map.getBounds(),
       useMapBounds: true
     }
@@ -210,7 +212,7 @@ const displayPlaces = (places) => {
       spriteOrigin: new window.kakao.maps.Point(46, (order * 36)),
       offset: new window.kakao.maps.Point(11, 28)
     };
-    
+
     const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions);
     const position = new window.kakao.maps.LatLng(place.y, place.x);
 
@@ -225,7 +227,7 @@ const displayPlaces = (places) => {
         <div class="placeinfo p-3 bg-white rounded-lg shadow-lg">
           <a href="${place.place_url}" target="_blank" class="title text-lg font-bold">${place.place_name}</a>
           <div class="mt-1 text-sm text-gray-600">
-            ${place.road_address_name ? 
+            ${place.road_address_name ?
               `<div>${place.road_address_name}</div>
                <div class="text-gray-400">(지번: ${place.address_name})</div>` :
               `<div>${place.address_name}</div>`
@@ -257,19 +259,104 @@ const removePlaceMarkers = () => {
 
 const createInfoWindow = (property) => {
   const content = `
-    <div class="bg-white p-2 rounded-lg shadow-lg min-w-[200px]">
-      <div class="font-medium text-gray-900">${property.aptNm}</div>
-      <div class="text-sm text-gray-600">
-        ${property.floor}층 | ${Math.round(property.excluUseAr)}㎡
+    <div style="
+      background: white;
+      padding: 20px;
+      min-width: 280px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 107, 0, 0.1);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    ">
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      ">
+        <div style="
+          font-size: 18px;
+          font-weight: 600;
+          color: #1a1a1a;
+          line-height: 1.4;
+        ">${property.aptNm}</div>
       </div>
-      <div class="text-lg font-bold text-gray-900">
-        ${formatPrice(parseAmount(property.dealAmount))}만
+
+      <div style="
+        display: flex;
+        gap: 6px;
+        margin-bottom: 16px;
+      ">
+        <div style="
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: #fff5eb;
+          padding: 6px 10px;
+          border-radius: 8px;
+          color: #ff6b00;
+          font-size: 13px;
+          font-weight: 500;
+        ">
+          <span style="color: #ff8534;">⬆</span> ${property.floor}층
+        </div>
+        <div style="
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: #fff5eb;
+          padding: 6px 10px;
+          border-radius: 8px;
+          color: #ff6b00;
+          font-size: 13px;
+          font-weight: 500;
+        ">
+          <span style="color: #ff8534;">◼</span> ${Math.round(property.excluUseAr)}㎡
+        </div>
       </div>
-      <div class="text-xs text-gray-500">
-        ${property.dealYear}.${String(property.dealMonth).padStart(2, '0')}.${String(property.dealDay).padStart(2, '0')}
-      </div>
-      <div class="text-xs text-gray-500 mt-1">
-        총 ${property.dealCount}건의 거래
+
+      <div style="
+        font-size: 24px;
+        font-weight: 700;
+        color: #ff6b00;
+        margin-bottom: 16px;
+        letter-spacing: -0.5px;
+      ">${interestStore.formatPrice(interestStore.parseAmount(property.dealAmount))}만</div>
+
+      <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 12px;
+        border-top: 1px solid #ffe4cc;
+      ">
+        <div style="
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        ">
+          <span style="
+            color: #666;
+            font-size: 13px;
+          ">거래일</span>
+          <span style="
+            color: #1a1a1a;
+            font-weight: 500;
+            font-size: 14px;
+          ">${property.dealYear}.${String(property.dealMonth).padStart(2, '0')}.${String(property.dealDay).padStart(2, '0')}</span>
+        </div>
+        <div style="
+          background: #f8f9fa;
+          color: #666;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 13px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        ">
+          <span style="color: #ff6b00; font-weight: 600;">${property.dealCount}</span>건의 거래
+        </div>
       </div>
     </div>
   `;
@@ -339,7 +426,7 @@ const updateMarkers = (properties) => {
 
       // 마커 생성
       const position = new window.kakao.maps.LatLng(lat, lng);
-      
+
       const marker = new window.kakao.maps.Marker({
         position: position
       });
@@ -381,23 +468,6 @@ const updateMarkers = (properties) => {
   }
 };
 
-const formatPrice = (price) => {
-  const billion = Math.floor(price / 100000000);
-  const million = Math.floor((price % 100000000) / 10000);
-  
-  let result = '';
-  if (billion > 0) result += `${billion}억 `;
-  if (million > 0) result += `${million}`;
-  if (billion === 0 && million === 0) result = '0';
-  return result.trim();
-};
-
-const parseAmount = (amount) => {
-  if (!amount) return 0;
-  return parseInt(amount.replace(/,/g, '')) * 10000;
-};
-
-
 </script>
 
 <style scoped>
@@ -407,27 +477,27 @@ const parseAmount = (amount) => {
  height: 28px;
 }
 
-.category_bank { 
+.category_bank {
  background: url(@/assets/images/bank.png) no-repeat center;
  background-size: contain;
 }
 
-.category_mart { 
+.category_mart {
  background: url(@/assets/images/mart.png) no-repeat center;
  background-size: contain;
 }
 
-.category_pharmacy { 
+.category_pharmacy {
  background: url(@/assets/images/pharmacy.png) no-repeat center;
  background-size: contain;
 }
 
-.category_cafe { 
+.category_cafe {
  background: url(@/assets/images/cafe.png) no-repeat center;
  background-size: contain;
 }
 
-.category_store { 
+.category_store {
  background: url(@/assets/images/store.png) no-repeat center;
  background-size: contain;
 }
