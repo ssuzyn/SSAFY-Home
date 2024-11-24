@@ -4,6 +4,8 @@ import QnAView from '@/views/QnAView.vue';
 import SignupView from '@/views/SignupView.vue';
 import MyPageContent from '@/components/mypage/MyPageContent.vue';
 import UpdatedProfilePage from '@/components/mypage/UpdatedProfilePage.vue';
+import FindIdPage from '@/components/auth/FindIdPage.vue';
+import ResetPasswordPage from '@/components/auth/ResetPasswordPage.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuth } from '@/stores/auth'; // Pinia store 가져오기
 
@@ -38,6 +40,16 @@ const routes = [
     name: 'SignUp',
     component: SignupView,
   },
+  {
+    path: '/findid',
+    name: 'FindId',
+    component: FindIdPage,
+  },
+  {
+    path: '/resetpassword',
+    name: 'ResetPassword',
+    component: ResetPasswordPage,
+  },
 ];
 
 const router = createRouter({
@@ -45,7 +57,7 @@ const router = createRouter({
   routes,
 });
 
-// 전역 가드 추가
+// 전역 가드 수정
 router.beforeEach((to, from, next) => {
   const auth = useAuth(); // Pinia의 auth store 사용
 
@@ -58,3 +70,4 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router;
+

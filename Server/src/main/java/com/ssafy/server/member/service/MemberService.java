@@ -18,4 +18,7 @@ public interface MemberService {
 	void deleRefreshToken(String userId) throws Exception;
 
 	boolean checkIdAvailability(String userId) throws Exception;
+
+	String findUserId(String name, String email) throws Exception;
+	void resetPassword(String name, String userId, String newPassword) throws Exception;
 }

@@ -90,6 +90,8 @@ export const useBoard = defineStore('board', () => {
     }
   }
 
+  
+
   const deleteComment = async (commentId, articleNo) => {
     try {
       await axiosStore.delete(`${API_URL}/comments/${commentId}`)

@@ -17,17 +17,28 @@
       <div class="flex flex-col lg:flex-row gap-8">
         <!-- 왼쪽 질문 목록 -->
         <div class="flex-1">
-          <div class="mb-6">
+          <!-- 검색 영역 -->
+          <div class="mb-6 flex gap-3">
+            <select 
+              v-model="searchType"
+              class="p-3 border border-gray-200 text-gray-700 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+            >
+              <option value="title_content">제목 + 내용</option>
+              <option value="title">제목</option>
+              <option value="content">내용</option>
+              <option value="nickname">닉네임</option>
+            </select>
             <input
               v-model="searchQuery"
-              placeholder="질문 검색하기"
+              :placeholder="searchType === 'nickname' ? '닉네임을 입력하세요' : '질문 검색하기'"
               type="search"
-              class="w-full p-3 border border-gray-200 text-gray-900 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+              class="flex-1 p-3 border border-gray-200 text-gray-900 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
               @input="handleSearch"
             />
           </div>
 
-          <div class="space-y-4">
+          <!-- 질문 목록 -->
+          <div class="space-y-4 overflow-y-auto" style="max-height: calc(100vh - 12rem);">
             <div v-for="question in board.questions"
                  :key="question.articleNo"
                  class="bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:border-orange-100">
@@ -45,6 +56,7 @@
               <!-- 하단 메타 정보 및 버튼 -->
               <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                 <div class="flex items-center gap-4">
+                  <!-- 프로필 이미지와 사용자 정보 -->
                   <div class="flex items-center">
                     <LazyImage
                       :path="question.userProfile"
@@ -54,6 +66,7 @@
                     />
                     <span class="text-sm text-gray-700 ml-2">{{ question.userId }}</span>
                   </div>
+                  <!-- 조회수 -->
                   <div class="flex items-center">
                     <Eye class="w-4 h-4 text-gray-400 mr-1.5" />
                     <span class="text-sm text-gray-600">{{ question.hit }}</span>
@@ -76,9 +89,11 @@
         <div class="lg:w-80 bg-white border border-gray-100 rounded-xl p-6 h-fit shadow-sm">
           <h2 class="text-lg text-gray-900 font-semibold mb-4">인기 질문</h2>
           <ul class="space-y-4">
-            <li v-for="(question, index) in popularQuestions" :key="index">
-              <a class="text-sm hover:text-orange-600 text-gray-700 hover:underline transition-colors duration-200 block" href="#">
-                {{ question }}
+            <li v-for="(question, index) in topQuestions" :key="question.articleNo" class="flex items-start">
+              <span class="text-orange-500 font-bold mr-2 mt-0.5">{{ index + 1 }}.</span>
+              <a @click="openQuestionDetailDialog(question.articleNo)" 
+                 class="text-sm text-gray-700 hover:text-orange-500 hover:underline transition-colors cursor-pointer flex-1">
+                {{ question.subject }}
               </a>
             </li>
           </ul>
@@ -235,7 +250,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch, h } from 'vue'
+import { ref, reactive, onMounted, watch, h, computed } from 'vue'
 import { Plus, ChevronRight, UserCircle, Eye, XCircle, PlusCircle, Clock, MessageCircle, SendHorizontal } from 'lucide-vue-next'
 import { useBoard } from '@/stores/board'
 import { useAuth } from '@/stores/auth'
@@ -248,16 +263,17 @@ const board = useBoard()
 const auth = useAuth()
 const router = useRouter()
 
-const popularQuestions = [
-  "전세 사기 예방하는 방법",
-  "부동산 세금 계산하는 법",
-  "신축 아파트 vs 구축 아파트",
-]
-
 const searchQuery = ref('')
+const searchType = ref('title_content')
 const showNewQuestionDialog = ref(false)
 const newQuestion = reactive({ subject: '', content: '' })
 const newAnswer = ref('')
+
+const topQuestions = computed(() => {
+  return [...board.questions]
+    .sort((a, b) => b.hit - a.hit)
+    .slice(0, 3);
+})
 
 onMounted(async () => {
   try {
@@ -271,7 +287,7 @@ const handleSearch = () => {
   if (searchQuery.value.trim() === '') {
     board.fetchAllQuestions()
   } else {
-    board.fetchQuestions('title_content', searchQuery.value)
+    board.fetchQuestions(searchType.value, searchQuery.value)
   }
 }
 
@@ -373,7 +389,6 @@ const formatDate = (dateArray) => {
   });
 }
 
-// Watch for changes in selectedQuestion and comments
 watch(() => board.selectedQuestion, (newVal) => {
   if (newVal) {
     console.log('Selected question updated:', newVal)
