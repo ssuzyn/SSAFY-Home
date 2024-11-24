@@ -105,7 +105,7 @@ watch(() => store.isVisible, (newValue) => {
             <div class="flex items-center justify-between">
               <div class="flex items-center">
                 <h3 class="text-lg font-medium">
-                  {{ interestStore.formatPrice(interestStore.parseAmount(property.latestPrice)) }}만원
+                  {{ interestStore.formatPrice(interestStore.parseAmount(property.latestPrice)) }}
                 </h3>
               </div>
               <div class="flex items-center space-x-3">

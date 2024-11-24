@@ -1,18 +1,18 @@
 <template>
-  <div 
+  <div
     class="bg-gray-100 rounded-lg shadow-sm hover:shadow-md
     transition-shadow duration-200 cursor-pointer overflow-hidden"
     @click="$emit('click')"
   >
     <div class="p-3 flex flex-col">
       <div class="text-medium font-medium text-gray-900 mb-2">{{ property.name }}</div>
-      
+
       <div class="flex flex-col">
         <div class="text-xl font-bold text-gray-900 mb-2">
-          {{ formatPrice(property.price) }}
-          <span class="text-sm">만</span>
+          {{ interestStore.formatPrice(property.price) }}
+          <span class="text-sm"></span>
         </div>
-        
+
         <div class="flex items-center gap-2 text-xs text-gray-600">
           <span>{{ property.type }}</span>
           <span class="text-gray-300 mx-1">·</span>
@@ -40,6 +40,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { useInterestStore } from '@/stores/interest';
 
 const props = defineProps({
   property: {
@@ -60,22 +61,7 @@ const props = defineProps({
 
 defineEmits(['click']);
 
-const formatPrice = (price) => {
-  const billion = Math.floor(price / 100000000);
-  const million = Math.floor((price % 100000000) / 10000);
-  
-  let result = '';
-  if (billion > 0) {
-    result += `${billion}억 `;
-  }
-  if (million > 0) {
-    result += `${million}`;
-  }
-  if (billion === 0 && million === 0) {
-    result = '0';
-  }
-  return result.trim();
-};
+const interestStore = useInterestStore();
 
 const formatDate = (date) => {
   if (!date) return '';
