@@ -91,15 +91,17 @@ export const useInterestStore = defineStore('interest', () => {
   };
 
   // 가격 포맷팅 유틸리티 함수
-  const formatPrice = (price) => {
-    const billion = Math.floor(price / 100000000);
-    const million = Math.floor((price % 100000000) / 10000);
-
-    let result = '';
-    if (billion > 0) result += `${billion}억 `;
-    if (million > 0) result += `${million}`;
-    if (billion === 0 && million === 0) result = '0';
-    return result.trim();
+  const formatPrice = (amount) => {
+    if (amount >= 100000000) {
+      const uk = Math.floor(amount / 100000000);
+      const man = Math.floor((amount % 100000000) / 10000);
+      if (man > 0) {
+        return `${uk}억 ${man}만원`;
+      }
+      return `${uk}억원`;
+    }
+    const man = Math.floor(amount / 10000);
+    return `${man}만원`;
   };
 
   return {
