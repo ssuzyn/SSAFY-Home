@@ -87,6 +87,16 @@ public class BoardController {
         return ResponseEntity.ok().build();
     }
 
+    // 댓글 수정
+    // BoardController.java
+    @PutMapping("/comments")
+    @Operation(summary = "댓글 수정", description = "특정 댓글의 내용을 수정합니다.")
+    public ResponseEntity<Void> updateComment(@RequestBody CommentDto commentDto) {
+        boardService.updateComment(commentDto);
+        log.info("댓글 수정 완료 - content: {}",commentDto.getContent());
+        return ResponseEntity.ok().build();
+    }
+
     // 댓글 목록 조회
     @GetMapping("/{articleNo}/comments")
     @Operation(summary = "댓글 조회", description = "특정 게시글에 작성된 댓글 목록을 조회합니다.")

@@ -59,6 +59,7 @@ export const useBoard = defineStore('board', () => {
       await getQuestionDetails(boardDto.articleNo)
     } catch (error) {
       console.error('Failed to update question:', error)
+      throw error
     }
   }
 
@@ -90,7 +91,7 @@ export const useBoard = defineStore('board', () => {
     }
   }
 
-  
+
 
   const deleteComment = async (commentId, articleNo) => {
     try {
@@ -98,6 +99,16 @@ export const useBoard = defineStore('board', () => {
       await fetchComments(articleNo)
     } catch (error) {
       console.error('Failed to delete comment:', error)
+    }
+  }
+
+  const updateComment = async (commentDto) => {
+    try {
+      await axiosStore.put(`${API_URL}/comments`, commentDto)
+      await fetchComments(commentDto.articleNo)
+    } catch (error) {
+      console.error('Failed to update comment:', error)
+      throw error
     }
   }
 
@@ -113,6 +124,7 @@ export const useBoard = defineStore('board', () => {
     deleteQuestion,
     fetchComments,
     createComment,
-    deleteComment
+    deleteComment,
+    updateComment
   }
 })

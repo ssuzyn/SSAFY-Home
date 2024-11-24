@@ -29,6 +29,7 @@ public interface BoardMapper {
     int createComment(CommentDto commentDto);
 
     int deleteComment(@Param("commentId") int commentId);
+    int updateComment(CommentDto commentDto);
 
     // Q&A글 별 댓글 조회
     List<CommentDto> getCommentsByArticleNo(@Param("articleNo") int articleNo);

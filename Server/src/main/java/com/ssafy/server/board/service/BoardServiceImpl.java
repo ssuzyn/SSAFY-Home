@@ -58,6 +58,11 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    public void updateComment(CommentDto commentDto) {
+        boardMapper.updateComment(commentDto);
+    }
+
+    @Override
     public List<CommentDto> getCommentsByArticleNo(int articleNo) {
         return boardMapper.getCommentsByArticleNo(articleNo);
     }

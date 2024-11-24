@@ -22,10 +22,10 @@ public interface BoardService {
     // Q&A 조회수 상승
     void incrementHit(int articleNo);
 
-    // 댓글 작성/삭제
+    // 댓글 작성/삭제/수정
     void createComment(CommentDto commentDto);
-
     void deleteComment(int commentId);
+    void updateComment(CommentDto commentDto);
 
     // Q&A글 별 댓글 조회
     List<CommentDto> getCommentsByArticleNo(int articleNo);

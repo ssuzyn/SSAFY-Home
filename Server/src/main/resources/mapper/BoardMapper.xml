@@ -91,6 +91,13 @@
         DELETE FROM comments WHERE comment_id = #{commentId}
     </delete>
 
+    <!-- BoardMapper.xml -->
+    <update id="updateComment" parameterType="CommentDto">
+        UPDATE comments
+        SET content = #{content}
+        WHERE comment_id = #{commentId}
+    </update>
+
     <!-- Q&A 글별 댓글 조회 -->
     <select id="getCommentsByArticleNo" parameterType="int" resultMap="commentResultMap">
         SELECT
