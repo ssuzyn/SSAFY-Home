@@ -27,6 +27,9 @@ public class CommentDto {
     @Schema(description = "댓글 내용", example = "이 질문에 대한 답변입니다.")
     private String content;
 
+    @Schema(description = "사용자 프로필", example = "admin/basic_profile.png")
+    private String userProfile;
+
     @Schema(description = "댓글 등록 시간", example = "2024-11-19T16:05:45")
     private LocalDateTime registerTime;
 }
