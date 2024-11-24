@@ -61,10 +61,11 @@ const currCategory = ref('');
 const placeMarkers = ref([]);
 
 const categoryImages = {
-  'BK9': 'https://m.richgo.ai/newMapSystem/markerIcon/marker-set-place-22.svg', // 은행
-  'MT1': 'https://m.richgo.ai/newMapSystem/markerIcon/marker-set-place-1.svg',  // 마트
-  'HP8': 'https://m.richgo.ai/newMapSystem/markerIcon/marker-set-place-6.svg',  // 병원
-  'CE7': 'https://m.richgo.ai/newMapSystem/markerIcon/marker-set-place-5.svg'   // 카페
+  'BK9': 'src/assets/images/bank.png', // 은행
+  'MT1': 'src/assets/images/mart.png',  // 마트
+  'HP8': 'src/assets/images/hospital.png',  // 병원
+  'CE7': 'src/assets/images/cafe.png',   // 카페
+  'FD6': 'src/assets/images/food.png'
 };
 
 const categories = [
@@ -91,6 +92,12 @@ const categories = [
     name: '카페',
     order: 3,
     iconUrl: categoryImages['CE7']
+  },
+  {
+    id: 'FD6',
+    name: '음식점',
+    order: 4,
+    iconUrl: categoryImages['FD6']
   },
 ];
 
@@ -242,8 +249,8 @@ const displayPlaces = (places) => {
     const content = document.createElement('div');
     content.innerHTML = `
       <div style="
-        width: 28px;
-        height: 28px;
+        width: 32px;
+        height: 32px;
         background: white;
         border-radius: 50%;
         display: flex;
@@ -255,7 +262,7 @@ const displayPlaces = (places) => {
       ">
         <img
           src="${categoryImages[currCategory.value]}"
-          style="width: 16px; height: 16px;"
+          style="width: 18px; height: 18px;"
           alt="Category marker"
         />
       </div>
