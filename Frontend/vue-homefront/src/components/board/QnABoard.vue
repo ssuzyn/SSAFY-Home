@@ -46,8 +46,13 @@
               <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                 <div class="flex items-center gap-4">
                   <div class="flex items-center">
-                    <UserCircle class="w-5 h-5 text-gray-400 mr-1.5" />
-                    <span class="text-sm text-gray-700">{{ question.userId }}</span>
+                    <LazyImage
+                      :path="question.userProfile"
+                      :alt="`${question.userId}의 프로필`"
+                      container-class="w-8 h-8"
+                      image-class="rounded-full"
+                    />
+                    <span class="text-sm text-gray-700 ml-2">{{ question.userId }}</span>
                   </div>
                   <div class="flex items-center">
                     <Eye class="w-4 h-4 text-gray-400 mr-1.5" />
@@ -153,8 +158,13 @@
           </div>
           <div class="flex items-center gap-4 text-sm text-gray-600">
             <div class="flex items-center">
-              <UserCircle class="w-5 h-5 mr-1.5 text-gray-400" />
-              {{ board.selectedQuestion.userId }}
+              <LazyImage
+                :path="board.selectedQuestion.userProfile"
+                :alt="`${board.selectedQuestion.userId}의 프로필`"
+                container-class="w-8 h-8"
+                image-class="rounded-full"
+              />
+              <span class="text-sm ml-2">{{ board.selectedQuestion.userId }}</span>
             </div>
             <div class="flex items-center">
               <Clock class="w-4 h-4 mr-1.5 text-gray-400" />
@@ -184,8 +194,13 @@
                 <p class="text-gray-700">{{ comment.content }}</p>
                 <div class="mt-3 flex items-center gap-4 text-sm text-gray-600">
                   <div class="flex items-center">
-                    <UserCircle class="w-4 h-4 mr-1.5 text-gray-400" />
-                    {{ comment.userId }}
+                    <LazyImage
+                      :path="comment.userProfile"
+                      :alt="`${comment.userId}의 프로필`"
+                      container-class="w-6 h-6"
+                      image-class="rounded-full"
+                    />
+                    <span class="text-sm ml-2">{{ comment.userId }}</span>
                   </div>
                   <div class="flex items-center">
                     <Clock class="w-4 h-4 mr-1.5 text-gray-400" />
@@ -220,11 +235,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, h } from 'vue'
 import { Plus, ChevronRight, UserCircle, Eye, XCircle, PlusCircle, Clock, MessageCircle, SendHorizontal } from 'lucide-vue-next'
 import { useBoard } from '@/stores/board'
 import { useAuth } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { message } from "ant-design-vue";
+import LazyImage from '@/components/common/LazyImage.vue'
+
 
 const board = useBoard()
 const auth = useAuth()
@@ -259,13 +277,23 @@ const handleSearch = () => {
 
 const openNewQuestionDialog = () => {
   if (!auth.isLoggedIn) {
-    if (confirm('로그인이 필요한 서비스입니다. 로그인 하시겠습니까?')) {
-      router.push('/login')
-    }
-    return
+    message.info({
+      content: '로그인이 필요한 서비스입니다.',
+      class: 'custom-message',
+      duration: 2,
+      btn: h(
+        'button',
+        {
+          type: 'button',
+          class: 'ml-4 text-orange-500 hover:text-orange-600',
+          onClick: () => router.push('/login')
+        },
+        '로그인하기'
+      )
+    });
+    return;
   }
-
-  showNewQuestionDialog.value = true
+  showNewQuestionDialog.value = true;
 }
 
 const closeNewQuestionDialog = () => {
@@ -286,10 +314,21 @@ const handleNewQuestion = async () => {
 
 const openQuestionDetailDialog = async (articleNo) => {
   if (!auth.isLoggedIn) {
-    if (confirm('로그인이 필요한 서비스입니다. 로그인 하시겠습니까?')) {
-      router.push('/login')
-    }
-    return
+    message.info({
+      content: '로그인이 필요한 서비스입니다.',
+      class: 'custom-message',
+      duration: 2,
+      btn: h(
+        'button',
+        {
+          type: 'button',
+          class: 'ml-4 text-orange-500 hover:text-orange-600',
+          onClick: () => router.push('/login')
+        },
+        '로그인하기'
+      )
+    });
+    return;
   }
 
   await board.getQuestionDetails(articleNo)
@@ -345,3 +384,4 @@ watch(() => board.comments, (newVal) => {
   console.log('Comments updated:', newVal)
 }, { deep: true })
 </script>
+
