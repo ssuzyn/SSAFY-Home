@@ -27,21 +27,21 @@ export const useInterestStore = defineStore('interest', () => {
       aptSeq: detail.aptSeq,
       aptNm: detail.aptNm, // infowindow용
       dongNm: detail.dongNm,
-      
+
       // 위치 정보
       latitude: detail.latitude,
       longitude: detail.longitude,
-      
+
       // 최신 거래 정보
       floor: detail.floor || '',
       excluUseAr: detail.excluUseAr || 0,
       dealAmount: detail.dealAmount || '',
-      
+
       // 날짜 정보
       dealYear,
       dealMonth,
       dealDay,
-      
+
       // 거래 목록
       deals: (detail.deals || []).map(deal => {
         const { dealYear, dealMonth, dealDay } = parseDealDate(deal.dealDate);
@@ -54,14 +54,14 @@ export const useInterestStore = defineStore('interest', () => {
           excluUseAr: deal.excluUseAr
         };
       }),
-      
+
       // 거래 건수
       dealCount: detail.dealCount || '0',
-      
+
       // 지도 마커와 인포윈도우에 필요한 계산된 필드들
       price: parseAmount(detail.dealAmount), // 숫자형 가격
-      formattedDate: dealYear ? 
-        `${dealYear}.${dealMonth}.${dealDay}` : 
+      formattedDate: dealYear ?
+        `${dealYear}.${dealMonth}.${dealDay}` :
         null
     };
   };
@@ -94,7 +94,7 @@ export const useInterestStore = defineStore('interest', () => {
   const formatPrice = (price) => {
     const billion = Math.floor(price / 100000000);
     const million = Math.floor((price % 100000000) / 10000);
-    
+
     let result = '';
     if (billion > 0) result += `${billion}억 `;
     if (million > 0) result += `${million}`;
@@ -107,6 +107,7 @@ export const useInterestStore = defineStore('interest', () => {
     shouldShowDetail,
     selectProperty,
     clearSelection,
+    parseAmount,
     formatPrice
   };
 });

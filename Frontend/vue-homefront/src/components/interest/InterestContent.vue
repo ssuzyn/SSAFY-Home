@@ -18,7 +18,7 @@ const handlePropertyClick = async (property) => {
   try {
     // 1. 먼저 백엔드에서 아파트 상세 정보를 가져옴
     const detail = await getHouseDetail(property.aptSeq);
-    
+
     // 2. 상세 정보에서 위도/경도를 포함한 정보를 store에 저장
     interestStore.selectedProperty = {
       ...property,
@@ -105,7 +105,7 @@ watch(() => store.isVisible, (newValue) => {
             <div class="flex items-center justify-between">
               <div class="flex items-center">
                 <h3 class="text-lg font-medium">
-                  {{ property.latestPrice }}만원
+                  {{ interestStore.formatPrice(interestStore.parseAmount(property.latestPrice)) }}만원
                 </h3>
               </div>
               <div class="flex items-center space-x-3">
@@ -124,7 +124,7 @@ watch(() => store.isVisible, (newValue) => {
                   :apt-seq="property.aptSeq"
                   :disabled="store.loading"
                   class="interest-btn text-blue-500"
-                  @click.stop                
+                  @click.stop
                   />
               </div>
             </div>

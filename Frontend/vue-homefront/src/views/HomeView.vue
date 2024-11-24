@@ -16,14 +16,14 @@
       <LocationMap
         :properties="displayProperties"
         :selected-property="selectedProperty"
-        :center-position="mapCenter" 
+        :center-position="mapCenter"
         :zoom-level="mapZoom"
         @select-property="handleMarkerClick"
         class="h-full w-full relative z-0"
       />
 
       <!-- 검색결과 PropertyList -->
-      <div 
+      <div
         class="absolute top-0 h-full bg-white z-20 transform transition-transform duration-300 ease-in-out shadow-lg"
         :class="{
           'translate-x-0 w-[400px]': isSidebarOpen,
@@ -40,26 +40,26 @@
       </div>
 
       <!-- 토글 버튼 -->
-      <button 
+      <button
         @click="toggleSidebar"
         class="absolute top-2 z-30 bg-white w-8 h-8 rounded-lg shadow-lg hover:bg-gray-50 flex items-center justify-center transition-all duration-300 ease-in-out"
         :class="[isSidebarOpen ? 'left-[400px]' : 'left-2']"
       >
         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path 
+          <path
             v-if="isSidebarOpen"
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
             d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
-          /> 
-          <path 
+          />
+          <path
             v-else
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
             d="M13 5l7 7-7 7M5 5l7 7-7 7"
-          /> 
+          />
         </svg>
       </button>
     </div>
@@ -102,42 +102,58 @@ const isDetailModalOpen = ref(false);
 const detailData = ref(null);
 const mapCenter = ref(null);
 const mapZoom = ref(15);
+const selectedMarker = ref(null);
 
 const DETAIL_ZOOM_LEVEL = 3;
 
 watch(() => interestStore.selectedProperty, (newProperty) => {
   if (newProperty) {
-    // PropertyList의 transformProperty 함수에 맞는 데이터 구조로 변환
+    const fetchDetail = async () => {
+      try {
+        const detail = await getHouseDetail(newProperty.aptSeq);
+        const latestDeal = detail.deals?.[0] || {};
 
-    console.log('관심매물 property for PropertyList:', newProperty);
+        // dealDate를 년/월/일로 분리
+        const dealDate = latestDeal.dealDate || '';
+        const [dealYear, dealMonth, dealDay] = dealDate.split('-');
 
-    interestProperty.value = newProperty;
-    searchResults.value = [newProperty]; // 배열로 래핑
-    isSidebarOpen.value = true;
+        // 최신 거래 정보를 포함한 property 객체 생성
+        const propertyWithDetail = {
+          ...newProperty,
+          floor: latestDeal.floor,
+          excluUseAr: latestDeal.excluUseAr,
+          dealAmount: latestDeal.dealAmount,
+          dealYear,
+          dealMonth,
+          dealDay,
+          deals: detail.deals
+        };
 
-    mapCenter.value = {
-      lat: parseFloat(newProperty.latitude),
-      lng: parseFloat(newProperty.longitude)
+        console.log('관심매물 property for PropertyList:', propertyWithDetail);
+
+        interestProperty.value = propertyWithDetail;
+        searchResults.value = [propertyWithDetail];
+        selectedMarker.value = propertyWithDetail;
+        isSidebarOpen.value = true;
+
+        mapCenter.value = {
+          lat: parseFloat(newProperty.latitude),
+          lng: parseFloat(newProperty.longitude)
+        };
+        mapZoom.value = DETAIL_ZOOM_LEVEL;
+      } catch (error) {
+        console.error('Failed to fetch property detail:', error);
+      }
     };
-    mapZoom.value = DETAIL_ZOOM_LEVEL;
+
+    fetchDetail();
   } else {
     interestProperty.value = null;
     searchResults.value = [];
+    selectedMarker.value = null;
   }
 });
 
-// 디버깅을 위한 추가 watch
-watch(() => searchResults.value, (newResults) => {
-  console.log('Search results updated:', newResults);
-  if (newResults.length > 0) {
-    console.log('First property in results:', newResults[0]);
-  }
-}, { deep: true });
-
-// searchResults가 변경될 때마다 로그 출력
-// watch(() => searchResults.value, (newResults) => {
-//   console.log('Search results updated:', newResults);
-// }, { deep: true });
 
 // LocationMap에 전달할 properties 계산
 const displayProperties = computed(() => {
@@ -202,7 +218,7 @@ const handleMarkerClick = async (property) => {
       };
       mapZoom.value = DETAIL_ZOOM_LEVEL;
     }
-    
+
     const detail = await fetchPropertyDetail(property.aptSeq);
     detailData.value = detail;
     isDetailModalOpen.value = true;
