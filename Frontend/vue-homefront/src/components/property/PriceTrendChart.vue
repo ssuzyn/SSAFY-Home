@@ -57,6 +57,21 @@ const filteredDeals = computed(() => {
   );
 });
 
+const priceDifference = computed(() => {
+  if (filteredDeals.value.length < 2) return null;
+
+  const latestDeal = filteredDeals.value[filteredDeals.value.length - 1];
+  const previousDeal = filteredDeals.value[filteredDeals.value.length - 2];
+
+  const difference = latestDeal.dealAmount - previousDeal.dealAmount;
+  const percentage = ((difference / previousDeal.dealAmount) * 100).toFixed(2);
+
+  return {
+    difference,
+    percentage
+  };
+});
+
 const formatPriceForChart = (amount) => {
   // 차트에서는 만원 단위로 받으므로 다시 원 단위로 변환
   const won = amount * 10000;
@@ -75,11 +90,16 @@ const formatPriceForChart = (amount) => {
 
 
 const chartData = computed(() => {
-  if (!filteredDeals.value.length) return {
-    labels: [],
-    datasets: []
-  };
-  
+  if (!filteredDeals.value.length) {
+    console.log('No deals available');
+    return {
+      labels: [],
+      datasets: []
+    };
+  }
+
+  console.log('Filtered Deals:', filteredDeals.value);
+
   return {
     labels: filteredDeals.value.map(deal => 
       deal.dealDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1년 $2월')
@@ -102,15 +122,21 @@ const chartData = computed(() => {
         pointBorderWidth: 2,
         pointHoverBorderWidth: 2,
         fill: false,
+        yAxisID: 'y1', // 가격을 위한 y축
         order: 0
       },
       {
         type: 'bar',
         label: '거래량',
-        data: filteredDeals.value.map(deal => deal.dealAmount / 10000),
+        data: filteredDeals.value.map(deal => {
+          console.log('Volume:', deal.excluUseAr);
+          return deal.excluUseAr;
+        }), // 거래량 데이터로 변경
         backgroundColor: '#E8F1FF',
+        yAxisID: 'y2', // 거래량을 위한 y축
         order: 1,
-        barPercentage: 0.3
+        barPercentage: 0.8, // 막대 너비 조정
+        categoryPercentage: 0.8 // 카테고리 너비 조정
       }
     ]
   };
@@ -129,7 +155,10 @@ const chartOptions = {
       callbacks: {
         label: (context) => {
           const value = context.parsed.y;
-          return formatPriceForChart(value);
+          if (context.dataset.type === 'line') {
+            return formatPriceForChart(value);
+          }
+          return `${value}건`; // 거래량에 대한 툴팁
         }
       },
       backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -142,7 +171,7 @@ const chartOptions = {
     }
   },
   scales: {
-    y: {
+    y1: { // 가격을 위한 y축
       position: 'right',
       beginAtZero: true,
       grid: {
@@ -156,6 +185,21 @@ const chartOptions = {
           }
           return `${value}만`;
         },
+        color: '#999',
+        font: {
+          size: 11
+        }
+      }
+    },
+    y2: { // 거래량을 위한 y축
+      position: 'left',
+      beginAtZero: true, // 거래량이 0부터 시작
+      grid: {
+        drawBorder: false,
+        color: '#f0f0f0'
+      },
+      ticks: {
+        stepSize: 1, // 자연수로 표시
         color: '#999',
         font: {
           size: 11
@@ -184,6 +228,20 @@ const chartOptions = {
 
 <template>
   <div>
+    <!-- 차트 위 정보 표시 영역 -->
+    <div class="mb-4 p-4 bg-gray-100 rounded-lg flex justify-between items-center">
+      <div class="text-center">
+        <div class="text-lg font-bold">최근 실거래가</div>
+        <div class="text-2xl font-bold">24억 3,000</div>
+        <div class="text-sm">최고 대비 -1억 9,000만 (7.25%)</div>
+      </div>
+      <div class="text-center">
+        <div class="text-lg font-bold">매물 최저가</div>
+        <div class="text-2xl font-bold text-red-500">22억 9,000</div>
+        <div class="text-sm text-red-500">4주 전 대비 1,000만</div>
+      </div>
+    </div>
+
     <!-- 차트 헤더 -->
     <div class="flex items-center justify-between mb-6">
       <h4 class="text-lg font-bold">실거래가 추이</h4>
@@ -221,3 +279,12 @@ const chartOptions = {
     </div>
   </div>
 </template>
+
+<style scoped>
+.relative {
+  position: relative;
+}
+.absolute {
+  position: absolute;
+}
+</style>

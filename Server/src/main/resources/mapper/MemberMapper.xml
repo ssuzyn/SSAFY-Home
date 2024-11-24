@@ -90,4 +90,18 @@
 		where user_id = #{userId}
 	</update>
 
+	<!-- Find User ID -->
+	<select id="findUserId" parameterType="map" resultType="string">
+		SELECT user_id
+		FROM members
+		WHERE user_name = #{name} AND email_id = #{emailId} AND email_domain = #{emailDomain}
+	</select>
+
+	<!-- Reset Password -->
+	<update id="resetPassword" parameterType="map">
+		UPDATE members
+		SET user_pwd = "1234"
+		WHERE user_id = #{userId} AND user_name = #{name}
+	</update>
+
 </mapper>

@@ -23,5 +23,8 @@ public interface MemberMapper {
     Object getRefreshToken(String userid) throws SQLException;
     void deleteRefreshToken(Map<String, String> map) throws SQLException;
     int checkIdAvailability(String userId) throws SQLException;
+
+    String findUserId(Map<String, String> params) throws SQLException;
+    void resetPassword(Map<String, String> params) throws SQLException;
 }
 

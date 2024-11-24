@@ -1,11 +1,14 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useAxiosStore } from './axiosStore';
+import { useRouter } from 'vue-router';
 
 export const useAuth = defineStore('auth', () => {
+  const router = useRouter();
   const axiosStore = useAxiosStore();
   const user = ref(JSON.parse(localStorage.getItem('user')) || null);
   const isLoggedIn = computed(() => !!axiosStore.token);
+  const rememberedUserId = ref(localStorage.getItem('rememberedUserId') || '');
 
   const setToken = async (newToken) => {
     axiosStore.setToken(newToken);
@@ -15,7 +18,6 @@ export const useAuth = defineStore('auth', () => {
         const response = await axiosStore.get('/user/info');
         user.value = response.data['userInfo'];
         localStorage.setItem('user', JSON.stringify(user.value));
-        location.reload();
       } catch (error) {
         console.error('User info 요청 실패:', error);
         user.value = null;
@@ -24,9 +26,7 @@ export const useAuth = defineStore('auth', () => {
     } else {
       user.value = null;
       localStorage.removeItem('user');
-      window.location.href = '/';
     }
-    
   };
 
   const fetchUserInfo = async () => {
@@ -73,7 +73,7 @@ export const useAuth = defineStore('auth', () => {
     }
   };
 
-  const login = async (userId, userPwd, rememberMe) => {
+  const login = async (userId, userPwd, rememberUserId) => {
     try {
       const response = await axiosStore.post('/user/login', {
         userId, 
@@ -87,8 +87,12 @@ export const useAuth = defineStore('auth', () => {
 
       await setToken(accessToken);
 
-      if (rememberMe) {
-        // rememberMe 로직 구현
+      if (rememberUserId) {
+        localStorage.setItem('rememberedUserId', userId);
+        rememberedUserId.value = userId;
+      } else {
+        localStorage.removeItem('rememberedUserId');
+        rememberedUserId.value = '';
       }
 
       return { success: true };
@@ -103,6 +107,7 @@ export const useAuth = defineStore('auth', () => {
 
   const logout = () => {
     setToken(null);
+    router.push('/');
   };
 
   const validateToken = async () => {
@@ -118,6 +123,32 @@ export const useAuth = defineStore('auth', () => {
     }
   };
 
+  const findUserId = async (name, email) => {
+    try {
+      const response = await axiosStore.post('/user/findid', { name, email });
+      return { success: true, userId: response.data.userId };
+    } catch (error) {
+      console.error('Failed to find user ID:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.message || '아이디를 찾을 수 없습니다.' 
+      };
+    }
+  };
+
+  const resetPassword = async (name, userId) => {
+    try {
+      const response = await axiosStore.post('/user/resetpassword', { name, userId });
+      return { success: true, message: response.data.message };
+    } catch (error) {
+      console.error('Failed to reset password:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.message || '비밀번호 재설정에 실패했습니다.' 
+      };
+    }
+  };
+
   validateToken();
 
   return {
@@ -127,6 +158,10 @@ export const useAuth = defineStore('auth', () => {
     logout,
     fetchUserInfo,
     updateUserInfo,
-    uploadProfileImage
+    uploadProfileImage,
+    rememberedUserId,
+    findUserId,
+    resetPassword
   }
 });
+
