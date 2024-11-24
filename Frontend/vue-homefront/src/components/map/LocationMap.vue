@@ -61,11 +61,11 @@ const currCategory = ref('');
 const placeMarkers = ref([]);
 
 const categoryImages = {
-  'BK9': 'src/assets/images/bank.png', // 은행
-  'MT1': 'src/assets/images/mart.png',  // 마트
-  'HP8': 'src/assets/images/hospital.png',  // 병원
-  'CE7': 'src/assets/images/cafe.png',   // 카페
-  'FD6': 'src/assets/images/food.png'
+  'BK9': 'src/assets/images/bank-blue.png', // 은행
+  'MT1': 'src/assets/images/mart-blue.png',  // 마트
+  'HP8': 'src/assets/images/hospital-blue.png',  // 병원
+  'CE7': 'src/assets/images/cafe-blue.png',   // 카페
+  'FD6': 'src/assets/images/food-blue.png'
 };
 
 const categories = [
@@ -133,10 +133,10 @@ watch(() => props.selectedProperty, (newProperty) => {
       kakao.maps.event.removeListener(map, 'tilesloaded', tileLoadedListener);
     }
 
-    // 현재 지도 레벨이 3보다 크면 더 가깝게 조정
+    // 현재 지도 레벨이 4보다 크면 더 가깝게 조정
     const currentLevel = map.getLevel();
-    if (currentLevel > 3) {
-      map.setLevel(2, {animate: true});
+    if (currentLevel > 4) {
+      map.setLevel(4, {animate: true});
     }
 
     // 부드럽게 이동
@@ -257,7 +257,7 @@ const displayPlaces = (places) => {
         align-items: center;
         justify-content: center;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        border: 2px solid #4DAD94;
+        border: 3px solid #3091FF;
         cursor: pointer;
       ">
         <img
@@ -283,14 +283,14 @@ const displayPlaces = (places) => {
           padding: 12px 16px;
           background: white;
           border-radius: 8px;
-          border-bottom: 3px solid #4DAD94;
+          border-bottom: 3px solid #3091FF;
           min-width: 150px;
           box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         ">
           <div style="
             font-size: 15px;
             font-weight: 600;
-            color: #4DAD94;
+            color: #3091FF;
             margin-bottom: 6px;
           ">${place.place_name}</div>
           <div style="

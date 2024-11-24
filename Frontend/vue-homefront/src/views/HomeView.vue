@@ -104,7 +104,7 @@ const mapCenter = ref(null);
 const mapZoom = ref(15);
 const selectedMarker = ref(null);
 
-const DETAIL_ZOOM_LEVEL = 3;
+const DETAIL_ZOOM_LEVEL = 4;
 
 watch(() => interestStore.selectedProperty, (newProperty) => {
   if (newProperty) {
