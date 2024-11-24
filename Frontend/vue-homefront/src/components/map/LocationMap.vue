@@ -60,6 +60,12 @@ let ps = null; // 장소 검색 객체
 const currCategory = ref('');
 const placeMarkers = ref([]);
 
+const markerImage = new window.kakao.maps.MarkerImage(
+  'src/assets/images/marker.png',
+  new window.kakao.maps.Size(35, 45),  // 마커 이미지 크기
+  { offset: new window.kakao.maps.Point(18, 36) }  // 마커 중심 위치 (이미지 크기의 절반, 높이)
+);
+
 const categoryImages = {
   'BK9': 'src/assets/images/bank-blue.png', // 은행
   'MT1': 'src/assets/images/mart-blue.png',  // 마트
@@ -517,7 +523,8 @@ const updateMarkers = (properties) => {
       // 마커 생성
       const position = new window.kakao.maps.LatLng(lat, lng);
       const marker = new window.kakao.maps.Marker({
-        position: position
+        position: position,
+        image: markerImage
       });
 
       marker.propertyData = { ...property };
