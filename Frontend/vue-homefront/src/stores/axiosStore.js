@@ -4,10 +4,11 @@ import { ref, computed } from 'vue';
 
 export const useAxiosStore = defineStore('axios', () => {
   const token = ref(localStorage.getItem('token') || null);
-  
-  // axios 인스턴스를 store 내부로 이동
+
+  const baseURL = 'http://127.0.0.1:8080';
+
   const axiosInstance = axios.create({
-    baseURL: 'http://127.0.0.1:8080',
+    baseURL,
     withCredentials: true,
     headers: {
       'Content-Type': 'application/json',
@@ -67,6 +68,7 @@ export const useAxiosStore = defineStore('axios', () => {
     get,
     post,
     put,
-    delete: del
+    delete: del,
+    baseURL
   }
 });
