@@ -29,6 +29,9 @@ public class BoardDto {
     @Schema(description = "조회수", example = "123")
     private int hit;
 
+    @Schema(description = "사용자 프로필", example = "admin/basic_profile.png")
+    private String userProfile;
+
     @Schema(description = "등록 시간", example = "2024-11-19T16:05:45")
     private LocalDateTime registerTime;
 }

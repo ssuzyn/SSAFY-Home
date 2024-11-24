@@ -33,8 +33,6 @@ public class BoardController {
         return ResponseEntity.ok(boards);
     }
 
-    // 기존의 다른 메서드들...
-
     // Q&A 게시글 작성
     @PostMapping
     @Operation(summary = "게시글 작성", description = "새로운 Q&A 게시글을 작성합니다.")
