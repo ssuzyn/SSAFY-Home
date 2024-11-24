@@ -37,8 +37,8 @@ export const useInterestDrawer = defineStore("interestDrawer", () => {
       if (response.data.data) {
         favorites.value = response.data.data.map((item) => ({
           aptSeq: item.aptSeq,
-          aptName: item.aptName,
-          dongName: item.dongName,
+          aptNm: item.aptName,
+          dongNm: item.dongName,
           latestPrice: item.latestDealAmount,
           prevPrice: item.prevDealAmount,
           change: item.priceChangeRate,

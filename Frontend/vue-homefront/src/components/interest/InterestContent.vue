@@ -5,10 +5,34 @@ import { storeToRefs } from "pinia";
 import { useAuth } from "@/stores/auth";
 import { onMounted, watch } from "vue";
 import InterestButton from "./InterestButton.vue";
+import { useInterestStore } from '@/stores/interest';
+import { getHouseDetail } from '@/api/house';
 
 const store = useInterestDrawer();
 const { favorites } = storeToRefs(store);
 const auth = useAuth();
+const interestStore = useInterestStore();
+
+// closeDrawer 함수 추가
+const closeDrawer = () => {
+  store.isVisible = false;
+};
+
+// 아파트 클릭 핸들러
+const handlePropertyClick = async (property) => {
+  try {
+    // 1. 먼저 백엔드에서 아파트 상세 정보를 가져옴
+    const detail = await getHouseDetail(property.aptSeq);
+
+    // 2. 상세 정보에서 위도/경도를 포함한 정보를 store에 저장
+    interestStore.selectedProperty = {
+      ...property,
+      ...detail  // 여기에 위도/경도 등 상세 정보가 포함됨
+    };
+  } catch (error) {
+    console.error('Failed to fetch property details:', error);
+  }
+};
 
 onMounted(() => {
   if (auth.isLoggedIn) {
@@ -16,9 +40,11 @@ onMounted(() => {
   }
 });
 
-const closeDrawer = () => {
-  store.isVisible = false;
-};
+watch(() => store.isVisible, (newValue) => {
+  if (newValue && auth.isLoggedIn) {
+    store.initialize();
+  }
+});
 </script>
 
 <template>
@@ -70,20 +96,21 @@ const closeDrawer = () => {
           <div
             v-for="property in favorites"
             :key="property.aptSeq"
-            class="property-item"
+            class="property-item cursor-pointer"
+            @click="handlePropertyClick(property)"
           >
             <div class="mb-1">
-              <span class="text-gray-600 text-sm">{{ property.dongName }}</span>
+              <span class="text-gray-600 text-sm">{{ property.dongNm }}</span>
             </div>
             <div class="mb-1">
               <span class="text-gray-600 text-medium">{{
-                property.aptName
+                property.aptNm
               }}</span>
             </div>
             <div class="flex items-center justify-between">
               <div class="flex items-center">
                 <h3 class="text-lg font-medium">
-                  {{ property.latestPrice }}만원
+                  {{ interestStore.formatPrice(interestStore.parseAmount(property.latestPrice)) }}
                 </h3>
               </div>
               <div class="flex items-center space-x-3">
@@ -102,7 +129,8 @@ const closeDrawer = () => {
                   :apt-seq="property.aptSeq"
                   :disabled="store.loading"
                   class="interest-btn text-blue-500"
-                />
+                  @click.stop
+                  />
               </div>
             </div>
             <div class="mt-2 border-b pb-4"></div>

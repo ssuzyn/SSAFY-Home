@@ -49,7 +49,7 @@ export const useAxiosStore = defineStore('axios', () => {
     async (error) => {
       if (error.response?.status === 401) {
         setToken(null);
-        location.reload();
+        // location.reload();
       }
       return Promise.reject(error);
     }

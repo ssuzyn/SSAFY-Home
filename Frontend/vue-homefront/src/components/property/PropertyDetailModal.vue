@@ -28,7 +28,7 @@ const closeModal = () => {
   emit('close');
 };
 
-const handleFavoriteToggle = (event) => {
-  emit('toggle-favorite', event);
+const handleFavoriteToggle = async (propertyId) => {
+  await interestStore.toggleFavorite(propertyId);
 };
 </script>
