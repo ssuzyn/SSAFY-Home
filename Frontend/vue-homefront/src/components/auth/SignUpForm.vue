@@ -42,6 +42,7 @@
                 v-model="formData.user_pwd"
                 :type="showPassword ? 'text' : 'password'"
                 maxlength="255"
+                @input="checkPasswordMatch"
                 class="w-full px-4 py-3 text-lg border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400"
                 placeholder="비밀번호 입력"
                 required
@@ -61,11 +62,15 @@
             <label class="block text-sm font-medium text-gray-700 mb-1">비밀번호 확인</label>
             <input
               v-model="formData.confirmPassword"
-              type="password"
+              :type="showPassword ? 'text' : 'password'"
+              @input="checkPasswordMatch"
               class="w-full px-4 py-3 text-lg border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400"
               placeholder="비밀번호 재입력"
               required
             />
+            <div v-if="passwordMismatchMessage" class="text-red-500 text-sm mt-1">
+              {{ passwordMismatchMessage }}
+            </div>
           </div>
 
           <!-- 이름 -->
@@ -148,7 +153,7 @@
           <!-- 회원가입 버튼 -->
           <button
             type="submit"
-            :disabled="!idAvailable || isSubmitting"
+            :disabled="!idAvailable || isSubmitting || formData.user_pwd !== formData.confirmPassword"
             class="w-full py-3 px-4 text-lg bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-md transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed mt-6"
           >
             {{ isSubmitting ? '처리중...' : '회원가입' }}
@@ -179,6 +184,7 @@ const showPassword = ref(false)
 const isSubmitting = ref(false)
 const idAvailable = ref(false)
 const idCheckMessage = ref('')
+const passwordMismatchMessage = ref('')
 
 let idCheckTimeout = null
 
@@ -217,13 +223,21 @@ const checkIdAvailability = async () => {
   }, 500)
 }
 
+const checkPasswordMatch = () => {
+  if (formData.user_pwd === formData.confirmPassword) {
+    passwordMismatchMessage.value = ''
+  } else {
+    passwordMismatchMessage.value = '비밀번호가 일치하지 않습니다.'
+  }
+}
+
 const validateEmail = (email) => {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return re.test(email)
 }
 
 const handleSignUp = async () => {
-  if (formData.user_pwd !== formData.confirmPassword) {
+  if (passwordMismatchMessage.value) {
     alert('비밀번호가 일치하지 않습니다.')
     return
   }
@@ -258,3 +272,4 @@ const handleSignUp = async () => {
   }
 }
 </script>
+

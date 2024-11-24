@@ -17,17 +17,27 @@
       <div class="flex flex-col lg:flex-row gap-6">
         <!-- 왼쪽 질문 목록 -->
         <div class="flex-1">
-          <div class="mb-4">
+          <div class="mb-4 flex gap-2">
+            <select 
+              v-model="searchType"
+              class="p-2 border text-black rounded-md"
+            >
+              <option value="title_content">제목 + 내용</option>
+              <option value="title">제목</option>
+              <option value="content">내용</option>
+              <option value="nickname">닉네임</option>
+            </select>
             <input 
               v-model="searchQuery" 
-              placeholder="질문 검색" 
+              :placeholder="searchType === 'nickname' ? '닉네임을 입력하세요' : '질문 검색'"
               type="search" 
-              class="w-full p-2 border text-black rounded-md"
+              class="flex-1 p-2 border text-black rounded-md"
               @input="handleSearch"
             />
           </div>
           
-          <div class="space-y-4">
+          <!-- 질문 목록 (스크롤 가능 영역) -->
+          <div class="space-y-4 overflow-y-auto" style="max-height: calc(100vh - 12rem);">
             <div v-for="question in board.questions" :key="question.articleNo" class="bg-white border rounded-lg p-4 shadow-sm">
               <h3 class="text-lg text-black font-semibold">{{ question.subject }}</h3>
               <p class="text-sm text-black mt-1">
@@ -53,9 +63,10 @@
         <div class="lg:w-80 bg-white border rounded-lg p-4 h-fit">
           <h2 class="text-lg text-black font-semibold mb-4">인기 질문</h2>
           <ul class="space-y-3">
-            <li v-for="(question, index) in popularQuestions" :key="index">
-              <a class="text-sm hover:underline text-orange-500" href="#">
-                {{ question }}
+            <li v-for="(question, index) in topQuestions" :key="question.articleNo" class="flex items-center">
+              <span class="text-orange-500 font-bold mr-2">{{ index + 1 }}.</span>
+              <a @click="openQuestionDetailDialog(question.articleNo)" class="text-sm hover:underline text-orange-500 cursor-pointer flex-1">
+                {{ question.subject }}
               </a>
             </li>
           </ul>
@@ -153,7 +164,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, computed } from 'vue'
 import { Plus, ChevronRight } from 'lucide-vue-next'
 import { useBoard } from '@/stores/board'
 import { useAuth } from '@/stores/auth'
@@ -163,16 +174,17 @@ const board = useBoard()
 const auth = useAuth()
 const router = useRouter()
 
-const popularQuestions = [
-  "전세 사기 예방하는 방법",
-  "부동산 세금 계산하는 법",
-  "신축 아파트 vs 구축 아파트",
-]
-
 const searchQuery = ref('')
+const searchType = ref('title_content')
 const showNewQuestionDialog = ref(false)
 const newQuestion = reactive({ subject: '', content: '' })
 const newAnswer = ref('')
+
+const topQuestions = computed(() => {
+  return [...board.questions]
+    .sort((a, b) => b.hit - a.hit)
+    .slice(0, 3);
+})
 
 onMounted(async () => {
   try {
@@ -186,7 +198,7 @@ const handleSearch = () => {
   if (searchQuery.value.trim() === '') {
     board.fetchAllQuestions()
   } else {
-    board.fetchQuestions('title_content', searchQuery.value)
+    board.fetchQuestions(searchType.value, searchQuery.value)
   }
 }
 
@@ -267,7 +279,6 @@ const formatDate = (dateArray) => {
   });
 }
 
-// Watch for changes in selectedQuestion and comments
 watch(() => board.selectedQuestion, (newVal) => {
   if (newVal) {
     console.log('Selected question updated:', newVal)

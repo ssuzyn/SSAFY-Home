@@ -50,26 +50,32 @@
           <div class="flex items-center">
             <label class="flex items-center">
               <input
-                v-model="formData.rememberMe"
+                v-model="formData.rememberUserId"
                 type="checkbox"
                 class="rounded border-gray-300 text-orange-500 focus:ring-orange-500"
               />
-              <span class="ml-2 text-sm text-gray-600">로그인 상태 유지</span>
+              <span class="ml-2 text-sm text-gray-600">아이디 기억하기</span>
             </label>
+          </div>
+
+          <!-- 에러 메시지 표시 -->
+          <div v-if="errorMessage" class="text-red-500 text-sm mt-2">
+            {{ errorMessage }}
           </div>
 
           <button
             type="submit"
-            class="w-full py-3 px-4 text-lg bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-md transition-colors"
+            :disabled="isLoading"
+            class="w-full py-3 px-4 text-lg bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-md transition-colors disabled:opacity-50"
           >
-            로그인
+            {{ isLoading ? '로그인 중...' : '로그인' }}
           </button>
         </form>
 
         <div class="mt-6 flex items-center justify-center space-x-4 text-base text-gray-600">
-          <a href="#" class="hover:text-orange-500">비밀번호 찾기</a>
+          <a href="/resetpassword" class="hover:text-orange-500">비밀번호 찾기</a>
           <span class="text-gray-300">|</span>
-          <a href="#" class="hover:text-orange-500">아이디 찾기</a>
+          <a href="/findid" class="hover:text-orange-500">아이디 찾기</a>
           <span class="text-gray-300">|</span>
           <a href="/signup" class="hover:text-orange-500">회원가입</a>
         </div>
@@ -79,10 +85,11 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { XCircle, Eye, EyeOff } from 'lucide-vue-next'
 import { useAuth } from '@/stores/auth'
 import { useRouter } from 'vue-router'
+import { message } from 'ant-design-vue'
 
 const auth = useAuth()
 const router = useRouter()
@@ -94,32 +101,39 @@ const errorMessage = ref('')
 const formData = reactive({
   userId: '',
   userPwd: '',
-rememberMe: false
+  rememberUserId: false
+})
+
+onMounted(() => {
+  formData.userId = auth.rememberedUserId
+  formData.rememberUserId = !!auth.rememberedUserId
 })
 
 const handleLogin = async () => {
-isLoading.value = true
-errorMessage.value = ''
+  isLoading.value = true
+  errorMessage.value = ''
 
-try {
-  const { success, error } = await auth.login(
-    formData.userId,
-    formData.userPwd,
-    formData.rememberMe
-  )
+  try {
+    const { success, error } = await auth.login(
+      formData.userId,
+      formData.userPwd,
+      formData.rememberUserId
+    )
 
-  if (success) {
-    console.log('로그인 성공')
-    router.push('/')  // 로그인 성공 시 홈페이지로 이동
-  } else {
-    console.error('로그인 실패:', error)
-    errorMessage.value = error || '로그인에 실패했습니다. 다시 시도해주세요.'
+    if (success) {
+      console.log('로그인 성공')
+      router.push('/')  // 로그인 성공 시 홈페이지로 이동
+      message.success("환영합니다!")
+    } else {
+      console.error('로그인 실패:', error)
+      errorMessage.value = error || '로그인에 실패했습니다. 다시 시도해주세요.'
+      message.error(error || "로그인에 실패했습니다. 아이디나 비밀번호를 확인해주세요.")
+    }
+  } catch (error) {
+    console.error('로그인 오류:', error)
+    errorMessage.value = '로그인 중 오류가 발생했습니다. 나중에 다시 시도해주세요.'
+  } finally {
+    isLoading.value = false
   }
-} catch (error) {
-  console.error('로그인 오류:', error)
-  errorMessage.value = '로그인 중 오류가 발생했습니다. 나중에 다시 시도해주세요.'
-} finally {
-  isLoading.value = false
-}
 }
 </script>
