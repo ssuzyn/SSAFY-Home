@@ -100,7 +100,7 @@ onMounted(() => {
   initializeKakaoMap();
 });
 
-// properties가 변경될 때마다 마커 업데이트
+// properties가 변경될 때마다 마커 업데이��
 watch(() => props.properties, (newProperties) => {
   console.log('Properties changed:', newProperties);
   updateMarkers(newProperties);
@@ -232,76 +232,106 @@ const searchPlaces = () => {
 };
 
 const displayPlaces = (places) => {
-  // 카스텀 오버레이 스타일
-  const createMarkerContent = (category) => `
-    <div style="
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    ">
-      <img
-        src="${categoryImages[category]}"
-        style="
-          width: 24px;
-          height: 24px;
-          object-fit: contain;
-        "
-      />
-    </div>
-  `;
+  // 기존 마커와 인포윈도우 제거
+  removePlaceMarkers();
 
   places.forEach(place => {
     const position = new window.kakao.maps.LatLng(place.y, place.x);
 
+    // DOM 엘리먼트 생성
+    const content = document.createElement('div');
+    content.innerHTML = `
+      <div style="
+        width: 28px;
+        height: 28px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        border: 2px solid #4DAD94;
+        cursor: pointer;
+      ">
+        <img
+          src="${categoryImages[currCategory.value]}"
+          style="width: 16px; height: 16px;"
+          alt="Category marker"
+        />
+      </div>
+    `;
+
     // 커스텀 오버레이 생성
-    const customOverlay = new kakao.maps.CustomOverlay({
+    const marker = new window.kakao.maps.CustomOverlay({
       position: position,
-      content: createMarkerContent(currCategory.value),
-      yAnchor: 1,
-      zIndex: 3
+      content: content,
+      yAnchor: 1
     });
 
-    // 지도에 표시
-    customOverlay.setMap(map);
-    placeMarkers.value.push(customOverlay);
+    // 인포윈도우 생성
+    const infoWindow = new window.kakao.maps.InfoWindow({
+      position: position,
+      content: `
+        <div style="
+          padding: 12px 16px;
+          background: white;
+          border-radius: 8px;
+          border-bottom: 3px solid #4DAD94;
+          min-width: 150px;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        ">
+          <div style="
+            font-size: 15px;
+            font-weight: 600;
+            color: #4DAD94;
+            margin-bottom: 6px;
+          ">${place.place_name}</div>
+          <div style="
+            font-size: 12px;
+            color: #666;
+            margin-bottom: ${place.phone ? '4px' : '0'};
+          ">${place.road_address_name || place.address_name}</div>
+          ${place.phone ? `
+            <div style="
+              font-size: 12px;
+              color: #888;
+            ">${place.phone}</div>
+          ` : ''}
+        </div>
+      `,
+      removable: true
+    });
 
     // 클릭 이벤트 처리
-    kakao.maps.event.addListener(customOverlay, 'click', function() {
-      const content = `
-        <div class="placeinfo p-3 bg-white rounded-lg shadow-lg">
-          <a href="${place.place_url}" target="_blank" class="title text-lg font-bold">${place.place_name}</a>
-          <div class="mt-1 text-sm text-gray-600">
-            ${place.road_address_name ?
-              `<div>${place.road_address_name}</div>
-               <div class="text-gray-400">(지번: ${place.address_name})</div>` :
-              `<div>${place.address_name}</div>`
-            }
-            ${place.phone ? `<div class="mt-1">${place.phone}</div>` : ''}
-          </div>
-        </div>
-      `;
-
-      const infoWindow = new window.kakao.maps.InfoWindow({
-        content: content,
-        removable: true
-      });
-
+    content.onclick = function() {
+      // 기존 인포윈도우 모두 닫기
       infowindows.value.forEach(info => info.close());
-      infoWindow.open(map, customOverlay);
-      infowindows.value = [infoWindow];
-    });
+      infowindows.value = [];
+
+      // 새 인포윈도우 열기
+      infoWindow.open(map);
+      infowindows.value.push(infoWindow);
+    };
+
+    // 마커를 지도에 표시
+    marker.setMap(map);
+
+    // 배열에 저장
+    placeMarkers.value.push(marker);
   });
 };
 
+// 마커 제거 함수 수정
 const removePlaceMarkers = () => {
-  placeMarkers.value.forEach(marker => marker.setMap(null));
-  placeMarkers.value = [];
+  // 기존 인포윈도우 닫기
   infowindows.value.forEach(info => info.close());
+  infowindows.value = [];
+
+  // 기존 마커 제거
+  placeMarkers.value.forEach(marker => {
+    marker.setMap(null);
+  });
+  placeMarkers.value = [];
 };
 
 const createInfoWindow = (property) => {
@@ -415,12 +445,18 @@ const createInfoWindow = (property) => {
 };
 
 const updateMarkers = (properties) => {
-  // 기존 마커 제거 로직...
-  clusterer.clear();
-  markers.value.forEach(marker => marker.setMap(null));
+  // 기존 인포윈도우 먼저 닫기
   infowindows.value.forEach(info => info.close());
-  markers.value = [];
   infowindows.value = [];
+
+  // 클러스터러 초기화
+  clusterer.clear();
+
+  // 기존 마커 제거
+  markers.value.forEach(marker => {
+    marker.setMap(null);
+  });
+  markers.value = [];
 
   if (properties.length === 0) return;
 
@@ -473,20 +509,31 @@ const updateMarkers = (properties) => {
 
       // 마커 생성
       const position = new window.kakao.maps.LatLng(lat, lng);
-
       const marker = new window.kakao.maps.Marker({
         position: position
       });
 
-      // 마커에 property 데이터 저장
       marker.propertyData = { ...property };
-
       const infowindow = createInfoWindow(property);
 
+      // 마커 클릭 이벤트
       window.kakao.maps.event.addListener(marker, 'click', () => {
         infowindows.value.forEach(info => info.close());
         infowindow.open(map, marker);
         emit('select-property', property);
+      });
+
+      // 마커 마우스오버 이벤트 추가
+      window.kakao.maps.event.addListener(marker, 'mouseover', () => {
+        infowindow.open(map, marker);
+      });
+
+      // 마커 마우스아웃 이벤트 추가
+      window.kakao.maps.event.addListener(marker, 'mouseout', () => {
+        // 현재 선택된 property가 아닌 경우에만 인포윈도우 닫기
+        if (!props.selectedProperty || props.selectedProperty.aptSeq !== property.aptSeq) {
+          infowindow.close();
+        }
       });
 
       markers.value.push(marker);
@@ -500,18 +547,19 @@ const updateMarkers = (properties) => {
     }
   }).filter(marker => marker !== null);
 
-  // 클러스터러에 마커 추가
+  // 유효한 마커만 클러스터러에 추가
   if (markersToAdd.length > 0) {
-    clusterer.addMarkers(markersToAdd);
+    try {
+      clusterer.addMarkers(markersToAdd);
 
-    // 가장 밀집된 영으로 지도 이동
-    if (densestArea) {
-      const center = new window.kakao.maps.LatLng(densestArea.lat, densestArea.lng);
-      map.setCenter(center);
-      map.setLevel(5);
+      if (densestArea) {
+        const center = new window.kakao.maps.LatLng(densestArea.lat, densestArea.lng);
+        map.setCenter(center);
+        map.setLevel(5);
+      }
+    } catch (error) {
+      console.error('Error adding markers to clusterer:', error);
     }
-  } else {
-    console.warn('No valid markers to add');
   }
 };
 
