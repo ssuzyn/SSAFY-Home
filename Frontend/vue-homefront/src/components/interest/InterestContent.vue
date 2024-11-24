@@ -13,6 +13,11 @@ const { favorites } = storeToRefs(store);
 const auth = useAuth();
 const interestStore = useInterestStore();
 
+// closeDrawer 함수 추가
+const closeDrawer = () => {
+  store.isVisible = false;
+};
+
 // 아파트 클릭 핸들러
 const handlePropertyClick = async (property) => {
   try {
