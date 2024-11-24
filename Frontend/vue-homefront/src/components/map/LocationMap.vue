@@ -2,18 +2,20 @@
   <div class="relative w-full h-full">
     <div id="map" class="w-full h-full"></div>
     <!-- 카테고리 -->
-    <ul id="category" class="absolute top-4 right-4 bg-white rounded-lg shadow-lg overflow-hidden z-10">
+    <ul id="category" class="absolute top-20 right-4 bg-white rounded-lg shadow-lg overflow-hidden z-10">
       <li
         v-for="cat in categories"
         :key="cat.id"
         :id="cat.id"
         :data-order="cat.order"
-        class="px-4 py-2 text-black flex items-center cursor-pointer hover:bg-gray-100 transition-colors"
+        class="text-black flex items-center cursor-pointer hover:bg-gray-100 transition-colors"
         :class="{ 'bg-blue-50': currCategory === cat.id }"
         @click="onClickCategory(cat.id)"
       >
-        <span class="w-6 h-6 mr-2" :class="cat.iconClass"></span>
-        {{ cat.name }}
+        <div class="w-6 flex items-center justify-center">
+          <img :src="cat.iconUrl" alt="Category Icon" class="category-icon">
+        </div>
+        <span class="text-sm font-medium">{{ cat.name }}</span>
       </li>
     </ul>
   </div>
@@ -58,12 +60,38 @@ let ps = null; // 장소 검색 객체
 const currCategory = ref('');
 const placeMarkers = ref([]);
 
+const categoryImages = {
+  'BK9': 'https://m.richgo.ai/newMapSystem/markerIcon/marker-set-place-22.svg', // 은행
+  'MT1': 'https://m.richgo.ai/newMapSystem/markerIcon/marker-set-place-1.svg',  // 마트
+  'HP8': 'https://m.richgo.ai/newMapSystem/markerIcon/marker-set-place-6.svg',  // 병원
+  'CE7': 'https://m.richgo.ai/newMapSystem/markerIcon/marker-set-place-5.svg'   // 카페
+};
+
 const categories = [
-  { id: 'BK9', name: '은행', order: 0, iconClass: 'category_bank' },
-  { id: 'MT1', name: '마트', order: 1, iconClass: 'category_mart' },
-  { id: 'PM9', name: '약국', order: 2, iconClass: 'category_pharmacy' },
-  { id: 'CE7', name: '카페', order: 4, iconClass: 'category_cafe' },
-  { id: 'CS2', name: '편의점', order: 5, iconClass: 'category_store' }
+  {
+    id: 'BK9',
+    name: '은행',
+    order: 0,
+    iconUrl: categoryImages['BK9']
+  },
+  {
+    id: 'MT1',
+    name: '마트',
+    order: 1,
+    iconUrl: categoryImages['MT1']
+  },
+  {
+    id: 'HP8',
+    name: '병원',
+    order: 2,
+    iconUrl: categoryImages['HP8']
+  },
+  {
+    id: 'CE7',
+    name: '카페',
+    order: 3,
+    iconUrl: categoryImages['CE7']
+  },
 ];
 
 const interestStore = useInterestStore();
@@ -156,8 +184,6 @@ const initMap = () => {
     level: 3
   };
   map = new window.kakao.maps.Map(container, options);
-  // map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);
-
 
   // 클러스터러 초기화
   clusterer = new window.kakao.maps.MarkerClusterer({
@@ -167,12 +193,13 @@ const initMap = () => {
     texts: (size) => `${size}건`
   });
 
-  // 장소 검색 객체 생성
-  ps = new window.kakao.maps.services.Places();
+  // Places 서비스 초기화를 map 객체 생성 후에 수행
+  ps = new window.kakao.maps.services.Places(map); // map 객체를 인자로 전달
 };
 
 // 카테고리 관련 함수들 추가
 const onClickCategory = (categoryId) => {
+  console.log('Clicked category:', categoryId);
   if (currCategory.value === categoryId) {
     currCategory.value = '';
     removePlaceMarkers();
@@ -192,37 +219,59 @@ const searchPlaces = () => {
     (data, status) => {
       if (status === window.kakao.maps.services.Status.OK) {
         displayPlaces(data);
+      } else {
+        console.log('카테고리 검색 실패:', status);
       }
     },
     {
-      bounds: map.getBounds(),
-      useMapBounds: true
+      location: map.getCenter(),
+      radius: 2000,
+      sort: kakao.maps.services.SortBy.DISTANCE
     }
   );
 };
 
 const displayPlaces = (places) => {
-  const order = categories.find(cat => cat.id === currCategory.value)?.order || 0;
+  // 카스텀 오버레이 스타일
+  const createMarkerContent = (category) => `
+    <div style="
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    ">
+      <img
+        src="${categoryImages[category]}"
+        style="
+          width: 24px;
+          height: 24px;
+          object-fit: contain;
+        "
+      />
+    </div>
+  `;
 
   places.forEach(place => {
-    const imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_category.png';
-    const imageSize = new window.kakao.maps.Size(27, 28);
-    const imgOptions = {
-      spriteSize: new window.kakao.maps.Size(72, 208),
-      spriteOrigin: new window.kakao.maps.Point(46, (order * 36)),
-      offset: new window.kakao.maps.Point(11, 28)
-    };
-
-    const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions);
     const position = new window.kakao.maps.LatLng(place.y, place.x);
 
-    const marker = new window.kakao.maps.Marker({
-      map: map,
+    // 커스텀 오버레이 생성
+    const customOverlay = new kakao.maps.CustomOverlay({
       position: position,
-      image: markerImage
+      content: createMarkerContent(currCategory.value),
+      yAnchor: 1,
+      zIndex: 3
     });
 
-    window.kakao.maps.event.addListener(marker, 'click', () => {
+    // 지도에 표시
+    customOverlay.setMap(map);
+    placeMarkers.value.push(customOverlay);
+
+    // 클릭 이벤트 처리
+    kakao.maps.event.addListener(customOverlay, 'click', function() {
       const content = `
         <div class="placeinfo p-3 bg-white rounded-lg shadow-lg">
           <a href="${place.place_url}" target="_blank" class="title text-lg font-bold">${place.place_name}</a>
@@ -243,11 +292,9 @@ const displayPlaces = (places) => {
       });
 
       infowindows.value.forEach(info => info.close());
-      infoWindow.open(map, marker);
+      infoWindow.open(map, customOverlay);
       infowindows.value = [infoWindow];
     });
-
-    placeMarkers.value.push(marker);
   });
 };
 
@@ -457,7 +504,7 @@ const updateMarkers = (properties) => {
   if (markersToAdd.length > 0) {
     clusterer.addMarkers(markersToAdd);
 
-    // 가장 밀집된 영역으로 지도 이동
+    // 가장 밀집된 영으로 지도 이동
     if (densestArea) {
       const center = new window.kakao.maps.LatLng(densestArea.lat, densestArea.lng);
       map.setCenter(center);
@@ -472,56 +519,71 @@ const updateMarkers = (properties) => {
 
 <style scoped>
 .category-icon {
- display: inline-block;
- width: 27px;
- height: 28px;
+  display: inline-block;
+  width: 27px;
+  height: 28px;
+}
+
+.w-6 {
+  width: 36px !important;
+  height: 36px !important;
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .category_bank {
- background: url(@/assets/images/bank.png) no-repeat center;
- background-size: contain;
+  background: url(@/assets/images/bank.png) no-repeat center;
+  background-size: 24px;
 }
 
 .category_mart {
- background: url(@/assets/images/mart.png) no-repeat center;
- background-size: contain;
+  background: url(@/assets/images/mart.png) no-repeat center;
+  background-size: 24px;
 }
 
-.category_pharmacy {
- background: url(@/assets/images/pharmacy.png) no-repeat center;
- background-size: contain;
+.category_hospital {
+  background: url(@/assets/images/pharmacy.png) no-repeat center;
+  background-size: 24px;
 }
 
 .category_cafe {
- background: url(@/assets/images/cafe.png) no-repeat center;
- background-size: contain;
+  background: url(@/assets/images/cafe.png) no-repeat center;
+  background-size: 24px;
 }
 
 .category_store {
- background: url(@/assets/images/store.png) no-repeat center;
- background-size: contain;
+  background: url(@/assets/images/store.png) no-repeat center;
+  background-size: 24px;
 }
 
 #category {
- background: white;
- border-radius: 0.5rem;
- box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 #category li {
- border-bottom: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 #category li:last-child {
- border-bottom: none;
+  border-bottom: none;
 }
 
 #category li:hover {
- background: #f8f9fa;
+  background: #f8f9fa;
 }
 
 #category li.on {
- background: #eef6fd;
+  background: #eef6fd;
 }
 
 </style>
