@@ -60,11 +60,7 @@ let ps = null; // 장소 검색 객체
 const currCategory = ref('');
 const placeMarkers = ref([]);
 
-const markerImage = new window.kakao.maps.MarkerImage(
-  'src/assets/images/marker.png',
-  new window.kakao.maps.Size(35, 45),  // 마커 이미지 크기
-  { offset: new window.kakao.maps.Point(18, 36) }  // 마커 중심 위치 (이미지 크기의 절반, 높이)
-);
+let markerImage;
 
 const categoryImages = {
   'BK9': 'src/assets/images/bank-blue.png', // 은행
@@ -113,7 +109,7 @@ onMounted(() => {
   initializeKakaoMap();
 });
 
-// properties가 변경될 때마다 마커 업데이��
+// properties가 변경될 때마다 마커 업데이트
 watch(() => props.properties, (newProperties) => {
   console.log('Properties changed:', newProperties);
   updateMarkers(newProperties);
@@ -198,6 +194,13 @@ const initMap = () => {
   };
   map = new window.kakao.maps.Map(container, options);
 
+  // 마커 이미지 초기화를 여기로 이동
+  markerImage = new window.kakao.maps.MarkerImage(
+    'src/assets/images/marker.png',
+    new window.kakao.maps.Size(35, 45),
+    { offset: new window.kakao.maps.Point(18, 36) }
+  );
+
   // 클러스터러 초기화
   clusterer = new window.kakao.maps.MarkerClusterer({
     map: map,
@@ -206,8 +209,8 @@ const initMap = () => {
     texts: (size) => `${size}건`
   });
 
-  // Places 서비스 초기화를 map 객체 생성 후에 수행
-  ps = new window.kakao.maps.services.Places(map); // map 객체를 인자로 전달
+  // Places 서비스 초기화
+  ps = new window.kakao.maps.services.Places(map);
 };
 
 // 카테고리 관련 함수들 추가
@@ -501,7 +504,7 @@ const updateMarkers = (properties) => {
       const gridY = Math.floor(lat * 100);
       const gridKey = `${gridX},${gridY}`;
 
-      // 그리드 영역의 마커 수 카운트
+      // 그리드 영역의 마�� 수 카운트
       if (!grid[gridKey]) {
         grid[gridKey] = {
           count: 0,
