@@ -187,7 +187,7 @@
             <!-- 뒤로가기 버튼 -->
             <button
               @click="$router.go(-1)"
-              class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] text-sm font-medium flex items-center"
+              class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] text-sm font-medium flex items-center justify-center min-w-[140px]"
             >
               <span class="text-lg mr-1.5">←</span>
               뒤로가기
@@ -196,13 +196,10 @@
             <!-- 저장 버튼 -->
             <button
               @click="handleSave"
-              class="px-5 py-2.5 bg-gradient-to-r from-[#FF965B] to-[#FF8A3D] text-white rounded-xl hover:from-[#FF8A3D] hover:to-[#FF7A2D] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-orange-200/50 relative overflow-hidden group text-sm font-medium"
+              class="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white px-6 py-3 rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-orange-200 transform hover:scale-[1.02] active:scale-[0.98] min-w-[140px]"
             >
-              <span class="relative z-10 flex items-center justify-center">
-                <span class="text-lg mr-1.5">💾</span>
-                변경사항 저장
-              </span>
-              <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              <span class="text-lg mr-2">💾</span>
+              변경사항 저장
             </button>
           </div>
         </div>
