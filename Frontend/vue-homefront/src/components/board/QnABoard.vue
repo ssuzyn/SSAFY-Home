@@ -4,7 +4,7 @@
       <!-- 상단 제목과 버튼 영역 -->
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h1 class="text-4xl text-gray-900 font-bold tracking-tight">부동산 Q&A</h1>
+          <h1 class="text-4xl text-gray-900 font-bold tracking-tight">🗣️ 부동산 Q&A</h1>
           <p class="mt-2 text-gray-600">전문가들과 함께 부동산 관련 궁금증을 해결하세요</p>
         </div>
         <button
@@ -47,7 +47,8 @@
           <div class="space-y-4 overflow-y-auto pr-2" style="max-height: calc(100vh - 12rem);">
             <div v-for="question in board.questions"
                  :key="question.articleNo"
-                 class="bg-white border border-gray-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 hover:border-orange-200 transform hover:-translate-y-1">
+                 @click="openQuestionDetailDialog(question.articleNo)"
+                 class="group bg-white border border-gray-100 rounded-2xl p-6 shadow-md cursor-pointer">
               <!-- 상단 메타 정보 -->
               <div class="flex items-center gap-3 mb-3">
                 <span class="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs px-3 py-1 rounded-full font-medium">Q&A</span>
@@ -58,22 +59,22 @@
               </div>
 
               <!-- 제목 영역 -->
-              <h3 class="text-xl text-gray-900 font-semibold mb-4 hover:text-orange-500 transition-colors cursor-pointer line-clamp-2">
+              <h3 class="text-xl text-gray-900 font-semibold mb-4 group-hover:text-orange-500 transition-colors line-clamp-2">
                 {{ question.subject }}
               </h3>
 
               <!-- 하단 메타 정보 및 버튼 -->
               <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                 <div class="flex items-center gap-6">
-                  <!-- 프로필 이미와 사용자 정보 -->
-                  <div class="flex items-center group">
+                  <!-- 프로필 이미지와 사용자 정보 -->
+                  <div class="flex items-center">
                     <LazyImage
                       :path="question.userProfile"
                       :alt="`${question.userId}의 프로필`"
                       container-class="w-10 h-10"
                       image-class="rounded-full"
                     />
-                    <span class="text-sm font-medium text-gray-700 ml-2 group-hover:text-orange-500 transition-colors">{{ question.userId }}</span>
+                    <span class="text-sm font-medium text-gray-700 ml-2">{{ question.userId }}</span>
                   </div>
                   <!-- 조회수 -->
                   <div class="flex items-center px-3 py-1 bg-gray-50 rounded-full">
