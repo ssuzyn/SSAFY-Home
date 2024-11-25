@@ -85,9 +85,9 @@
 
           <!-- 링크 네비게이션 -->
           <div class="mt-8 flex items-center justify-center space-x-6 text-sm text-gray-600">
-            <a href="/resetpassword" class="hover:text-orange-500 transition-colors">비밀번호 찾기</a>
+            <a href="/resetPwd" class="hover:text-orange-500 transition-colors">비밀번호 찾기</a>
             <span class="text-gray-300">|</span>
-            <a href="/findid" class="hover:text-orange-500 transition-colors">아이디 찾기</a>
+            <a href="/findId" class="hover:text-orange-500 transition-colors">아이디 찾기</a>
             <span class="text-gray-300">|</span>
             <a href="/signup" class="hover:text-orange-500 transition-colors">회원가입</a>
           </div>

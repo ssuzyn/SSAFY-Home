@@ -41,13 +41,13 @@ const routes = [
     component: SignupView,
   },
   {
-    path: '/findid',
+    path: '/findId',
     name: 'FindId',
     component: FindIdPage,
   },
   {
-    path: '/resetpassword',
-    name: 'ResetPassword',
+    path: '/resetPwd',
+    name: 'ResetPwd',
     component: ResetPasswordPage,
   },
 ];
