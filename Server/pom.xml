@@ -110,6 +110,27 @@
       <artifactId>jaxb-runtime</artifactId>
       <scope>runtime</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework.retry</groupId>
+      <artifactId>spring-retry</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-aop</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>edu.stanford.nlp</groupId>
+      <artifactId>stanford-corenlp</artifactId>
+      <version>4.5.3</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.stanford.nlp</groupId>
+      <artifactId>stanford-corenlp</artifactId>
+      <classifier>models-korean</classifier>
+      <version>4.5.3</version>
+    </dependency>
+
   </dependencies>
 
 
