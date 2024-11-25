@@ -195,7 +195,7 @@
 
             <!-- 저장 버튼 -->
             <button
-              @click="handleSave"
+              @click="saveChanges"
               class="px-5 py-2.5 bg-gradient-to-r from-[#FF965B] to-[#FF8A3D] text-white rounded-xl hover:from-[#FF8A3D] hover:to-[#FF7A2D] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-orange-200/50 relative overflow-hidden group text-sm font-medium"
             >
               <span class="relative z-10 flex items-center justify-center">
