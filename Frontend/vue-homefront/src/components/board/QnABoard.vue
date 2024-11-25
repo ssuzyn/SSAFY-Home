@@ -7,13 +7,24 @@
           <h1 class="text-4xl text-gray-900 font-bold tracking-tight">🗣️ 부동산 Q&A</h1>
           <p class="mt-2 text-gray-600">전문가들과 함께 부동산 관련 궁금증을 해결하세요</p>
         </div>
-        <button
-          @click="openNewQuestionDialog"
-          class="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white px-6 py-3 rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 flex items-center shadow-lg hover:shadow-orange-200 transform hover:scale-[1.02] active:scale-[0.98]"
-        >
-          <Plus class="mr-2 h-5 w-5" />
-          질문하기
-        </button>
+        <div class="flex gap-3">
+          <!-- GPT 버튼 -->
+          <button
+            @click="openGptDialog"
+            class="w-36 bg-[#00A67E] hover:bg-[#008F6B] text-white px-5 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <span class="text-lg mr-1.5">🤖</span>
+            용어 도우미
+          </button>
+          <!-- 기존 질문하기 버튼 -->
+          <button
+            @click="openNewQuestionDialog"
+            class="w-36 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white px-5 py-2.5 rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-orange-200 transform hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <Plus class="mr-2 h-5 w-5" />
+            질문하기
+          </button>
+        </div>
       </div>
 
       <!-- 메인 콘텐츠 영역 -->
@@ -168,7 +179,7 @@
               <div class="relative">
                 <textarea
                   v-model="newQuestion.content"
-                  placeholder="질문 내용을 자세히 작성해주세요. 구체적인 내용을 포함하면 더 정확한 답변을 받을 수 있습니다."
+                  placeholder="질문 내용을 자세히 작성해주세요. 구체적인 내용을 포함면 더 정확한 답변을 받을 수 있습니다."
                   required
                   rows="8"
                   class="w-full p-4 bg-gray-50 text-gray-900 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
@@ -419,6 +430,12 @@
         </div>
       </div>
     </div>
+
+    <!-- RealEstateGPT 다이얼로그 -->
+    <RealEstateGPT
+      v-if="showGptDialog"
+      @close="closeGptDialog"
+    />
   </div>
 </template>
 
@@ -430,6 +447,7 @@ import { useAuth } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { message } from "ant-design-vue";
 import LazyImage from '@/components/common/LazyImage.vue'
+import RealEstateGPT from '@/components/news/RealEstateGPT.vue'
 
 
 const board = useBoard()
@@ -674,6 +692,17 @@ const handleDeleteComment = async (comment) => {
       message.error('댓글 삭제에 실패했습니다.')
     }
   }
+}
+
+// GPT 다이얼로그 상태 관리
+const showGptDialog = ref(false)
+
+const openGptDialog = () => {
+  showGptDialog.value = true
+}
+
+const closeGptDialog = () => {
+  showGptDialog.value = false
 }
 </script>
 

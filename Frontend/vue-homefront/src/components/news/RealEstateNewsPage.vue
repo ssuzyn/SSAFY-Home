@@ -7,7 +7,25 @@
           <h1 class="text-4xl text-gray-900 font-bold tracking-tight">📰 부동산 News</h1>
           <p class="mt-2 text-gray-600">최신 부동산 뉴스를 한눈에 확인하세요</p>
         </div>
+        <div class="flex items-center gap-4">
+          <Clock />
+          <button
+            @click="showGPT = true"
+            class="group flex items-center gap-2 px-5 py-2.5 bg-[#00A67E] hover:bg-[#008F6B] text-white rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+            <span class="text-2xl group-hover:scale-110 transition-transform">🤖</span>
+            <span class="font-medium">용어 도우미</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
       </div>
+
+      <!-- GPT 모달 추가 -->
+      <RealEstateGPT
+        v-if="showGPT"
+        @close="showGPT = false"
+      />
 
       <!-- 뉴스 목록 -->
       <div v-infinite-scroll="loadMore" :infinite-scroll-disabled="loading" :infinite-scroll-distance="10">
@@ -47,6 +65,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import InfiniteScroll from 'vue-infinite-scroll'
 import { message, Spin } from 'ant-design-vue'
 import {
   Row,
@@ -54,12 +73,14 @@ import {
   List,
   ListItem,
 } from 'ant-design-vue'
+import RealEstateGPT from './RealEstateGPT.vue'
 
 const news = ref([])
 const loading = ref(false)
 const page = ref(1)
 const pageSize = 10
 const hasMore = ref(true)
+const showGPT = ref(false)
 
 const getToken = () => localStorage.getItem('token')
 
@@ -102,6 +123,9 @@ const formatDate = (dateArr) => {
 onMounted(() => {
   fetchNews()
 })
+
+// directives 등록
+const vInfiniteScroll = InfiniteScroll.directive
 </script>
 
 <style scoped>
