@@ -109,6 +109,7 @@
             fileinfo f ON c.user_id = f.user_id
         WHERE
             c.article_no = #{articleNo}
+        ORDER BY c.register_time DESC
     </select>
 
     <!-- Q&A 검색 필터링 -->

@@ -65,7 +65,7 @@
               <!-- 하단 메타 정보 및 버튼 -->
               <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
                 <div class="flex items-center gap-6">
-                  <!-- 프로필 이미지와 사용자 정보 -->
+                  <!-- 프로필 이미와 사용자 정보 -->
                   <div class="flex items-center group">
                     <LazyImage
                       :path="question.userProfile"
@@ -122,56 +122,91 @@
     <!-- 새 질문 다이얼로그 -->
     <div v-if="showNewQuestionDialog"
          class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-2xl max-w-xl w-full mx-4 shadow-2xl transform transition-all duration-300 scale-100"
+      <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 shadow-2xl transform transition-all duration-300"
            @click.stop>
         <!-- 헤더 영역 -->
-        <div class="p-6 border-b border-gray-100">
+        <div class="p-8 border-b border-gray-100">
           <div class="flex items-center justify-between">
             <div>
-              <h2 class="text-2xl text-gray-900 font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">새 질문 작성</h2>
-              <p class="text-gray-500 mt-1">부동산에 관한 질문을 작성해주세요.</p>
+              <h2 class="text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+                새로운 질문
+              </h2>
+              <p class="text-gray-500 mt-2">
+                부동산에 관한 궁금한 점을 전문가에게 물어보세요
+              </p>
             </div>
             <button @click="closeNewQuestionDialog"
-                    class="text-gray-400 hover:text-gray-600 p-1.5 hover:bg-gray-100 rounded-xl transition-all duration-200">
+                    class="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-xl transition-all duration-200">
               <XCircle class="h-6 w-6" />
             </button>
           </div>
         </div>
 
         <!-- 폼 영역 -->
-        <form @submit.prevent="handleNewQuestion" class="p-6">
-          <div class="space-y-5">
+        <form @submit.prevent="handleNewQuestion" class="p-8">
+          <div class="space-y-6">
+            <!-- 제목 입력 -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
-              <input v-model="newQuestion.subject"
-                     placeholder="질문  제목을 입력해주세요"
-                     required
-                     class="w-full p-3.5 bg-gray-50 text-gray-900 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400" />
+              <div class="relative">
+                <input
+                  v-model="newQuestion.subject"
+                  placeholder="질문의 핵심을 간단히 작성해주세요"
+                  required
+                  class="w-full pl-4 pr-12 py-4 bg-gray-50 text-gray-900 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                />
+                <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                  <HelpCircle class="h-5 w-5 text-gray-400" />
+                </div>
+              </div>
             </div>
+
+            <!-- 내용 입력 -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">내용</label>
-              <textarea v-model="newQuestion.content"
-                        placeholder="질문 내용을 자세히 적어주세요"
-                        required
-                        rows="5"
-                        class="w-full p-3.5 bg-gray-50 text-gray-900 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"></textarea>
+              <div class="relative">
+                <textarea
+                  v-model="newQuestion.content"
+                  placeholder="질문 내용을 자세히 작성해주세요. 구체적인 내용을 포함하면 더 정확한 답변을 받을 수 있습니다."
+                  required
+                  rows="8"
+                  class="w-full p-4 bg-gray-50 text-gray-900 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                ></textarea>
+                <div class="absolute right-4 top-4">
+                  <MessageSquare class="h-5 w-5 text-gray-400" />
+                </div>
+              </div>
+            </div>
+
+            <!-- 작성 가이드 -->
+            <div class="bg-orange-50 rounded-xl p-4">
+              <h4 class="text-sm font-medium text-orange-800 flex items-center mb-2">
+                <Lightbulb class="h-4 w-4 mr-2" />
+                작성 팁
+              </h4>
+              <ul class="text-sm text-orange-700 space-y-1 ml-6 list-disc">
+                <li>구체적인 상황과 조건을 설명해주세요</li>
+                <li>관련된 배경 정보를 포함하면 좋습니다</li>
+                <li>명확한 질문을 통해 원하는 답변을 받으세요</li>
+              </ul>
             </div>
           </div>
 
           <!-- 버튼 영역 -->
-          <div class="flex justify-end gap-3 mt-6">
-            <button type="button"
-                    @click="closeNewQuestionDialog"
-                    class="px-5 py-2.5 text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200 font-medium">
+          <div class="flex justify-end gap-3 mt-8">
+            <button
+              type="button"
+              @click="closeNewQuestionDialog"
+              class="px-6 py-3 text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200 font-medium"
+            >
               취소
             </button>
-            <button type="submit"
-                    class="px-5 py-2.5 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] font-medium flex items-center relative overflow-hidden group"
+            <button
+              type="submit"
+              class="px-6 py-3 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] font-medium flex items-center group"
             >
-              <span class="relative z-10 flex items-center">
-                <PlusCircle class="w-5 h-5 mr-2" />
-                질문 등록
-              </span>
+              <PlusCircle class="w-5 h-5 mr-2" />
+              질문 등록하기
               <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </button>
           </div>
@@ -182,10 +217,10 @@
     <!-- 질문 상세 다이얼로그 -->
     <div v-if="board.selectedQuestion"
          class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-2xl max-w-3xl w-full mx-4 max-h-[90vh] shadow-2xl flex flex-col"
+      <div class="bg-white rounded-2xl max-w-3xl w-full mx-4 max-h-[80vh] overflow-hidden shadow-2xl flex flex-col"
            @click.stop>
         <!-- 헤더 영역 -->
-        <div class="p-6 border-b border-gray-100">
+        <div class="p-6 border-b border-gray-100 flex-shrink-0">
           <!-- 제목 영역 -->
           <div class="flex items-center justify-between mb-4">
             <!-- 수정 모드일 때 -->
@@ -274,7 +309,22 @@
         </div>
 
         <!-- 답변 섹션 -->
-        <div class="flex-1 overflow-y-auto p-6" style="max-height: 30vh;">
+        <div class="overflow-y-auto p-6" style="max-height: 40vh;">
+          <!-- 답변 목록 헤더 -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <h3 class="text-xl font-bold text-gray-900">답변 목록</h3>
+                <span class="bg-orange-100 text-orange-600 text-sm px-2.5 py-0.5 rounded-full">
+                  {{ board.comments.length }}
+                </span>
+              </div>
+              <div class="text-sm text-gray-500">
+                최신순
+              </div>
+            </div>
+          </div>
+
           <!-- 답변 목록 -->
           <div class="space-y-4">
             <div v-for="comment in board.comments"
@@ -343,7 +393,7 @@
         </div>
 
         <!-- 답변 작성 영역 -->
-        <div class="border-t border-gray-100 p-6 bg-gray-50/80">
+        <div class="border-t border-gray-100 p-6 bg-gray-50/80 flex-shrink-0">
           <form @submit.prevent="handleNewAnswer" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">답변 작성</label>
@@ -373,7 +423,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, watch, h, computed } from 'vue'
-import { Plus, ChevronRight, UserCircle, Eye, XCircle, PlusCircle, Clock, MessageCircle, SendHorizontal, Edit2, Trash2, Search, TrendingUp } from 'lucide-vue-next'
+import { Plus, ChevronRight, UserCircle, Eye, XCircle, PlusCircle, Clock, MessageCircle, SendHorizontal, Edit2, Trash2, Search, TrendingUp, HelpCircle, Lightbulb } from 'lucide-vue-next'
 import { useBoard } from '@/stores/board'
 import { useAuth } from '@/stores/auth'
 import { useRouter } from 'vue-router'
