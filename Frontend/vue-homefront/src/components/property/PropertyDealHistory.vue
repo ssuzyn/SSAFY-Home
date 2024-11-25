@@ -21,7 +21,7 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr
-              v-for="deal in deals"
+              v-for="deal in displayedDeals"
               :key="deal.dealDate + deal.floor"
               class="hover:bg-gray-50"
             >
@@ -38,12 +38,23 @@
             </tr>
           </tbody>
         </table>
+        
+        <div v-if="hasMoreDeals" class="text-center mt-4">
+          <button 
+            @click="showMore" 
+            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm"
+          >
+            더보기
+          </button>
+        </div>
       </div>
     </div>
   </template>
   
   <script setup>
-  defineProps({
+  import { ref, computed } from 'vue';
+
+  const props = defineProps({
     deals: {
       type: Array,
       required: true,
@@ -57,4 +68,19 @@
       required: true,
     },
   });
+
+  const itemsPerPage = ref(5);
+  const currentPage = ref(1);
+
+  const displayedDeals = computed(() => {
+    return props.deals.slice(0, currentPage.value * itemsPerPage.value);
+  });
+
+  const hasMoreDeals = computed(() => {
+    return displayedDeals.value.length < props.deals.length;
+  });
+
+  const showMore = () => {
+    currentPage.value++;
+  };
   </script>
