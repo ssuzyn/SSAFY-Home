@@ -67,8 +67,9 @@ const priceDifference = computed(() => {
   const percentage = ((difference / previousDeal.dealAmount) * 100).toFixed(2);
 
   return {
-    difference,
-    percentage
+    difference: formatPriceForChart(Math.abs(difference/10000)),
+    percentage: Math.abs(percentage),
+    isDecrease: difference < 0
   };
 });
 
@@ -88,6 +89,28 @@ const formatPriceForChart = (amount) => {
   }
 };
 
+const groupDealsByMonth = computed(() => {
+  if (!filteredDeals.value.length) return [];
+  
+  const monthlyDeals = {};
+  
+  filteredDeals.value.forEach(deal => {
+    const monthKey = deal.dealDate.substring(0, 7); // YYYY-MM 형식으로 추출
+    if (!monthlyDeals[monthKey]) {
+      monthlyDeals[monthKey] = {
+        count: 0,
+        totalAmount: 0,
+        date: monthKey
+      };
+    }
+    monthlyDeals[monthKey].count += 1;
+    monthlyDeals[monthKey].totalAmount += deal.dealAmount;
+  });
+
+  return Object.values(monthlyDeals).sort((a, b) => 
+    a.date.localeCompare(b.date)
+  );
+});
 
 const chartData = computed(() => {
   if (!filteredDeals.value.length) {
@@ -98,17 +121,17 @@ const chartData = computed(() => {
     };
   }
 
-  console.log('Filtered Deals:', filteredDeals.value);
+  const monthlyData = groupDealsByMonth.value;
 
   return {
-    labels: filteredDeals.value.map(deal => 
-      deal.dealDate.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1년 $2월')
+    labels: monthlyData.map(data => 
+      data.date.replace(/(\d{4})-(\d{2})/, '$1년 $2월')
     ),
     datasets: [
       {
         type: 'line',
         label: '거래가격',
-        data: filteredDeals.value.map(deal => deal.dealAmount / 10000), // 억원 단위로 변환
+        data: filteredDeals.value.map(deal => deal.dealAmount / 10000),
         borderColor: '#4A8CFF',
         backgroundColor: '#4A8CFF',
         borderWidth: 2,
@@ -122,21 +145,18 @@ const chartData = computed(() => {
         pointBorderWidth: 2,
         pointHoverBorderWidth: 2,
         fill: false,
-        yAxisID: 'y1', // 가격을 위한 y축
+        yAxisID: 'y1',
         order: 0
       },
       {
         type: 'bar',
         label: '거래량',
-        data: filteredDeals.value.map(deal => {
-          console.log('Volume:', deal.excluUseAr);
-          return deal.excluUseAr;
-        }), // 거래량 데이터로 변경
+        data: monthlyData.map(data => data.count),
         backgroundColor: '#E8F1FF',
-        yAxisID: 'y2', // 거래량을 위한 y축
+        yAxisID: 'y2',
         order: 1,
-        barPercentage: 0.8, // 막대 너비 조정
-        categoryPercentage: 0.8 // 카테고리 너비 조정
+        barPercentage: 0.5,
+        categoryPercentage: 0.7
       }
     ]
   };
@@ -171,7 +191,7 @@ const chartOptions = {
     }
   },
   scales: {
-    y1: { // 가격을 위한 y축
+    y1: {
       position: 'right',
       beginAtZero: true,
       grid: {
@@ -191,19 +211,20 @@ const chartOptions = {
         }
       }
     },
-    y2: { // 거래량을 위한 y축
+    y2: {
       position: 'left',
-      beginAtZero: true, // 거래량이 0부터 시작
+      beginAtZero: true,
       grid: {
-        drawBorder: false,
-        color: '#f0f0f0'
+        display: false
       },
       ticks: {
-        stepSize: 1, // 자연수로 표시
+        stepSize: 5,
+        callback: (value) => `${value}건`,
         color: '#999',
         font: {
           size: 11
-        }
+        },
+        padding: 10
       }
     },
     x: {
@@ -215,7 +236,9 @@ const chartOptions = {
         color: '#999',
         font: {
           size: 11
-        }
+        },
+        autoSkip: true,
+        maxTicksLimit: 12
       }
     }
   },
@@ -224,6 +247,59 @@ const chartOptions = {
     mode: 'index'
   }
 };
+
+const latestPrice = computed(() => {
+  if (!filteredDeals.value.length) return null;
+  return formatPriceForChart(filteredDeals.value[filteredDeals.value.length - 1].dealAmount/10000);
+});
+
+const highestPrice = computed(() => {
+  if (!filteredDeals.value.length) return null;
+  const maxDeal = Math.max(...filteredDeals.value.map(deal => deal.dealAmount));
+  return maxDeal;
+});
+
+const lowestPrice = computed(() => {
+  if (!filteredDeals.value.length) return null;
+  const minDeal = Math.min(...filteredDeals.value.map(deal => deal.dealAmount));
+  return minDeal;
+});
+
+
+
+const priceComparison = computed(() => {
+  if (!filteredDeals.value.length) return null;
+  
+  const latest = filteredDeals.value[filteredDeals.value.length - 1].dealAmount;
+  const highest = highestPrice.value;
+  
+  const difference = latest - highest;
+  const percentage = ((difference / highest) * 100).toFixed(2);
+  
+  return {
+    difference: formatPriceForChart(Math.abs(difference/10000)),
+    percentage: Math.abs(percentage),
+    isDecrease: difference < 0
+  };
+});
+
+const lowpriceComparison = computed(() => {
+  if (!filteredDeals.value.length) return null;
+  
+  const latest = filteredDeals.value[filteredDeals.value.length - 1].dealAmount;
+  const lowest = lowestPrice.value;
+  
+  const difference = lowest - latest;
+  const percentage = ((difference / lowest) * 100).toFixed(2);
+  
+  return {
+    difference: formatPriceForChart(Math.abs(difference/10000)),
+    percentage: Math.abs(percentage),
+    isDecrease: difference < 0
+  };
+});
+
+
 </script>
 
 <template>
@@ -232,13 +308,28 @@ const chartOptions = {
     <div class="mb-4 p-4 bg-gray-100 rounded-lg flex justify-between items-center">
       <div class="text-center">
         <div class="text-lg font-bold">최근 실거래가</div>
-        <div class="text-2xl font-bold">24억 3,000</div>
-        <div class="text-sm">최고 대비 -1억 9,000만 (7.25%)</div>
+        <div class="text-2xl font-bold">{{ latestPrice ? latestPrice : '데이터 없음' }}</div>
+        <div class="text-sm" v-if="priceDifference">
+          직전 거래 대비 
+          <span :class="priceDifference.isDecrease ? 'text-blue-500' : 'text-red-500'">
+            {{ priceDifference.isDecrease ? '-' : '+' }}{{ priceDifference.difference }}
+            ({{ priceDifference.percentage }}%)
+          </span>
+        </div>
+        <div class="text-sm" v-else>비교 데이터 없음</div>
       </div>
       <div class="text-center">
-        <div class="text-lg font-bold">매물 최저가</div>
-        <div class="text-2xl font-bold text-red-500">22억 9,000</div>
-        <div class="text-sm text-red-500">4주 전 대비 1,000만</div>
+        <div class="text-lg font-bold">최저 실거래가</div>
+        <div class="text-2xl font-bold">
+          {{ lowestPrice ? formatPriceForChart(lowestPrice/10000) : '데이터 없음' }}
+        </div>
+        <div class="text-sm" v-if="priceComparison">
+          최근가 대비 
+          <span :class="lowpriceComparison.isDecrease ? 'text-blue-500' : 'text-red-500'">
+            {{ lowpriceComparison.isDecrease ? '-' : '+' }}{{ lowpriceComparison.difference }}
+            ({{ lowpriceComparison.percentage }}%)
+          </span>
+        </div>
       </div>
     </div>
 
