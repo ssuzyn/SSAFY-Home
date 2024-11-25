@@ -1,9 +1,10 @@
 package com.ssafy.server.config;
 
 import java.util.concurrent.TimeUnit;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
-import org.springframework.http.HttpMethod;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -21,6 +22,11 @@ public class WebConfiguration implements WebMvcConfigurer {
     public WebConfiguration(JWTInterceptor jwtInterceptor) {
         super();
         this.jwtInterceptor = jwtInterceptor;
+    }
+
+    @Bean
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
     }
 
     @Override

@@ -63,44 +63,58 @@ const placeMarkers = ref([]);
 let markerImage;
 
 const categoryImages = {
-  'BK9': 'src/assets/images/bank-blue.png', // 은행
-  'MT1': 'src/assets/images/mart-blue.png',  // 마트
+  'SW8': 'src/assets/images/subway-blue.png',    // 지하철역
+  'SC4': 'src/assets/images/school-blue.png',    // 학교
+  'BK9': 'src/assets/images/bank-blue.png',      // 은행
+  'MT1': 'src/assets/images/mart-blue.png',      // 마트
   'HP8': 'src/assets/images/hospital-blue.png',  // 병원
-  'CE7': 'src/assets/images/cafe-blue.png',   // 카페
-  'FD6': 'src/assets/images/food-blue.png'
+  'CE7': 'src/assets/images/cafe-blue.png',      // 카페
+  'FD6': 'src/assets/images/food-blue.png'       // 음식점
 };
 
 const categories = [
   {
+    id: 'SW8',
+    name: '지하철',
+    order: 0,
+    iconUrl: categoryImages['SW8']
+  },
+  {
+    id: 'SC4',
+    name: '학교',
+    order: 1,
+    iconUrl: categoryImages['SC4']
+  },
+  {
     id: 'BK9',
     name: '은행',
-    order: 0,
+    order: 2,
     iconUrl: categoryImages['BK9']
   },
   {
     id: 'MT1',
     name: '마트',
-    order: 1,
+    order: 3,
     iconUrl: categoryImages['MT1']
   },
   {
     id: 'HP8',
     name: '병원',
-    order: 2,
+    order: 4,
     iconUrl: categoryImages['HP8']
   },
   {
     id: 'CE7',
     name: '카페',
-    order: 3,
+    order: 5,
     iconUrl: categoryImages['CE7']
   },
   {
     id: 'FD6',
     name: '음식점',
-    order: 4,
+    order: 6,
     iconUrl: categoryImages['FD6']
-  },
+  }
 ];
 
 const interestStore = useInterestStore();
