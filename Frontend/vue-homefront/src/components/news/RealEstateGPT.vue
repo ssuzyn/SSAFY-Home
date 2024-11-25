@@ -17,22 +17,43 @@
       <!-- 메인 컨텐츠 -->
       <div class="p-6 space-y-6">
         <!-- 작성 팁 -->
-        <div class="bg-[#f7f7f8] rounded-xl p-4 border border-[#00A67E]/20">
-          <h4 class="text-lg font-semibold text-[#00A67E] flex items-center gap-2 mb-4">
-            <span class="text-2xl">💡</span>
-            뉴스에서 본 생소한 용어를 물어보세요
+        <div class="rounded-xl p-5 border border-[#00A67E]/20">
+          <h4 class="text-base font-semibold text-gray-800 flex items-center mb-3.5">
+            <Lightbulb class="h-5 w-5 mr-2 text-[#00A67E]" />
+            생소한 부동산 용어를 물어보세요
           </h4>
-          <ul class="text-sm text-gray-600 space-y-2 ml-4 list-disc">
-            <li>"총부채원리금상환비율(DSR)이 무엇인가요?"</li>
-            <li>"기준금리 인상이 부동산 시장에 미치는 영향은?"</li>
-            <li>"무순위 청약이란 무엇인가요?"</li>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-3 group">
+              <div class="flex-shrink-0 w-6 h-6 rounded-full bg-[#00A67E]/10 flex items-center justify-center">
+                <span class="text-[#00A67E] text-sm font-medium">1</span>
+              </div>
+              <p class="text-sm text-gray-600 leading-relaxed pt-0.5 group-hover:text-gray-900 transition-colors">
+                "총부채원리금상환비율(DSR)이 무엇인가요?"
+              </p>
+            </li>
+            <li class="flex items-start gap-3 group">
+              <div class="flex-shrink-0 w-6 h-6 rounded-full bg-[#00A67E]/10 flex items-center justify-center">
+                <span class="text-[#00A67E] text-sm font-medium">2</span>
+              </div>
+              <p class="text-sm text-gray-600 leading-relaxed pt-0.5 group-hover:text-gray-900 transition-colors">
+                "기준금리 인상이 부동산 시장에 미치는 영향은?"
+              </p>
+            </li>
+            <li class="flex items-start gap-3 group">
+              <div class="flex-shrink-0 w-6 h-6 rounded-full bg-[#00A67E]/10 flex items-center justify-center">
+                <span class="text-[#00A67E] text-sm font-medium">3</span>
+              </div>
+              <p class="text-sm text-gray-600 leading-relaxed pt-0.5 group-hover:text-gray-900 transition-colors">
+                "무순위 청약이란 무엇인가요?"
+              </p>
+            </li>
           </ul>
         </div>
 
         <!-- 입력창 -->
         <AInputSearch
           v-model:value="question"
-          placeholder="부동산 뉴스에서 궁금한 용어나 개념을 입력해주세요"
+          placeholder="부동산 뉴스나 Q&A에서 궁금한 용어나 개념을 입력해주세요"
           enter-button="질문하기"
           size="large"
           :loading="loading"
@@ -57,6 +78,7 @@ import { ref } from 'vue'
 import { message, Input } from 'ant-design-vue'
 import { CloseOutlined } from '@ant-design/icons-vue'
 import { useAxiosStore } from '@/stores/axiosStore'
+import { Lightbulb } from 'lucide-vue-next'
 
 const { Search: AInputSearch } = Input
 

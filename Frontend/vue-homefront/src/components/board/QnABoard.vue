@@ -11,18 +11,18 @@
           <!-- GPT 버튼 -->
           <button
             @click="openGptDialog"
-            class="w-36 bg-[#00A67E] hover:bg-[#008F6B] text-white px-5 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
+            class="w-36 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
           >
             <span class="text-lg mr-1.5">🤖</span>
-            용어 도우미
+            <span class="text-base font-medium">용어 도우미</span>
           </button>
           <!-- 기존 질문하기 버튼 -->
           <button
             @click="openNewQuestionDialog"
             class="w-36 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white px-5 py-2.5 rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-orange-200 transform hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Plus class="mr-2 h-5 w-5" />
-            질문하기
+            <Plus class="text-lg mr-2 h-5 w-5" />
+            <span class="text-base font-medium">질문하기</span>
           </button>
         </div>
       </div>
@@ -137,13 +137,13 @@
       <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 shadow-2xl transform transition-all duration-300"
            @click.stop>
         <!-- 헤더 영역 -->
-        <div class="p-8 border-b border-gray-100">
+        <div class="p-6 border-b border-gray-100">
           <div class="flex items-center justify-between">
             <div>
-              <h2 class="text-3xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
+              <h2 class="text-2xl font-bold bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent">
                 새로운 질문
               </h2>
-              <p class="text-gray-500 mt-2">
+              <p class="text-gray-500 mt-1.5 text-sm">
                 부동산에 관한 궁금한 점을 전문가에게 물어보세요
               </p>
             </div>
@@ -191,15 +191,36 @@
             </div>
 
             <!-- 작성 가이드 -->
-            <div class="bg-orange-50 rounded-xl p-4">
-              <h4 class="text-sm font-medium text-orange-800 flex items-center mb-2">
-                <Lightbulb class="h-4 w-4 mr-2" />
+            <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+              <h4 class="text-base font-semibold text-gray-800 flex items-center mb-3.5">
+                <Lightbulb class="h-5 w-5 mr-2 text-orange-500" />
                 작성 팁
               </h4>
-              <ul class="text-sm text-orange-700 space-y-1 ml-6 list-disc">
-                <li>구체적인 상황과 조건을 설명해주세요</li>
-                <li>관련된 배경 정보를 포함하면 좋습니다</li>
-                <li>명확한 질문을 통해 원하는 답변을 받으세요</li>
+              <ul class="space-y-3">
+                <li class="flex items-start gap-3 group">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center">
+                    <span class="text-orange-500 text-sm font-medium">1</span>
+                  </div>
+                  <p class="text-sm text-gray-600 leading-relaxed pt-0.5 group-hover:text-gray-900 transition-colors">
+                    구체적인 상황과 조건을 설명해주세요
+                  </p>
+                </li>
+                <li class="flex items-start gap-3 group">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center">
+                    <span class="text-orange-500 text-sm font-medium">2</span>
+                  </div>
+                  <p class="text-sm text-gray-600 leading-relaxed pt-0.5 group-hover:text-gray-900 transition-colors">
+                    관련된 배경 정보를 포함하면 좋습니다
+                  </p>
+                </li>
+                <li class="flex items-start gap-3 group">
+                  <div class="flex-shrink-0 w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center">
+                    <span class="text-orange-500 text-sm font-medium">3</span>
+                  </div>
+                  <p class="text-sm text-gray-600 leading-relaxed pt-0.5 group-hover:text-gray-900 transition-colors">
+                    명확한 질문을 통해 원하는 답변을 받으세요
+                  </p>
+                </li>
               </ul>
             </div>
           </div>
@@ -431,17 +452,19 @@
       </div>
     </div>
 
-    <!-- RealEstateGPT 다이얼로그 -->
-    <RealEstateGPT
-      v-if="showGptDialog"
-      @close="closeGptDialog"
-    />
+    <!-- GPT 다이얼로그 추가 -->
+    <Teleport to="body">
+      <RealEstateGPT
+        v-if="showGptDialog"
+        @close="closeGptDialog"
+      />
+    </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, watch, h, computed } from 'vue'
-import { Plus, ChevronRight, UserCircle, Eye, XCircle, PlusCircle, Clock, MessageCircle, SendHorizontal, Edit2, Trash2, Search, TrendingUp, HelpCircle, Lightbulb } from 'lucide-vue-next'
+import { Plus, ChevronRight, UserCircle, Eye, XCircle, PlusCircle, Clock, MessageCircle, SendHorizontal, Edit2, Trash2, Search, TrendingUp, HelpCircle, Lightbulb, MessageSquare } from 'lucide-vue-next'
 import { useBoard } from '@/stores/board'
 import { useAuth } from '@/stores/auth'
 import { useRouter } from 'vue-router'
@@ -493,7 +516,7 @@ const handleSearch = () => {
 const openNewQuestionDialog = () => {
   if (!auth.isLoggedIn) {
     message.info({
-      content: '로그인이 필요한 서비스입니다.',
+      content: '로그인이 필요 서비스입니다.',
       class: 'custom-message',
       duration: 2,
       btn: h(
