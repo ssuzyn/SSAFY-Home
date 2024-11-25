@@ -5,12 +5,15 @@
 
 <mapper namespace="com.ssafy.server.news.mapper.NewsMapper">
   <insert id="insertNews" parameterType="com.ssafy.server.news.dto.NewsDto">
-    INSERT INTO news (title, link, date)
-    VALUES (#{title}, #{link}, #{date})
+    INSERT INTO news (title, link, date, thumbnail)
+    VALUES (#{title}, #{link}, #{date}, #{thumbnail})
   </insert>
 
-  <select id="selectNews" resultType="com.ssafy.server.news.dto.NewsDto">
-    SELECT id, title, link, date
+
+  <select id="selectNews" resultType="NewsDto">
+    SELECT id, title, link, thumbnail, date
     FROM news
+    ORDER BY date DESC
   </select>
+
 </mapper>
