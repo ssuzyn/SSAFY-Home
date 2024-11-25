@@ -414,7 +414,7 @@ const createInfoWindow = (property) => {
         color: #ff6b00;
         margin-bottom: 16px;
         letter-spacing: -0.5px;
-      ">${interestStore.formatPrice(interestStore.parseAmount(property.dealAmount))}만</div>
+      ">${interestStore.formatPrice(interestStore.parseAmount(property.dealAmount))}</div>
 
       <div style="
         display: flex;

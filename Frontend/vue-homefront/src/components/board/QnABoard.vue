@@ -144,7 +144,7 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
               <input v-model="newQuestion.subject"
-                     placeholder="질문의 제목을 입력해주세요"
+                     placeholder="질문  제목을 입력해주세요"
                      required
                      class="w-full p-3.5 bg-gray-50 text-gray-900 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder-gray-400" />
             </div>
@@ -186,6 +186,7 @@
            @click.stop>
         <!-- 헤더 영역 -->
         <div class="p-6 border-b border-gray-100">
+          <!-- 제목 영역 -->
           <div class="flex items-center justify-between mb-4">
             <!-- 수정 모드일 때 -->
             <div v-if="isEditingQuestion" class="w-full">
@@ -217,129 +218,126 @@
               </div>
             </template>
           </div>
-          <!-- 작성자 정보 및 시간 -->
-          <div class="flex items-center gap-4 text-sm text-gray-600">
-            <div class="flex items-center">
-              <LazyImage
-                :path="board.selectedQuestion.userProfile"
-                :alt="`${board.selectedQuestion.userId}의 프로필`"
-                container-class="w-8 h-8"
-                image-class="rounded-full"
-              />
-              <span class="ml-2">{{ board.selectedQuestion.userId }}</span>
+
+          <!-- 작성자 정보 및 메타데이터 -->
+          <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+            <div class="flex items-center gap-4">
+              <div class="flex items-center">
+                <LazyImage
+                  :path="board.selectedQuestion.userProfile"
+                  :alt="`${board.selectedQuestion.userId}의 프로필`"
+                  container-class="w-8 h-8"
+                  image-class="rounded-full"
+                />
+                <span class="ml-2 font-medium text-gray-900">{{ board.selectedQuestion.userId }}</span>
+              </div>
+              <div class="flex items-center text-gray-500">
+                <Clock class="w-4 h-4 mr-1.5" />
+                {{ formatDate(board.selectedQuestion.registerTime) }}
+              </div>
+              <div v-if="board.selectedQuestion.updateTime" class="text-gray-400">
+                <span class="text-xs">(수정됨: {{ formatDate(board.selectedQuestion.updateTime) }})</span>
+              </div>
             </div>
-            <div class="flex items-center">
-              <Clock class="w-4 h-4 mr-1.5 text-gray-400" />
-              {{ formatDate(board.selectedQuestion.registerTime) }}
+            <div class="flex items-center gap-2">
+              <Eye class="w-4 h-4 text-gray-400" />
+              <span class="text-gray-600">{{ board.selectedQuestion.hit }}</span>
             </div>
-            <div v-if="board.selectedQuestion.updateTime" class="flex items-center text-gray-500">
-              <span class="text-xs">(수정됨: {{ formatDate(board.selectedQuestion.updateTime) }})</span>
+          </div>
+
+          <!-- 질문 내용 -->
+          <div v-if="isEditingQuestion">
+            <textarea
+              v-model="editQuestionForm.content"
+              rows="8"
+              class="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500"
+              placeholder="내용을 입력하세요"
+            ></textarea>
+            <div class="flex justify-end gap-2 mt-4">
+              <button
+                @click="saveEditedQuestion"
+                class="px-4 py-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white text-sm rounded-xl hover:from-orange-500 hover:to-orange-600 transition-all duration-200"
+              >
+                저장
+              </button>
+              <button
+                @click="cancelEditQuestion"
+                class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                취소
+              </button>
             </div>
+          </div>
+          <div v-else class="prose prose-orange max-w-none">
+            <p class="text-gray-800 whitespace-pre-wrap">{{ board.selectedQuestion.content }}</p>
           </div>
         </div>
 
-        <!-- 스크롤 가능한 컨텐츠 영역 수정 -->
-        <div class="flex-1 overflow-y-auto p-6">
-          <!-- 질문 내용 -->
-          <div class="bg-gray-50 rounded-xl p-5 mb-8">
-            <h3 class="font-semibold text-gray-900 mb-3">질문 내용</h3>
-            <!-- 수정 모드일 때 -->
-            <div v-if="isEditingQuestion">
-              <textarea
-                v-model="editQuestionForm.content"
-                rows="8"
-                class="w-full p-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500"
-                placeholder="내용을 입력하세요"
-              ></textarea>
-              <div class="flex justify-end gap-2 mt-4">
-                <button
-                  @click="saveEditedQuestion"
-                  class="px-4 py-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white text-sm rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] font-medium relative overflow-hidden group"
-                >
-                  <span class="relative z-10">저장</span>
-                  <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
-                </button>
-                <button
-                  @click="cancelEditQuestion"
-                  class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  취소
-                </button>
+        <!-- 답변 섹션 -->
+        <div class="flex-1 overflow-y-auto p-6" style="max-height: 30vh;">
+          <!-- 답변 목록 -->
+          <div class="space-y-4">
+            <div v-for="comment in board.comments"
+                 :key="comment.commentId"
+                 class="bg-gray-50 rounded-xl p-5">
+              <!-- 댓글 수정 모드 -->
+              <div v-if="editingComment?.commentId === comment.commentId" class="space-y-3">
+                <textarea
+                  v-model="editCommentContent"
+                  rows="3"
+                  class="w-full p-4 bg-white text-gray-900 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 shadow-sm"
+                ></textarea>
+                <div class="flex justify-end gap-2">
+                  <button
+                    @click="saveEditedComment"
+                    class="px-4 py-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white text-sm rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] font-medium relative overflow-hidden group"
+                  >
+                    <span class="relative z-10">저장</span>
+                    <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+                  </button>
+                  <button
+                    @click="cancelEditComment"
+                    class="px-4 py-2 text-gray-600 text-sm hover:bg-gray-100 rounded-xl transition-all duration-200 font-medium"
+                  >
+                    취소
+                  </button>
+                </div>
               </div>
-            </div>
-            <!-- 일반 모드일 때 -->
-            <p v-else class="text-gray-700">{{ board.selectedQuestion.content }}</p>
-          </div>
-
-          <!-- 답변 목록 수정 -->
-          <div>
-            <h3 class="font-semibold text-gray-900 mb-4 flex items-center">
-              <MessageCircle class="w-5 h-5 mr-2" />
-              답변 목록
-            </h3>
-            <div class="space-y-4">
-              <div v-for="comment in board.comments"
-                   :key="comment.commentId"
-                   class="bg-gray-50 rounded-xl p-5">
-                <!-- 댓글 수정 모드 -->
-                <div v-if="editingComment?.commentId === comment.commentId" class="space-y-3">
-                  <textarea
-                    v-model="editCommentContent"
-                    rows="3"
-                    class="w-full p-4 bg-white text-gray-900 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 shadow-sm"
-                  ></textarea>
-                  <div class="flex justify-end gap-2">
-                    <button
-                      @click="saveEditedComment"
-                      class="px-4 py-2 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white text-sm rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98] font-medium relative overflow-hidden group"
-                    >
-                      <span class="relative z-10">저장</span>
-                      <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              <!-- 댓글 일반 모드 -->
+              <template v-else>
+                <div class="flex justify-between items-start">
+                  <p class="text-gray-700">{{ comment.content }}</p>
+                  <div v-if="auth.user?.userId === comment.userId" class="flex gap-1">
+                    <button @click="handleEditComment(comment)"
+                            class="text-gray-400 hover:text-blue-600 p-1">
+                      <Edit2 class="h-4 w-4" />
                     </button>
-                    <button
-                      @click="cancelEditComment"
-                      class="px-4 py-2 text-gray-600 text-sm hover:bg-gray-100 rounded-xl transition-all duration-200 font-medium"
-                    >
-                      취소
+                    <button @click="handleDeleteComment(comment)"
+                            class="text-gray-400 hover:text-red-600 p-1">
+                      <Trash2 class="h-4 w-4" />
                     </button>
                   </div>
                 </div>
-                <!-- 댓글 일반 모드 -->
-                <template v-else>
-                  <div class="flex justify-between items-start">
-                    <p class="text-gray-700">{{ comment.content }}</p>
-                    <div v-if="auth.user?.userId === comment.userId" class="flex gap-1">
-                      <button @click="handleEditComment(comment)"
-                              class="text-gray-400 hover:text-blue-600 p-1">
-                        <Edit2 class="h-4 w-4" />
-                      </button>
-                      <button @click="handleDeleteComment(comment)"
-                              class="text-gray-400 hover:text-red-600 p-1">
-                        <Trash2 class="h-4 w-4" />
-                      </button>
-                    </div>
+                <!-- 댓글 작성자 정보 및 시간 -->
+                <div class="mt-3 flex items-center gap-4 text-sm text-gray-600">
+                  <div class="flex items-center">
+                    <LazyImage
+                      :path="comment.userProfile"
+                      :alt="`${comment.userId}의 프로필`"
+                      container-class="w-6 h-6"
+                      image-class="rounded-full"
+                    />
+                    <span class="ml-2">{{ comment.userId }}</span>
                   </div>
-                  <!-- 댓글 작성자 정보 및 시간 -->
-                  <div class="mt-3 flex items-center gap-4 text-sm text-gray-600">
-                    <div class="flex items-center">
-                      <LazyImage
-                        :path="comment.userProfile"
-                        :alt="`${comment.userId}의 프로필`"
-                        container-class="w-6 h-6"
-                        image-class="rounded-full"
-                      />
-                      <span class="ml-2">{{ comment.userId }}</span>
-                    </div>
-                    <div class="flex items-center">
-                      <Clock class="w-4 h-4 mr-1.5 text-gray-400" />
-                      {{ formatDate(comment.registerTime) }}
-                    </div>
-                    <div v-if="comment.updateTime" class="flex items-center text-gray-500">
-                      <span class="text-xs">(수정됨: {{ formatDate(comment.updateTime) }})</span>
-                    </div>
+                  <div class="flex items-center">
+                    <Clock class="w-4 h-4 mr-1.5 text-gray-400" />
+                    {{ formatDate(comment.registerTime) }}
                   </div>
-                </template>
-              </div>
+                  <div v-if="comment.updateTime" class="flex items-center text-gray-500">
+                    <span class="text-xs">(수정됨: {{ formatDate(comment.updateTime) }})</span>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>

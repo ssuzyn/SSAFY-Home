@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-orange-50 via-gray-50 to-white">
-    <div class="w-full max-w-2xl mx-auto p-4 pt-24">
+    <div class="w-full max-w-2xl mx-auto p-4 pt-36">
       <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <!-- 헤더 -->
         <header class="bg-gradient-to-r from-[#FF965B] to-[#FF8A3D] text-white py-4 px-6 relative overflow-hidden">
@@ -195,14 +195,14 @@
 
             <!-- 저장 버튼 -->
             <button
-              @click="saveChanges"
+              @click="handleSave"
               class="px-5 py-2.5 bg-gradient-to-r from-[#FF965B] to-[#FF8A3D] text-white rounded-xl hover:from-[#FF8A3D] hover:to-[#FF7A2D] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-orange-200/50 relative overflow-hidden group text-sm font-medium"
             >
               <span class="relative z-10 flex items-center justify-center">
                 <span class="text-lg mr-1.5">💾</span>
                 변경사항 저장
               </span>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </button>
           </div>
         </div>
@@ -283,7 +283,7 @@ const handleImageError = async (e) => {
   }
 };
 
-const saveChanges = async () => {
+const handleSave = async () => {
   try {
     const updateData = {
       userName: user.userName,

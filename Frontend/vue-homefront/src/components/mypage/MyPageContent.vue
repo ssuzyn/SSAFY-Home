@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-orange-50 via-gray-50 to-white">
-    <div class="w-full max-w-2xl mx-auto p-4 pt-24">
+    <div class="w-full max-w-2xl mx-auto p-4 pt-36">
       <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <!-- 헤더 -->
         <header class="bg-gradient-to-r from-[#FF965B] to-[#FF8A3D] text-white py-4 px-6 relative overflow-hidden">
@@ -138,7 +138,7 @@
                 <span class="text-lg mr-2">✏️</span>
                 프로필 수정
               </span>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
             </button>
           </div>
         </div>
