@@ -85,11 +85,26 @@
 
           <!-- 링크 네비게이션 -->
           <div class="mt-8 flex items-center justify-center space-x-6 text-sm text-gray-600">
-            <a href="/resetpassword" class="hover:text-orange-500 transition-colors">비밀번호 찾기</a>
+            <router-link
+              to="/resetPwd"
+              class="hover:text-orange-500 transition-colors"
+            >
+              비밀번호 찾기
+            </router-link>
             <span class="text-gray-300">|</span>
-            <a href="/findid" class="hover:text-orange-500 transition-colors">아이디 찾기</a>
+            <router-link
+              to="/findId"
+              class="hover:text-orange-500 transition-colors"
+            >
+              아이디 찾기
+            </router-link>
             <span class="text-gray-300">|</span>
-            <a href="/signup" class="hover:text-orange-500 transition-colors">회원가입</a>
+            <router-link
+              to="/signup"
+              class="hover:text-orange-500 transition-colors"
+            >
+              회원가입
+            </router-link>
           </div>
         </div>
       </div>
