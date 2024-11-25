@@ -5,8 +5,7 @@
         <!-- 헤더 -->
         <header class="bg-gradient-to-r from-[#FF965B] to-[#FF8A3D] text-white py-4 px-6 relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent"></div>
-          <h1 class="text-xl font-bold relative z-10 text-center">프로필 수정</h1>
-          <p class="text-orange-50 text-xs text-center mt-1">개인정보 수정</p>
+          <h1 class="text-2xl font-bold relative z-10 text-center">프로필 수정</h1>
         </header>
 
         <div class="p-6">

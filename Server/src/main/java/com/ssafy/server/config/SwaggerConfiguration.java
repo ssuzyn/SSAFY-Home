@@ -68,4 +68,9 @@ public class SwaggerConfiguration {
 		return GroupedOpenApi.builder().group("ssafy-house").pathsToMatch("/house/**").build();
 	}
 
+	@Bean
+	public GroupedOpenApi newsApi() {
+		return GroupedOpenApi.builder().group("ssafy-news").pathsToMatch("/news/**").build();
+	}
+
 }

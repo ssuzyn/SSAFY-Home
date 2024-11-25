@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.server.news.mapper.NewsMapper">
+  <insert id="insertNews" parameterType="com.ssafy.server.news.dto.NewsDto">
+    INSERT INTO news (title, link, date, thumbnail)
+    VALUES (#{title}, #{link}, #{date}, #{thumbnail})
+  </insert>
+
+
+  <select id="selectNews" resultType="NewsDto">
+    SELECT id, title, link, thumbnail, date
+    FROM news
+    ORDER BY date DESC
+  </select>
+
+</mapper>

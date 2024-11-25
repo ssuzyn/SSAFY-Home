@@ -4,7 +4,7 @@
       <div class="w-full max-w-lg">
         <!-- 로고 -->
         <div class="text-center mb-10">
-          <h1 class="text-5xl font-bold text-orange-500 tracking-tight">HOUSE-TOSS</h1>
+          <h1 class="text-5xl font-bold text-orange-500 tracking-tight">ZIP</h1>
           <p class="mt-2 text-gray-600">안전하고 편리한 주거공간 플랫폼</p>
         </div>
 

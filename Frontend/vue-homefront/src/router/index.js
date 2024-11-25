@@ -4,6 +4,7 @@ import QnAView from '@/views/QnAView.vue';
 import SignupView from '@/views/SignupView.vue';
 import MyPageContent from '@/components/mypage/MyPageContent.vue';
 import UpdatedProfilePage from '@/components/mypage/UpdatedProfilePage.vue';
+import RealEstateNewsPage from '@/components/news/RealEstateNewsPage.vue';
 import FindIdPage from '@/components/auth/FindIdPage.vue';
 import ResetPasswordPage from '@/components/auth/ResetPasswordPage.vue';
 import { createRouter, createWebHistory } from 'vue-router';
@@ -50,6 +51,11 @@ const routes = [
     name: 'ResetPwd',
     component: ResetPasswordPage,
   },
+  {
+    path: '/real-estate-news',
+    name: 'RealEstateNews',
+    component: RealEstateNewsPage,
+  }
 ];
 
 const router = createRouter({
