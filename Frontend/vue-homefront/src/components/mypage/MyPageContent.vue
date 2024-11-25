@@ -4,9 +4,9 @@
       <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden border border-gray-100">
         <!-- 헤더 -->
         <header class="bg-gradient-to-r from-[#FF965B] to-[#FF8A3D] text-white py-4 px-6 relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent"></div>
-          <h1 class="text-xl font-bold relative z-10 text-center">마이페이지</h1>
-          <p class="text-orange-50 text-xs text-center mt-1">개인정보 관리</p>
+          <div class="flex items-center justify-center">
+            <h1 class="text-2xl font-bold text-white">마이페이지</h1>
+          </div>
         </header>
 
         <div class="p-6">
@@ -14,8 +14,8 @@
           <div class="flex gap-6 mb-6">
             <!-- 왼쪽: 프로필 사진 섹션 -->
             <div class="w-1/3">
-              <h2 class="text-base font-semibold mb-3 text-gray-800 flex items-center">
-                <span class="mr-2 text-lg">👤</span> 사용자 프로필
+              <h2 class="text-lg font-semibold mb-3 text-gray-800 flex items-center">
+                <span class="mr-2 text-xl">👤</span> 사용자 프로필
               </h2>
               <!-- 로필 사진 -->
               <div class="w-full aspect-square rounded-xl shadow-md overflow-hidden bg-white mb-3">
@@ -42,8 +42,8 @@
 
             <!-- 오른쪽: 프로필 정보 섹션 -->
             <div class="w-2/3">
-              <h2 class="text-base font-semibold mb-3 text-gray-800 flex items-center">
-                <span class="mr-2 text-lg">📋</span> 프로필 정보
+              <h2 class="text-lg font-semibold mb-3 text-gray-800 flex items-center">
+                <span class="mr-2 text-xl">📋</span> 프로필 정보
               </h2>
               <div class="space-y-2">
                 <!-- 이메일 -->
@@ -86,8 +86,8 @@
           <!-- 알림 설정 섹션 -->
           <br>
           <section class="mb-4">
-            <h2 class="text-base font-semibold mb-3 text-gray-800 flex items-center">
-              <span class="mr-2 text-lg">🔔</span> 알림 설정
+            <h2 class="text-lg font-semibold mb-3 text-gray-800 flex items-center">
+              <span class="mr-2 text-xl">🔔</span> 알림 설정
             </h2>
             <div class="space-y-2">
               <!-- 이메일 알림 -->
@@ -133,7 +133,7 @@
             <!-- 프로필 수정 버튼 -->
             <button
               @click="handleEdit"
-              class="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white px-6 py-3 rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-orange-200 transform hover:scale-[1.02] active:scale-[0.98]"
+              class="flex-1 max-w-[160px] bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white px-6 py-3 rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-orange-200 transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <span class="text-lg mr-2">✏️</span>
               프로필 수정
@@ -142,24 +142,25 @@
             <!-- 회원탈퇴 버튼 -->
             <button
               @click="handleDeleteAccount"
-              class="group flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-red-200 hover:border-red-300 hover:bg-red-50 transition-all duration-200"
+              class="flex-1 max-w-[160px] group flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-orange-200 hover:border-orange-300 hover:bg-orange-50 transition-all duration-200"
             >
-              <span class="text-red-400 group-hover:text-red-500 text-sm font-medium transition-colors">
-                회원탈퇴
-              </span>
-              <svg 
-                class="w-4 h-4 text-red-400 group-hover:text-red-500 transition-colors" 
-                fill="none" 
-                stroke="currentColor" 
+            <svg
+                class="w-4 h-4 text-orange-400 group-hover:text-orange-500 transition-colors"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path 
-                  stroke-linecap="round" 
-                  stroke-linejoin="round" 
-                  stroke-width="2" 
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                 />
               </svg>
+              <span class="text-orange-400 group-hover:text-orange-500 text-sm font-medium transition-colors">
+                회원탈퇴
+              </span>
+              
             </button>
           </div>
         </div>
@@ -172,16 +173,16 @@
     <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl transform transition-all">
       <div class="text-center mb-6">
         <div class="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
-          <svg 
-            class="w-6 h-6 text-red-500" 
-            fill="none" 
-            stroke="currentColor" 
+          <svg
+            class="w-6 h-6 text-red-500"
+            fill="none"
+            stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path 
-              stroke-linecap="round" 
-              stroke-linejoin="round" 
-              stroke-width="2" 
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
