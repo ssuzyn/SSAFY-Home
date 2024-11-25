@@ -51,8 +51,13 @@ const totalInterests = computed(() => {
     <div class="container mx-auto px-4 h-16 flex items-center justify-between">
       <router-link
         to="/"
-        class="text-4xl font-bold text-orange-500"
+        class="text-4xl font-bold text-orange-500 flex items-center gap-2"
       >
+        <img
+          src="@/assets/images/zip_logo.png"
+          alt="ZIP 로고"
+          class="w-14 h-14 object-contain"
+        />
         ZIP
       </router-link>
       <div class="flex items-center space-x-6">
