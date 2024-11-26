@@ -12,7 +12,7 @@
             @click="showGPT = true"
             class="group flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
             <span class="text-2xl group-hover:scale-110 transition-transform">🤖</span>
-            <span class="text-base font-medium">용어 도우미</span>
+            <span class="text-base font-medium">AI 도우미</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>

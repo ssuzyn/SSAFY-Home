@@ -5,7 +5,7 @@
       <div class="p-6 border-b flex items-center justify-between">
         <h2 class="text-xl font-bold flex items-center gap-2">
           <span>🤖</span>
-          부동산 용어 도우미
+          부동산 AI 도우미
         </h2>
         <button
           @click="$emit('close')"
@@ -20,7 +20,7 @@
         <div class="rounded-xl p-5 border border-[#00A67E]/20">
           <h4 class="text-base font-semibold text-gray-800 flex items-center mb-3.5">
             <Lightbulb class="h-5 w-5 mr-2 text-[#00A67E]" />
-            생소한 부동산 용어를 물어보세요
+            생소한 부동산 개념을 물어보세요
           </h4>
           <ul class="space-y-3">
             <li class="flex items-start gap-3 group">
