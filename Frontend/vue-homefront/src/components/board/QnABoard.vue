@@ -11,7 +11,7 @@
           <!-- GPT 버튼 -->
           <button
             @click="openGptDialog"
-            class="w-36 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
+            class="w-38 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg transform hover:scale-[1.02] active:scale-[0.98]"
           >
             <span class="text-lg mr-1.5">🤖</span>
             <span class="text-base font-medium">용어 도우미</span>
@@ -19,7 +19,7 @@
           <!-- 기존 질문하기 버튼 -->
           <button
             @click="openNewQuestionDialog"
-            class="w-36 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white px-5 py-2.5 rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-orange-200 transform hover:scale-[1.02] active:scale-[0.98]"
+            class="w-40 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white px-5 py-2.5 rounded-xl hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-orange-200 transform hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus class="text-lg mr-2 h-5 w-5" />
             <span class="text-base font-medium">질문하기</span>
