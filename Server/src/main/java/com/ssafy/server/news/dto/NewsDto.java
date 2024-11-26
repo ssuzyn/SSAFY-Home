@@ -13,4 +13,5 @@ public class NewsDto {
     private String link;       // 뉴스 링크
     private String thumbnail;  // 뉴스 썸네일 URL
     private LocalDate date;    // 뉴스 날짜
+    private String category;
 }

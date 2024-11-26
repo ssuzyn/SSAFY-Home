@@ -8,7 +8,6 @@
           <p class="mt-2 text-gray-600">최신 부동산 뉴스를 한눈에 확인하세요</p>
         </div>
         <div class="flex items-center gap-4">
-          <Clock />
           <button
             @click="showGPT = true"
             class="group flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5">
@@ -21,38 +20,70 @@
         </div>
       </div>
 
-      <!-- GPT 모달 추가 -->
-      <RealEstateGPT
-        v-if="showGPT"
-        @close="showGPT = false"
-      />
+      <!-- 카테고리 탭 -->
+      <div class="mb-6">
+        <div class="flex space-x-2 overflow-x-auto pb-2">
+          <button
+            v-for="cat in categories"
+            :key="cat.value"
+            @click="() => {
+              currentCategory = cat.value;
+              console.log('Selected category:', cat.value);
+              console.log('Filtered news count:', filteredNews.length);
+            }"
+            :class="[
+              'px-4 py-2 rounded-lg font-medium transition-all duration-200',
+              currentCategory === cat.value
+                ? 'bg-orange-500 text-white shadow-md'
+                : 'bg-white text-gray-600 hover:bg-orange-100'
+            ]"
+          >
+            {{ cat.label }}
+            <span class="ml-2 px-2 py-0.5 text-sm rounded-full" 
+                  :class="currentCategory === cat.value ? 'bg-orange-400' : 'bg-gray-100'">
+              {{ getNewsCounts(cat.value) }}
+            </span>
+          </button>
+        </div>
+      </div>
 
-      <!-- 뉴스 목록 -->
-      <div v-infinite-scroll="loadMore" :infinite-scroll-disabled="loading" :infinite-scroll-distance="10">
-        <a v-for="item in news"
-           :key="item.id"
-           :href="item.link"
-           target="_blank"
-           class="group block bg-white border border-gray-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 hover:border-orange-200 transform hover:-translate-y-1 mb-4 cursor-pointer">
-          <div class="flex gap-6">
-            <!-- 썸네일 -->
-            <div v-if="item.thumbnail" class="flex-shrink-0">
-              <img :src="item.thumbnail"
-                   :alt="item.title"
-                   class="w-32 h-24 object-cover rounded-xl"/>
-            </div>
-            <!-- 뉴스 내용 -->
-            <div class="flex-1">
-              <h3 class="text-xl font-semibold text-gray-900 group-hover:text-orange-500 transition-colors line-clamp-2 mb-3">
-                {{ item.title }}
-              </h3>
-              <div class="flex items-center text-gray-500 text-sm">
-                <Clock class="w-4 h-4 mr-1.5" />
-                {{ formatDate(item.date) }}
+      <!-- GPT 모달 -->
+      <RealEstateGPT v-if="showGPT" @close="showGPT = false" />
+
+      <!-- 필터링된 뉴스 목록 -->
+      <div v-infinite-scroll="loadMore" 
+           :infinite-scroll-disabled="loading" 
+           :infinite-scroll-distance="10">
+        <template v-if="filteredNews.length > 0">
+          <a v-for="item in filteredNews"
+             :key="item.id"
+             :href="item.link"
+             target="_blank"
+             class="group block bg-white border border-gray-100 rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 hover:border-orange-200 transform hover:-translate-y-1 mb-4 cursor-pointer">
+            <div class="flex gap-6">
+              <!-- 썸네일 -->
+              <div v-if="item.thumbnail" class="flex-shrink-0">
+                <img :src="item.thumbnail"
+                     :alt="item.title"
+                     class="w-32 h-24 object-cover rounded-xl"/>
+              </div>
+              <!-- 뉴스 내용 -->
+              <div class="flex-1">
+                <h3 class="text-xl font-semibold text-gray-900 group-hover:text-orange-500 transition-colors line-clamp-2 mb-3">
+                  {{ item.title }}
+                </h3>
+                <div class="flex items-center text-gray-500 text-sm">
+                  {{ formatDate(item.date) }}
+                </div>
               </div>
             </div>
-          </div>
-        </a>
+          </a>
+        </template>
+        
+        <!-- 데이터가 없을 때 표시할 메시지 -->
+        <div v-else-if="!loading" class="text-center py-10">
+          <p class="text-gray-500">해당 카테고리의 뉴스가 없습니다.</p>
+        </div>
 
         <!-- 로딩 스피너 -->
         <div v-if="loading" class="flex justify-center p-6">
@@ -64,15 +95,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import InfiniteScroll from 'vue-infinite-scroll'
-import { message, Spin } from 'ant-design-vue'
-import {
-  Row,
-  Col,
-  List,
-  ListItem,
-} from 'ant-design-vue'
+import { message } from 'ant-design-vue'
 import RealEstateGPT from './RealEstateGPT.vue'
 
 const news = ref([])
@@ -81,6 +106,36 @@ const page = ref(1)
 const pageSize = 10
 const hasMore = ref(true)
 const showGPT = ref(false)
+const currentCategory = ref('all')
+
+const categories = [
+  { label: '전체', value: 'all' },
+  { label: '아파트', value: 'apartment' },
+  { label: '분양', value: 'sale' },
+  { label: '재건축', value: 'reconstruction' }
+]
+
+// 카테고리별 뉴스 필터링
+const filteredNews = computed(() => {
+  console.log('Filtering news for category:', currentCategory.value);
+  console.log('Total news items:', news.value.length);
+  
+  if (currentCategory.value === 'all') {
+    return news.value;
+  }
+  
+  const filtered = news.value.filter(item => item.category === currentCategory.value);
+  console.log('Filtered news items:', filtered.length);
+  return filtered;
+})
+
+// 카테고리별 뉴스 수 계산
+const getNewsCounts = (category) => {
+  if (category === 'all') {
+    return news.value.length;
+  }
+  return news.value.filter(item => item.category === category).length;
+}
 
 const getToken = () => localStorage.getItem('token')
 
@@ -100,6 +155,7 @@ const fetchNews = async () => {
         hasMore.value = false
       }
       news.value = [...news.value, ...data.data]
+      console.log('Fetched news:', data.data);
       page.value += 1
     }
   } catch (error) {
@@ -123,9 +179,6 @@ const formatDate = (dateArr) => {
 onMounted(() => {
   fetchNews()
 })
-
-// directives 등록
-const vInfiniteScroll = InfiniteScroll.directive
 </script>
 
 <style scoped>

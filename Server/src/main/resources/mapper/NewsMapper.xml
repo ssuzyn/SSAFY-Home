@@ -5,15 +5,26 @@
 
 <mapper namespace="com.ssafy.server.news.mapper.NewsMapper">
   <insert id="insertNews" parameterType="com.ssafy.server.news.dto.NewsDto">
-    INSERT INTO news (title, link, date, thumbnail)
-    VALUES (#{title}, #{link}, #{date}, #{thumbnail})
+    INSERT INTO news (title, link, date, thumbnail, category)
+    VALUES (#{title}, #{link}, #{date}, #{thumbnail}, #{category})
   </insert>
 
 
-  <select id="selectNews" resultType="NewsDto">
-    SELECT id, title, link, thumbnail, date
+  <select id="selectNews" resultType="com.ssafy.server.news.dto.NewsDto">
+    SELECT id, title, link, thumbnail, date, category
     FROM news
     ORDER BY date DESC
   </select>
 
+  <!-- URL로 중복 체크 -->
+  <select id="checkDuplicateNewsByUrl" resultType="int">
+    SELECT COUNT(*) FROM news WHERE link = #{link}
+  </select>
+
+  <!-- 또는 제목과 날짜로 중복 체크 -->
+  <select id="checkDuplicateNews" resultType="int">
+    SELECT COUNT(*)
+    FROM news
+    WHERE title = #{title} AND date = #{date}
+  </select>
 </mapper>

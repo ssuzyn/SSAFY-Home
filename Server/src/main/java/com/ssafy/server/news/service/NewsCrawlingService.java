@@ -34,19 +34,37 @@ public class NewsCrawlingService {
 
     @Scheduled(cron = "0 0 7,14,20 * * *")  // 매일 오전 7시, 오후 2시, 저녁 8시
     public void fetchAndProcessNews() {
-        List<NewsDto> newsList = fetchTodayNews();
+        List<NewsDto> realEstateNews = fetchTodayNews("분양", "sale");
+        List<NewsDto> apartmentNews = fetchTodayNews("아파트", "apartment");
+        List<NewsDto> reconstructionNews = fetchTodayNews("재건축", "reconstruction");
+
+
+        // 각 주제별 뉴스 DB 저장
+        saveNews(realEstateNews);
+        saveNews(apartmentNews);
+        saveNews(reconstructionNews);
+    }
+
+    private void saveNews(List<NewsDto> newsList) {
         for (NewsDto news : newsList) {
-            newsMapper.insertNews(news); // DB에 저장
+            // URL로 중복 체크
+            if (newsMapper.checkDuplicateNewsByUrl(news.getLink()) == 0) {
+                newsMapper.insertNews(news);
+            } else {
+                System.out.println("Duplicate news found, skipping: " + news.getTitle());
+            }
+
         }
     }
 
-    private List<NewsDto> fetchTodayNews() {
-        String url = String.format("%s?engine=google_news&q=부동산&hl=ko&gl=kr&num=50&tbm=nws&api_key=%s", SERPAPI_URL, serpApiKey);        System.out.println("SerpAPI 호출 URL: " + url);
+    private List<NewsDto> fetchTodayNews(String keyword, String category) {
+        String url = String.format("%s?engine=google_news&q=%s&hl=ko&gl=kr&num=50&tbm=nws&api_key=%s", SERPAPI_URL, keyword, serpApiKey);
+        System.out.println("SerpAPI 호출 URL: " + url);
 
         try {
             String response = restTemplate.getForObject(url, String.class);
             System.out.println("API 응답 내용: " + response); // 응답 로그 출력
-            return parseNewsResults(response);
+            return parseNewsResults(response, category); // category 전달
         } catch (HttpClientErrorException e) {
             System.err.println("HTTP 상태 코드: " + e.getStatusCode());
             System.err.println("응답 내용: " + e.getResponseBodyAsString());
@@ -58,7 +76,8 @@ public class NewsCrawlingService {
     }
 
 
-    private List<NewsDto> parseNewsResults(String jsonResponse) {
+
+    private List<NewsDto> parseNewsResults(String jsonResponse, String category) {
         List<NewsDto> results = new ArrayList<>();
         try {
             JSONObject json = (JSONObject) new JSONParser().parse(jsonResponse);
@@ -81,11 +100,12 @@ public class NewsCrawlingService {
                         }
 
                         results.add(NewsDto.builder()
-                            .title((String) storyItem.get("title"))
-                            .link((String) storyItem.get("link"))
-                            .date(articleDate)
-                            .thumbnail((String) storyItem.get("thumbnail"))
-                            .build());
+                                .title((String) storyItem.get("title"))
+                                .link((String) storyItem.get("link"))
+                                .date(articleDate)
+                                .thumbnail((String) storyItem.get("thumbnail"))
+                                .category(category) // 카테고리 설정
+                                .build());
                     }
                 }
                 // stories가 없는 경우 처리
@@ -99,11 +119,12 @@ public class NewsCrawlingService {
                     }
 
                     results.add(NewsDto.builder()
-                        .title((String) newsItem.get("title"))
-                        .link((String) newsItem.get("link"))
-                        .date(articleDate)
-                        .thumbnail((String) newsItem.get("thumbnail"))
-                        .build());
+                            .title((String) newsItem.get("title"))
+                            .link((String) newsItem.get("link"))
+                            .date(articleDate)
+                            .thumbnail((String) newsItem.get("thumbnail"))
+                            .category(category) // 카테고리 설정
+                            .build());
                 }
             }
         } catch (Exception e) {
@@ -111,6 +132,7 @@ public class NewsCrawlingService {
         }
         return results;
     }
+
 
     public List<NewsDto> getAllNews() {
         return newsMapper.selectNews();
