@@ -2,8 +2,10 @@ LOCK TABLES `members` WRITE;
 /*!40000 ALTER TABLE `members` DISABLE KEYS */;
 INSERT INTO members (user_id, user_name, user_pwd, email_id, email_domain, join_date, gender, age, phone_number)
 VALUES
-    ('admin', '관리자', '1234', 'admin', 'google.com', '2023-10-08 16:10:08', 'M', 35, '010-1234-5678'),
-    ('ssafy', '김싸피', '1234', 'ssafy', 'ssafy.com', '2023-10-08 16:10:08', 'F', 27, '010-9876-5432');
+    ('boss', 'ZIP 보스', '1234', 'boss', 'gmail.com', '2023-10-08 16:10:08', 'M', 35, '010-1234-5678'),
+    ('ssafy', '김싸피', '1234', 'ssafy', 'ssafy.com', '2024-11-25 22:45:01', 'F', 27, '010-9876-5432'),
+    ('snoopy', '스누피', '1234', 'hello', 'naver.com', '2024-11-26 10:23:08', 'F', 20, '010-1111-2222'),
+    ('dragon', '뱀의 꼬리', '1234', 'snake', 'gmail.com', '2024-11-26 14:05:15', 'M', 24, '010-3333-4444'),
 /*!40000 ALTER TABLE `members` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -12,10 +14,13 @@ LOCK TABLES `fileinfo` WRITE;
 /*!40000 ALTER TABLE `fileinfo` DISABLE KEYS */;
 INSERT INTO fileinfo (user_id, original_name, save_path)
 VALUES
-    ('admin', '1732590347026_zipLogo.png', 'admin/1732590347026_zipLogo.png'),
-    ('ssafy', 'basic_profile.png', 'ssafy/basic_profile.png');
+    ('boss', '1732590347026_zipLogo.png', 'boss/1732590347026_zipLogo.png'),
+    ('ssafy', 'basic_profile.png', 'ssafy/basic_profile.png'),
+    ('snoopy', 'snoopy.jpg', 'snoopy/1732604640492_snoopy.jpg'),
+    ('dragon', 'dragon.png', 'dragon/1732605106527_dragon.png');
 /*!40000 ALTER TABLE `fileinfo` ENABLE KEYS */;
 UNLOCK TABLES;
+
 
 LOCK TABLES `guguncodes` WRITE;
 /*!40000 ALTER TABLE `guguncodes` DISABLE KEYS */;
@@ -31,12 +36,48 @@ UNLOCK TABLES;
 
 INSERT INTO interest_apt (user_id, apt_seq) VALUES
                                                 ('ssafy', '11110-100'),
-                                                ('ssafy', '11110-102'),
                                                 ('ssafy', '11110-2445'),
-                                                ('ssafy', '11140-1039'),
                                                 ('ssafy', '11140-1217'),
-                                                ('ssafy', '11140-1300'),
+                                                ('ssafy', '11680-5114'),
                                                 ('ssafy', '48123-156');
+
+INSERT INTO board (user_id, subject, content, hit, register_time)
+VALUES
+    ('boss', '아파트 층수에 따른 장단점', '아파트 층수에 따라 생활의 질이 어떻게 달라지나요? 경험 공유 부탁드립니다.', 45, NOW()),
+    ('ssafy', '부동산 매매 시 공인중개사 수수료', '공인중개사 수수료가 어떻게 계산되는지 궁금합니다.', 38, NOW()),
+    ('snoopy', '재개발 지역 투자 유망성', '재개발 지역에 투자하려는데, 어떤 점을 주의해야 하나요?', 60, NOW()),
+    ('dragon', '원룸 임대 계약 시 확인 사항', '원룸 계약 시 반드시 확인해야 할 서류가 있을까요?', 33, NOW()),
+    ('ssafy', '상가 매매 후 관리비 문제', '상가를 매수한 후 관리비 문제가 생길 수 있다는데, 어떻게 해결할까요?', 22, NOW()),
+    ('boss', '오피스텔 투자 시 수익률 계산법', '오피스텔 투자 시 기대 수익률은 어떻게 계산하나요?', 55, NOW());
+
+
+INSERT INTO comments (article_no, user_id, content, register_time)
+VALUES
+    -- 아파트 층수에 따른 장단점
+    (1, 'snoopy', '저층은 출입이 편리하고, 고층은 조망권이 좋아요. 필요에 따라 선택하세요.', NOW()),
+    (1, 'ssafy', '고층은 여름에 더 시원하지만, 엘리베이터 문제도 고려해야 해요.', NOW()),
+
+    -- 부동산 매매 시 공인중개사 수수료
+    (2, 'dragon', '수수료는 거래 금액에 따라 정해집니다. 계약 전에 협의 가능해요.', NOW()),
+    (2, 'boss', '법정 수수료율을 넘는 요구를 받으면 신고할 수 있어요.', NOW()),
+
+    -- 재개발 지역 투자 유망성
+    (3, 'boss', '재개발 지역은 사업 진행 상태를 반드시 확인하세요. 리스크가 있을 수 있어요.', NOW()),
+    (3, 'ssafy', '주변 인프라와 공시지가 상승 가능성도 중요합니다.', NOW()),
+
+    -- 원룸 임대 계약 시 확인 사항
+    (4, 'snoopy', '임대차 계약서와 등기부등본을 꼭 확인하세요.', NOW()),
+    (4, 'dragon', '임대인의 신분증과 부동산 매매 이력을 확인하면 좋아요.', NOW()),
+
+    -- 상가 매매 후 관리비 문제
+    (5, 'boss', '상가 관리비 문제는 관리사무소와 계약서를 다시 검토해야 해요.', NOW()),
+    (5, 'snoopy', '관리비 항목별로 구체적으로 나와 있는지 확인하세요.', NOW()),
+
+    -- 오피스텔 투자 시 수익률 계산법
+    (6, 'ssafy', '월세 수익과 관리비, 공실 위험을 함께 고려하세요.', NOW()),
+    (6, 'dragon', '세금까지 포함한 총 투자 비용을 계산해보세요.', NOW());
+
+
 
 INSERT IGNORE INTO latest_housedeals (
     apt_seq,
