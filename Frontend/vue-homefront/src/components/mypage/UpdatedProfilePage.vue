@@ -43,7 +43,7 @@
                   <input type="file" @change="onFileChange" accept="image/*" class="hidden" />
                 </label>
               </div>
-              <!-- 이름과 아이디 입력 -->
+              <!-- 름과 아이디 입력 -->
               <div class="space-y-2">
                 <p class="text-sm text-gray-500">{{ user.emailId ? `@${user.emailId}` : "-" }}</p>
                 <input
@@ -121,6 +121,62 @@
                       class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
                       placeholder="나이를 입력하세요"
                     />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 비밀번호 변경 섹션 -->
+          <div class="mb-6">
+            <div class="grid grid-cols-2 gap-2">
+              <!-- 새 비밀번호 -->
+              <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-xs font-medium text-gray-500 mb-1 flex items-center">
+                  <span class="mr-1.5">🔑</span> 새 비밀번호
+                </p>
+                <div class="relative">
+                  <input
+                    v-model="passwords.new"
+                    :type="showPassword ? 'text' : 'password'"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                    placeholder="새 비밀번호를 입력해주세요"
+                  />
+                  <button
+                    @click="showPassword = !showPassword"
+                    type="button"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <component :is="showPassword ? Eye : EyeOff" class="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              <!-- 새 비밀번호 확인 -->
+              <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+                <p class="text-xs font-medium text-gray-500 mb-1 flex items-center">
+                  <span class="mr-1.5">🔐</span> 새 비밀번호 확인
+                </p>
+                <div class="relative">
+                  <input
+                    v-model="passwords.confirm"
+                    :type="showPassword ? 'text' : 'password'"
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                    :class="{
+                      'border-red-500': validationMessages.passwordMatch && !validationMessages.passwordMatch.includes('✓'),
+                      'border-green-500': validationMessages.passwordMatch?.includes('✓')
+                    }"
+                    placeholder="새 비밀번호를 다시 입력해주세요"
+                  />
+                  <div
+                    v-if="validationMessages.passwordMatch"
+                    class="absolute right-0 top-full mt-1 text-sm"
+                    :class="{
+                      'text-red-500': !validationMessages.passwordMatch.includes('✓'),
+                      'text-green-500': validationMessages.passwordMatch.includes('✓')
+                    }"
+                  >
+                    {{ validationMessages.passwordMatch }}
                   </div>
                 </div>
               </div>
@@ -208,11 +264,12 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, computed } from 'vue';
+import { reactive, ref, onMounted, computed, watch } from 'vue';
 import { useAuth } from "@/stores/auth";
 import { useAxiosStore } from "@/stores/axiosStore";
 import { useRouter } from "vue-router";
 import { message } from "ant-design-vue";
+import { Eye, EyeOff } from 'lucide-vue-next'
 
 
 const router = useRouter();
@@ -233,6 +290,11 @@ const user = reactive({
 const notifications = reactive({
   email: true,
   sms: false
+});
+
+const passwords = reactive({
+  new: "",
+  confirm: ""
 });
 
 const imagePreview = ref(null);
@@ -279,13 +341,39 @@ const handleImageError = async (e) => {
   }
 };
 
+const showPassword = ref(false);
+const validationMessages = reactive({
+  passwordMatch: ''
+});
+
+const checkPasswordMatch = () => {
+  if (!passwords.new || !passwords.confirm) {
+    validationMessages.passwordMatch = ''
+  } else if (passwords.new === passwords.confirm) {
+    validationMessages.passwordMatch = '✓ 비밀번호가 일치합니다'
+  } else {
+    validationMessages.passwordMatch = '비밀번호가 일치하지 않습니다'
+  }
+}
+
+// 비밀번호 입력 감시
+watch([() => passwords.new, () => passwords.confirm], checkPasswordMatch)
+
 const handleSave = async () => {
   try {
+    // 비밀번호 유효성 검사
+    if (passwords.new || passwords.confirm) {
+      if (passwords.new !== passwords.confirm) {
+        message.error("새 비밀번호가 일치하지 않습니다.");
+        return;
+      }
+    }
+
     const updateData = {
       userName: user.userName,
       emailId: user.emailId,
       emailDomain: user.emailDomain,
-      userPwd: user.userPwd,
+      userPwd: passwords.new || user.userPwd,
       gender: user.gender,
       age: user.age,
       phoneNumber: user.phoneNumber
@@ -308,7 +396,7 @@ const handleSave = async () => {
     router.push({ name: 'MyPage' });
   } catch (error) {
     console.error("변경사항 저장 중 오류 발생:", error);
-    message.error("변경사항 저장 중 오류가 발생했습니다:"|| error.response?.data?.message);
+    message.error(error.response?.data?.message || "변경사항 저장 중 오류가 발생했습니다.");
   }
 };
 </script>
