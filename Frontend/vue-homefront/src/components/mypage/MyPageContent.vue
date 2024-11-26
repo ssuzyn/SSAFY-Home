@@ -160,7 +160,7 @@
               <span class="text-orange-400 group-hover:text-orange-500 text-sm font-medium transition-colors">
                 회원탈퇴
               </span>
-              
+
             </button>
           </div>
         </div>
@@ -213,6 +213,7 @@ import { reactive, ref, onMounted, computed } from "vue";
 import { useAuth } from "@/stores/auth";
 import { useAxiosStore } from "@/stores/axiosStore";
 import { useRouter } from "vue-router";
+import { message } from 'ant-design-vue';
 
 const router = useRouter();
 const auth = useAuth();
@@ -254,13 +255,13 @@ const confirmDelete = async () => {
   try {
     const response = await axiosStore.delete('/user/delete');
     if (response.status === 200) {
-      alert('회원탈퇴가 완료되었습니다.');
+      message.success('회원탈퇴가 완료되었습니다.');
       await auth.logout();
       router.push('/');
     }
   } catch (error) {
     console.error('회원탈퇴 실패:', error);
-    alert(error.response?.data?.message || '회원탈퇴 처리 중 문제가 발생했습니다.');
+    message.error(error.response?.data?.message || '회원탈퇴 처리 중 문제가 발생했습니다.');
   } finally {
     showDeleteModal.value = false;
   }
