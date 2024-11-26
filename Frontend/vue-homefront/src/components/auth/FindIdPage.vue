@@ -5,7 +5,7 @@
         <!-- 로고 -->
         <div class="text-center mb-10">
           <h1 class="text-5xl font-bold text-orange-500 tracking-tight">ZIP</h1>
-          <p class="mt-2 text-gray-600">안전하고 편리한 주거공간 플랫폼</p>
+          <p class="mt-2 text-gray-600">쉽고 똑똑한 부동산 정보 제공 플랫폼</p>
         </div>
 
         <!-- 아이디 찾기 폼 -->

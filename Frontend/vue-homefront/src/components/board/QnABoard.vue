@@ -5,7 +5,7 @@
       <div class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-4xl text-gray-900 font-bold tracking-tight">🗣️ 부동산 Q&A</h1>
-          <p class="mt-2 text-gray-600">전문가들과 함께 부동산 관련 궁금증을 해결하세요</p>
+          <p class="mt-2 text-gray-600">부동산 궁금증, 사용자들과 함께 해결하세요!</p>
         </div>
         <div class="flex gap-3">
           <!-- GPT 버튼 -->

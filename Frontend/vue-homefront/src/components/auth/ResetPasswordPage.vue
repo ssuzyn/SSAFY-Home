@@ -4,7 +4,7 @@
       <div class="w-full max-w-lg">
         <div class="text-center mb-10">
           <h1 class="text-5xl font-bold text-orange-500 tracking-tight">ZIP</h1>
-          <p class="mt-2 text-gray-600">안전하고 편리한 주거공간 플랫폼</p>
+          <p class="mt-2 text-gray-600">쉽고 똑똑한 부동산 정보 제공 플랫폼</p>
         </div>
         <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-100">
           <h2 class="text-2xl font-bold mb-6 text-center">비밀번호 재설정</h2>
