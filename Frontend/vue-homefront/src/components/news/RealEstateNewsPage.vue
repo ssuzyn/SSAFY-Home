@@ -185,7 +185,7 @@ onMounted(() => {
 /* 스크롤바 스타일링 */
 .overflow-auto {
   scrollbar-width: thin;
-  scrollbar-color: #f97316 #f1f1f1;
+  scrollbar-color: #e2e8f0 #f8fafc;  /* 연한 회색으로 변경 */
 }
 
 .overflow-auto::-webkit-scrollbar {
@@ -193,16 +193,16 @@ onMounted(() => {
 }
 
 .overflow-auto::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f8fafc;
   border-radius: 10px;
 }
 
 .overflow-auto::-webkit-scrollbar-thumb {
-  background: #f97316;
+  background: #e2e8f0;  /* 연한 회색으로 변경 */
   border-radius: 10px;
 }
 
 .overflow-auto::-webkit-scrollbar-thumb:hover {
-  background: #ea580c;
+  background: #cbd5e1;  /* hover 시 약간 진한 회색 */
 }
 </style>

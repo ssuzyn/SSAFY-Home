@@ -62,7 +62,7 @@
                  class="group bg-white border border-gray-100 rounded-2xl p-6 shadow-md cursor-pointer">
               <!-- 상단 메타 정보 -->
               <div class="flex items-center gap-3 mb-3">
-                <span class="bg-gradient-to-r from-orange-500 to-orange-600 text-white text-xs px-3 py-1 rounded-full font-medium">Q&A</span>
+                <span class="bg-gradient-to-r from-orange-400 to-orange-400 text-white text-xs px-3 py-1 rounded-full font-medium">Q&A</span>
                 <span class="text-xs text-gray-500 flex items-center">
                   <Clock class="w-3 h-3 mr-1" />
                   {{ formatDate(question.registerTime) }}
@@ -738,7 +738,7 @@ const closeGptDialog = () => {
 /* 스크롤바 스타일링 */
 .overflow-auto {
   scrollbar-width: thin;
-  scrollbar-color: #f97316 #f1f1f1;
+  scrollbar-color: #e2e8f0 #f8fafc;  /* 연한 회색으로 변경 */
 }
 
 .overflow-auto::-webkit-scrollbar {
@@ -746,17 +746,17 @@ const closeGptDialog = () => {
 }
 
 .overflow-auto::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f8fafc;
   border-radius: 10px;
 }
 
 .overflow-auto::-webkit-scrollbar-thumb {
-  background: #f97316;
+  background: #e2e8f0;  /* 연한 회색으로 변경 */
   border-radius: 10px;
 }
 
 .overflow-auto::-webkit-scrollbar-thumb:hover {
-  background: #ea580c;
+  background: #cbd5e1;  /* hover 시 약간 진한 회색 */
 }
 
 /* 기존 애니메이션 스타일 유지 */
