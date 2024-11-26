@@ -83,10 +83,12 @@ watch(() => store.isVisible, (newValue) => {
 
         <router-link
           to="/login"
-          class="inline-block px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
+          class="inline-block px-4 py-2.5 text-lg bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg relative overflow-hidden"
           @click="closeDrawer"
         >
-          로그인하기
+          <span class="relative z-10 text-white">로그인하기</span>
+          <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent opacity-50"></div>
+          <div class="login-button-shine"></div>
         </router-link>
       </div>
 
