@@ -10,6 +10,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -31,6 +32,7 @@ public class NewsCrawlingService {
     private final RestTemplate restTemplate;
     private final NewsMapper newsMapper;
 
+    @Scheduled(cron = "0 0 7,14,20 * * *")  // 매일 오전 7시, 오후 2시, 저녁 8시
     public void fetchAndProcessNews() {
         List<NewsDto> newsList = fetchTodayNews();
         for (NewsDto news : newsList) {
