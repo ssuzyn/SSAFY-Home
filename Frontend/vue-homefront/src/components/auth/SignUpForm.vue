@@ -18,20 +18,24 @@
               <div class="relative">
                 <input
                   v-model="formData.user_id"
-                  @input="checkIdAvailability"
                   type="text"
-                  maxlength="50"
-                  class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
-                  :class="{'border-red-500': idCheckMessage && !idAvailable, 'border-green-500': idCheckMessage && idAvailable}"
+                  class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  :class="{
+                    'border-red-500': validationMessages.userId && !validationMessages.userId.includes('✓'),
+                    'border-green-500': validationMessages.userId?.includes('✓')
+                  }"
                   placeholder="아이디를 입력해주세요"
                   required
                 />
                 <div
-                  v-if="idCheckMessage"
+                  v-if="validationMessages.userId"
                   class="absolute right-0 top-full mt-1 text-sm"
-                  :class="{'text-green-500': idAvailable, 'text-red-500': !idAvailable}"
+                  :class="{
+                    'text-red-500': !validationMessages.userId.includes('✓'),
+                    'text-green-500': validationMessages.userId.includes('✓')
+                  }"
                 >
-                  {{ idCheckMessage }}
+                  {{ validationMessages.userId }}
                 </div>
               </div>
             </div>
@@ -45,8 +49,6 @@
                   <input
                     v-model="formData.user_pwd"
                     :type="showPassword ? 'text' : 'password'"
-                    maxlength="255"
-                    @input="checkPasswordMatch"
                     class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
                     placeholder="비밀번호를 입력해주세요"
                     required
@@ -68,13 +70,23 @@
                   <input
                     v-model="formData.confirmPassword"
                     :type="showPassword ? 'text' : 'password'"
-                    @input="checkPasswordMatch"
                     class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
+                    :class="{
+                      'border-red-500': validationMessages.passwordMatch && !validationMessages.passwordMatch.includes('✓'),
+                      'border-green-500': validationMessages.passwordMatch?.includes('✓')
+                    }"
                     placeholder="비밀번호를 다시 입력해주세요"
                     required
                   />
-                  <div v-if="passwordMismatchMessage" class="absolute right-0 top-full mt-1 text-sm text-red-500">
-                    {{ passwordMismatchMessage }}
+                  <div
+                    v-if="validationMessages.passwordMatch"
+                    class="absolute right-0 top-full mt-1 text-sm"
+                    :class="{
+                      'text-red-500': !validationMessages.passwordMatch.includes('✓'),
+                      'text-green-500': validationMessages.passwordMatch.includes('✓')
+                    }"
+                  >
+                    {{ validationMessages.passwordMatch }}
                   </div>
                 </div>
               </div>
@@ -98,37 +110,90 @@
               <!-- 나이 -->
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">나이</label>
-                <input
-                  v-model="formData.age"
-                  type="number"
-                  min="1"
-                  max="150"
-                  class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
-                  placeholder="나이를 입력해주세요"
-                  required
-                />
+                <div class="relative">
+                  <input
+                    v-model="formData.age"
+                    type="number"
+                    min="1"
+                    max="150"
+                    class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
+                    :class="{
+                      'border-red-500': validationMessages.age && !validationMessages.age.includes('✓'),
+                      'border-green-500': validationMessages.age?.includes('✓')
+                    }"
+                    placeholder="나이를 입력해주세요"
+                    required
+                  />
+                  <div
+                    v-if="validationMessages.age"
+                    class="absolute right-0 top-full mt-1 text-sm"
+                    :class="{
+                      'text-red-500': !validationMessages.age.includes('✓'),
+                      'text-green-500': validationMessages.age.includes('✓')
+                    }"
+                  >
+                    {{ validationMessages.age }}
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- 이메일 -->
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-2">이메일</label>
-              <div class="flex space-x-2">
+              <div class="relative flex space-x-2">
                 <input
                   v-model="formData.email_id"
                   type="text"
                   class="w-1/2 px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
+                  :class="{
+                    'border-red-500': validationMessages.email && !validationMessages.email.includes('✓'),
+                    'border-green-500': validationMessages.email?.includes('✓')
+                  }"
                   placeholder="이메일 아이디"
                   required
                 />
                 <span class="flex items-center justify-center px-4 text-gray-500">@</span>
-                <input
-                  v-model="formData.email_domain"
-                  type="text"
-                  class="w-1/2 px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
-                  placeholder="도메인"
-                  required
-                />
+                <div class="w-1/2 relative">
+                  <select
+                    v-if="formData.email_domain !== 'custom'"
+                    v-model="formData.email_domain"
+                    class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70 appearance-none"
+                    :class="{
+                      'border-red-500': validationMessages.email && !validationMessages.email.includes('✓'),
+                      'border-green-500': validationMessages.email?.includes('✓')
+                    }"
+                    required
+                  >
+                    <option value="">도메인 선택</option>
+                    <option v-for="domain in emailDomains" :key="domain" :value="domain">
+                      {{ domain === 'custom' ? '직접 입력' : domain }}
+                    </option>
+                  </select>
+                  <input
+                    v-if="formData.email_domain === 'custom'"
+                    v-model="formData.email_domain"
+                    type="text"
+                    class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
+                    placeholder="도메인 입력"
+                    required
+                  />
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </div>
+                <div
+                  v-if="validationMessages.email"
+                  class="absolute right-0 top-full mt-1 text-sm"
+                  :class="{
+                    'text-red-500': !validationMessages.email.includes('✓'),
+                    'text-green-500': validationMessages.email.includes('✓')
+                  }"
+                >
+                  {{ validationMessages.email }}
+                </div>
               </div>
             </div>
 
@@ -138,13 +203,43 @@
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">성별</label>
                 <div class="flex space-x-4">
-                  <label class="flex items-center space-x-2 cursor-pointer group">
-                    <input type="radio" v-model="formData.gender" value="M" class="form-radio text-orange-500 focus:ring-orange-500" required>
-                    <span class="group-hover:text-orange-500 transition-colors">남성</span>
+                  <label class="flex-1">
+                    <input
+                      type="radio"
+                      v-model="formData.gender"
+                      value="M"
+                      class="hidden"
+                      required
+                    >
+                    <div
+                      class="flex items-center justify-center p-3 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:bg-green-50"
+                      :class="formData.gender === 'M' ? 'border-green-500 bg-green-50' : 'border-gray-200'"
+                    >
+                      <div class="flex flex-col items-center space-y-1">
+                        <span class="text-lg font-medium" :class="formData.gender === 'M' ? 'text-green-500' : 'text-gray-600'">
+                          👨 남성
+                        </span>
+                      </div>
+                    </div>
                   </label>
-                  <label class="flex items-center space-x-2 cursor-pointer group">
-                    <input type="radio" v-model="formData.gender" value="F" class="form-radio text-orange-500 focus:ring-orange-500" required>
-                    <span class="group-hover:text-orange-500 transition-colors">여성</span>
+                  <label class="flex-1">
+                    <input
+                      type="radio"
+                      v-model="formData.gender"
+                      value="F"
+                      class="hidden"
+                      required
+                    >
+                    <div
+                      class="flex items-center justify-center p-3 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:bg-green-50"
+                      :class="formData.gender === 'F' ? 'border-green-500 bg-green-50' : 'border-gray-200'"
+                    >
+                      <div class="flex flex-col items-center space-y-1">
+                        <span class="text-lg font-medium" :class="formData.gender === 'F' ? 'text-green-500' : 'text-gray-600'">
+                          👩 여성
+                        </span>
+                      </div>
+                    </div>
                   </label>
                 </div>
               </div>
@@ -152,22 +247,38 @@
               <!-- 전화번호 -->
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">전화번호</label>
-                <input
-                  v-model="formData.phone_number"
-                  type="tel"
-                  maxlength="15"
-                  class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
-                  placeholder="010-0000-0000"
-                  required
-                />
+                <div class="relative">
+                  <input
+                    v-model="formData.phone_number"
+                    type="tel"
+                    maxlength="13"
+                    class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
+                    :class="{
+                      'border-red-500': validationMessages.phone && !validationMessages.phone.includes('✓'),
+                      'border-green-500': validationMessages.phone?.includes('✓')
+                    }"
+                    placeholder="010-0000-0000"
+                    required
+                  />
+                  <div
+                    v-if="validationMessages.phone"
+                    class="absolute right-0 top-full mt-1 text-sm"
+                    :class="{
+                      'text-red-500': !validationMessages.phone.includes('✓'),
+                      'text-green-500': validationMessages.phone.includes('✓')
+                    }"
+                  >
+                    {{ validationMessages.phone }}
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- 회원가입 버튼 -->
             <button
               type="submit"
-              :disabled="!idAvailable || isSubmitting || formData.user_pwd !== formData.confirmPassword"
-              class="w-full py-3.5 px-4 text-lg bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 hover:from-orange-500 hover:via-orange-600 hover:to-orange-500 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg relative overflow-hidden disabled:opacity-50 mt-8"
+              :disabled="!isFormValid || isSubmitting"
+              class="w-full py-3.5 px-4 text-lg bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-md hover:shadow-lg relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 mt-8"
             >
               <span class="relative z-10">{{ isSubmitting ? '처리중...' : '회원가입' }}</span>
               <div class="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent opacity-50"></div>
@@ -189,8 +300,9 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { Eye, EyeOff } from 'lucide-vue-next'
+import { message } from 'ant-design-vue'
 import { useAxiosStore } from '@/stores/axiosStore'
 import { useRouter } from 'vue-router'
 
@@ -216,13 +328,65 @@ const formData = reactive({
   phone_number: ''
 })
 
+const validationMessages = reactive({
+  userId: '',
+  passwordMatch: '',
+  email: '',
+  age: '',
+  phone: ''
+})
+
+const emailDomains = [
+  'naver.com',
+  'gmail.com',
+  'daum.net',
+  'hanmail.net',
+  'nate.com',
+  'kakao.com',
+  'custom'
+]
+
+// 필드 라벨 정의
+const fieldLabels = {
+  userId: '아이디',
+  password: '비밀번호',
+  passwordMatch: '비밀번호 확인',
+  age: '나이',
+  phone: '전화번호',
+  email: '이메일'
+}
+
+// 필드명과 formData 속성 매핑
+const fieldNames = {
+  userId: 'user_id',
+  password: 'user_pwd',
+  passwordMatch: 'confirmPassword',
+  age: 'age',
+  phone: 'phone_number',
+  email: 'email_id'
+}
+
+// placeholder 텍스트 정의
+const placeholders = {
+  userId: '아이디를 입력해주세요',
+  password: '비밀번호를 입력해주세요',
+  passwordMatch: '비밀번호를 다시 입력해주세요',
+  age: '나이를 입력해주세요',
+  phone: '010-0000-0000',
+  email: '이메일 주소'
+}
+
 const checkIdAvailability = async () => {
   if (idCheckTimeout) clearTimeout(idCheckTimeout)
-
   idAvailable.value = false
 
+  if (!formData.user_id) {
+    validationMessages.userId = ''
+    return
+  }
+
   if (formData.user_id.length < 4) {
-    idCheckMessage.value = '아이디는 4자 이상이어야 합니다'
+    validationMessages.userId = '아이디는 4자 이상이어야 합니다'
     return
   }
 
@@ -230,36 +394,89 @@ const checkIdAvailability = async () => {
     try {
       const response = await axiosStore.get(`/user/check-id/${formData.user_id}`)
       idAvailable.value = response.data.available
-      idCheckMessage.value = response.data.message
+      validationMessages.userId = response.data.available ?
+        '✓ 사용 가능한 아이디입니다' :
+        '이미 사용 중인 아이디입니다'
     } catch (error) {
       console.error('아이디 중복 확인 중 오류 발생:', error)
-      idCheckMessage.value = '아이디 확인 중 오류가 발생했습니다'
-      idAvailable.value = false
+      validationMessages.userId = '아이디 확인 중 오류가 발생했습니다'
     }
   }, 500)
 }
 
 const checkPasswordMatch = () => {
-  if (formData.user_pwd === formData.confirmPassword) {
-    passwordMismatchMessage.value = ''
+  if (!formData.user_pwd || !formData.confirmPassword) {
+    validationMessages.passwordMatch = ''
+  } else if (formData.user_pwd === formData.confirmPassword) {
+    validationMessages.passwordMatch = '✓ 비밀번호가 일치합니다'
   } else {
-    passwordMismatchMessage.value = '비밀번호가 일치하지 않습니다.'
+    validationMessages.passwordMatch = '비밀번호가 일치하지 않습니다'
   }
 }
 
-const validateEmail = (email) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return re.test(email)
+const checkAge = () => {
+  const age = Number(formData.age)
+  if (!formData.age) {
+    validationMessages.age = ''
+  } else if (isNaN(age) || age < 1 || age > 150) {
+    validationMessages.age = '올바른 나이를 입력해주세요'
+  } else {
+    validationMessages.age = '✓ 올바른 나이입니다'
+  }
 }
+
+const checkPhoneNumber = () => {
+  const phoneRegex = /^010-\d{4}-\d{4}$/
+  if (!formData.phone_number) {
+    validationMessages.phone = ''
+  } else if (!phoneRegex.test(formData.phone_number)) {
+    validationMessages.phone = '010-0000-0000 형식으로 입력해주세요'
+  } else {
+    validationMessages.phone = '✓ 올바른 전화번호입니다'
+  }
+}
+
+const checkEmail = () => {
+  if (!formData.email_id || !formData.email_domain) {
+    validationMessages.email = ''
+  } else {
+    validationMessages.email = '✓ 올바른 이메일입니다'
+  }
+}
+
+watch(() => formData.user_id, checkIdAvailability)
+watch([() => formData.user_pwd, () => formData.confirmPassword], checkPasswordMatch)
+watch(() => formData.age, checkAge)
+watch(() => formData.phone_number, checkPhoneNumber)
+watch([() => formData.email_id, () => formData.email_domain], checkEmail)
+
+watch(() => formData.phone_number, (newValue) => {
+  if (!newValue) return
+  formData.phone_number = newValue.replace(/[^0-9]/g, '')
+    .replace(/^(\d{0,3})(\d{0,4})(\d{0,4})$/g, "$1-$2-$3")
+    .replace(/\-{1,2}$/g, "")
+})
+
+const isFormValid = computed(() => {
+  return (
+    formData.user_id &&
+    idAvailable.value &&
+    formData.user_pwd &&
+    formData.confirmPassword &&
+    formData.user_pwd === formData.confirmPassword &&
+    formData.user_name &&
+    formData.age &&
+    formData.email_id &&
+    formData.email_domain &&
+    formData.gender &&
+    formData.phone_number &&
+    validationMessages.phone?.includes('✓')
+  )
+})
 
 const handleSignUp = async () => {
-  if (passwordMismatchMessage.value) {
-    alert('비밀번호가 일치하지 않습니다.')
-    return
-  }
-
-  if (!validateEmail(`${formData.email_id}@${formData.email_domain}`)) {
-    alert('올바른 이메일 형식이 아닙니다.')
+  if (!isFormValid.value) {
+    message.warning('모든 필드를 올바르게 입력해주세요.')
     return
   }
 
@@ -278,11 +495,11 @@ const handleSignUp = async () => {
 
   try {
     await axiosStore.post('/user/register', signUpData)
-    alert('회원가입이 완료되었습니다.')
+    message.success('회원가입이 완료되었습니다.')
     router.push('/login')
   } catch (error) {
     console.error('회원가입 실패:', error)
-    alert('회원가입에 실패했습니다. 다시 시도해주세요.')
+    message.error('회원가입에 실패했습니다. 다시 시도해주세요.')
   } finally {
     isSubmitting.value = false
   }
