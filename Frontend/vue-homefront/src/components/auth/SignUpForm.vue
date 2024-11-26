@@ -156,7 +156,6 @@
                 <span class="flex items-center justify-center px-4 text-gray-500">@</span>
                 <div class="w-1/2 relative">
                   <select
-                    v-if="formData.email_domain !== 'custom'"
                     v-model="formData.email_domain"
                     class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70 appearance-none"
                     :class="{
@@ -167,17 +166,9 @@
                   >
                     <option value="">도메인 선택</option>
                     <option v-for="domain in emailDomains" :key="domain" :value="domain">
-                      {{ domain === 'custom' ? '직접 입력' : domain }}
+                      {{ domain }}
                     </option>
                   </select>
-                  <input
-                    v-if="formData.email_domain === 'custom'"
-                    v-model="formData.email_domain"
-                    type="text"
-                    class="w-full px-4 py-3.5 text-lg border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white/70"
-                    placeholder="도메인 입력"
-                    required
-                  />
                   <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -311,8 +302,6 @@ const router = useRouter()
 const showPassword = ref(false)
 const isSubmitting = ref(false)
 const idAvailable = ref(false)
-const idCheckMessage = ref('')
-const passwordMismatchMessage = ref('')
 
 let idCheckTimeout = null
 
@@ -342,39 +331,8 @@ const emailDomains = [
   'daum.net',
   'hanmail.net',
   'nate.com',
-  'kakao.com',
-  'custom'
+  'kakao.com'
 ]
-
-// 필드 라벨 정의
-const fieldLabels = {
-  userId: '아이디',
-  password: '비밀번호',
-  passwordMatch: '비밀번호 확인',
-  age: '나이',
-  phone: '전화번호',
-  email: '이메일'
-}
-
-// 필드명과 formData 속성 매핑
-const fieldNames = {
-  userId: 'user_id',
-  password: 'user_pwd',
-  passwordMatch: 'confirmPassword',
-  age: 'age',
-  phone: 'phone_number',
-  email: 'email_id'
-}
-
-// placeholder 텍스트 정의
-const placeholders = {
-  userId: '아이디를 입력해주세요',
-  password: '비밀번호를 입력해주세요',
-  passwordMatch: '비밀번호를 다시 입력해주세요',
-  age: '나이를 입력해주세요',
-  phone: '010-0000-0000',
-  email: '이메일 주소'
-}
 
 const checkIdAvailability = async () => {
   if (idCheckTimeout) clearTimeout(idCheckTimeout)
